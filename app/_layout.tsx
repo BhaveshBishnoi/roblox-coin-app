@@ -1,10 +1,11 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Colors } from '../constants/Colors';
+import { CoinProvider } from '../context/CoinContext';
 
 export default function RootLayout() {
     return (
-        <>
+        <CoinProvider>
             <StatusBar style="light" />
             <Stack
                 screenOptions={{
@@ -30,7 +31,8 @@ export default function RootLayout() {
                 <Stack.Screen name="quiz" options={{ title: 'Roblox Quiz' }} />
                 <Stack.Screen name="flip" options={{ title: 'Flip Cards' }} />
                 <Stack.Screen name="tips" options={{ title: 'Tips & Tricks' }} />
+                <Stack.Screen name="wallet" options={{ title: 'My Wallet' }} />
             </Stack>
-        </>
+        </CoinProvider>
     );
 }

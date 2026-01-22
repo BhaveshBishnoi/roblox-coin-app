@@ -37,6 +37,20 @@ export function SafeButton({ onPress, title, style, textStyle, gradientColors, v
         }
     };
 
+    const getTextColor = () => {
+        if (textStyle && (textStyle as TextStyle).color) return {}; // specific override
+        if (disabled) return { color: '#AAA' };
+        switch (variant) {
+            case 'purple':
+            case 'danger':
+            case 'secondary':
+            case 'surface':
+                return { color: '#FFF' };
+            default:
+                return { color: '#000' };
+        }
+    };
+
     return (
         <TouchableOpacity onPress={handlePress} activeOpacity={0.8} style={[styles.container, style]} disabled={disabled}>
             <LinearGradient
@@ -46,7 +60,7 @@ export function SafeButton({ onPress, title, style, textStyle, gradientColors, v
                 style={styles.gradient}
             >
                 {icon}
-                {title ? <Text style={[styles.text, textStyle, icon ? { marginLeft: 8 } : undefined]}>{title}</Text> : null}
+                {title ? <Text style={[styles.text, getTextColor(), textStyle, icon ? { marginLeft: 8 } : undefined]}>{title}</Text> : null}
                 {children}
             </LinearGradient>
         </TouchableOpacity>
@@ -72,7 +86,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     text: {
-        color: '#000000',
         fontWeight: '800',
         fontSize: 16,
         textTransform: 'uppercase',

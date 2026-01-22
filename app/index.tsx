@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { Container } from '../components/Container';
 import { Title } from '../components/Title';
 import { SafeButton } from '../components/SafeButton';
+import { useCoins } from '../context/CoinContext';
 import {
     Dices,
     Gift,
@@ -16,13 +17,15 @@ import {
 export default function Home() {
     const router = useRouter();
 
+    const { balance } = useCoins();
+
     const features = [
         { id: 'daily', title: 'Daily Coins', icon: Gift, route: '/daily', variant: 'primary' },
         { id: 'wheel', title: 'Lucky Wheel', icon: Zap, route: '/wheel', variant: 'accent' },
         { id: 'scratch', title: 'Scratch Card', icon: CreditCard, route: '/scratch', variant: 'secondary' },
         { id: 'quiz', title: 'Roblox Quiz', icon: Gamepad2, route: '/quiz', variant: 'purple' },
         { id: 'flip', title: 'Flip Cards', icon: Dices, route: '/flip', variant: 'danger' },
-        { id: 'tips', title: 'Tips & Tricks', icon: BookOpen, route: '/tips', variant: 'primary' },
+        { id: 'tips', title: 'Tips & Tricks', icon: BookOpen, route: '/tips', variant: 'surface' },
     ];
 
     return (
@@ -30,6 +33,14 @@ export default function Home() {
             <View style={styles.header}>
                 <Text style={styles.subtitle}>GET FREE</Text>
                 <Title>ROBLOX COINS</Title>
+                <SafeButton
+                    title={`${balance} COINS`}
+                    icon={<CreditCard size={16} color="#000" />}
+                    onPress={() => router.push('/wallet')}
+                    style={{ marginTop: 10, paddingHorizontal: 20, height: 40, minHeight: 0 }}
+                    textStyle={{ fontSize: 14 }}
+                    variant="accent"
+                />
             </View>
 
             <View style={styles.grid}>

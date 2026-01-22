@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Dimensions, Alert } from 'react-native';
 import { Container } from '../components/Container';
 import { Title } from '../components/Title';
 import { SafeButton } from '../components/SafeButton';
 import { Colors } from '../constants/Colors';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS } from 'react-native-reanimated';
 import Svg, { Path, Text as SvgText, G } from 'react-native-svg';
+import { useCoins } from '../context/CoinContext';
+import { Clock } from 'lucide-react-native';
 
 const SEGMENTS = ['10', '50', '100', 'JACKPOT', '20', '500', '5', 'LOSE'];
 const WHEEL_COLORS = [Colors.red, Colors.secondary, Colors.primary, Colors.accent, Colors.purple, '#FF8800', '#00D632', '#444'];
@@ -13,9 +15,24 @@ const SIZE = Dimensions.get('window').width * 0.8;
 const RADIUS = SIZE / 2;
 
 export default function Wheel() {
+    const { addCoins, checkCooldown, setCooldown, getRemainingTime } = useCoins();
     const rotation = useSharedValue(0);
     const [spinning, setSpinning] = useState(false);
-    const [result, setResult] = useState<string | null>(null);
+    const [available, setAvailable] = useState(false);
+    const [timeLeft, setTimeLeft] = useState<string | null>(null);
+
+    useEffect(() => {
+        const updateStatus = () => {
+            const isReady = checkCooldown('wheel', 1);
+            setAvailable(isReady);
+            if (!isReady) {
+                setTimeLeft(getRemainingTime('wheel', 1));
+            }
+        };
+        updateStatus();
+        const interval = setInterval(updateStatus, 1000);
+        return () => clearInterval(interval);
+    }, []);
 
     const animatedStyle = useAnimatedStyle(() => {
         return {
@@ -28,27 +45,25 @@ export default function Wheel() {
         const start = index * angle;
         const end = (index + 1) * angle;
 
-        // Adjust angles to start from top (subtract PI/2)? standard is right (0).
-        // Let's just use standard and rotate the whole wheel if needed.
-
         const x1 = RADIUS + RADIUS * Math.cos(start);
         const y1 = RADIUS + RADIUS * Math.sin(start);
         const x2 = RADIUS + RADIUS * Math.cos(end);
         const y2 = RADIUS + RADIUS * Math.sin(end);
 
-        // Large arc flag is 0 because 8 segments < 180 deg
         return `M${RADIUS},${RADIUS} L${x1},${y1} A${RADIUS},${RADIUS} 0 0,1 ${x2},${y2} Z`;
     };
 
     const handleResult = () => {
         setSpinning(false);
-        // Calculate which segment is at the arrow (Top, 270deg or -90deg)
-        // For now just random mock
-        setResult("100 COINS");
+        // Mock result: 100 coins
+        addCoins(100, 'Wheel Spin');
+        setCooldown('wheel');
+        setAvailable(false);
+        Alert.alert("WINNER!", "You won 100 Coins!");
     };
 
     const spin = () => {
-        setResult(null);
+        if (!available) return;
         setSpinning(true);
         const randomRotation = 360 * 5 + Math.random() * 360;
         rotation.value = withTiming(randomRotation, {
@@ -64,8 +79,14 @@ export default function Wheel() {
             <View style={styles.center}>
                 <Title>LUCKY WHEEL</Title>
 
-                <View style={styles.wheelContainer}>
-                    {/* Arrow Indicator */}
+                {!available && (
+                    <View style={styles.cooldownContainer}>
+                        <Clock size={16} color={Colors.red} />
+                        <Text style={styles.cooldownText}>Next Spin in {timeLeft}</Text>
+                    </View>
+                )}
+
+                <View style={[styles.wheelContainer, !available && { opacity: 0.5 }]}>
                     <View style={styles.arrowContainer}>
                         <View style={styles.arrow} />
                     </View>
@@ -75,7 +96,6 @@ export default function Wheel() {
                             <G>
                                 {SEGMENTS.map((seg, i) => {
                                     const angle = (360 / SEGMENTS.length) * i + (360 / SEGMENTS.length) / 2;
-                                    // Text Position
                                     const textRadius = RADIUS * 0.7;
                                     const textAngle = (i * (2 * Math.PI / SEGMENTS.length)) + ((2 * Math.PI / SEGMENTS.length) / 2);
                                     const tx = RADIUS + textRadius * Math.cos(textAngle);
@@ -97,7 +117,7 @@ export default function Wheel() {
                                                 alignmentBaseline="middle"
                                                 fontSize="14"
                                                 fontWeight="bold"
-                                                transform={`rotate(${angle}, ${tx}, ${ty})`} // Rotate text to match spoke
+                                                transform={`rotate(${angle}, ${tx}, ${ty})`}
                                             >
                                                 {seg}
                                             </SvgText>
@@ -109,13 +129,11 @@ export default function Wheel() {
                     </Animated.View>
                 </View>
 
-                {result && <Text style={styles.resultText}>You won {result}!</Text>}
-
                 <SafeButton
-                    title={spinning ? "SPINNING..." : "SPIN NOW"}
+                    title={spinning ? "SPINNING..." : available ? "SPIN NOW" : "COOLDOWN"}
                     onPress={spin}
-                    disabled={spinning}
-                    variant="accent"
+                    disabled={spinning || !available}
+                    variant={available ? "accent" : "secondary"}
                     style={{ width: '80%', marginTop: 20 }}
                 />
             </View>
@@ -128,6 +146,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingTop: 20,
         flex: 1,
+    },
+    cooldownContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 20,
+        marginBottom: 10,
+    },
+    cooldownText: {
+        color: Colors.red,
+        fontWeight: 'bold',
     },
     wheelContainer: {
         width: SIZE,
@@ -142,9 +174,8 @@ const styles = StyleSheet.create({
     },
     arrowContainer: {
         position: 'absolute',
-        top: -20, // Move arrow slightly outside
+        top: -20,
         zIndex: 10,
-        // Center horizontally
         left: SIZE / 2 - 15,
     },
     arrow: {
@@ -154,7 +185,7 @@ const styles = StyleSheet.create({
         borderStyle: 'solid',
         borderLeftWidth: 15,
         borderRightWidth: 15,
-        borderTopWidth: 30, // Pointing down
+        borderTopWidth: 30,
         borderLeftColor: 'transparent',
         borderRightColor: 'transparent',
         borderTopColor: '#FFF',
@@ -162,11 +193,5 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.5,
         shadowRadius: 4,
-    },
-    resultText: {
-        fontSize: 24,
-        color: Colors.accent,
-        fontWeight: 'bold',
-        marginTop: 20,
     }
 });
