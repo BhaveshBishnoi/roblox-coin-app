@@ -1,8 +1,17 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+export interface Transaction {
+    id: string;
+    type: 'earn' | 'spend';
+    amount: number;
+    source: string;
+    date: number;
+}
+
 interface CoinContextType {
     balance: number;
+    transactions: Transaction[];
     addCoins: (amount: number, source: string) => void;
     subtractCoins: (amount: number) => boolean;
     checkCooldown: (key: string, durationHours: number) => boolean;
@@ -20,6 +29,7 @@ export function useCoins() {
 
 export function CoinProvider({ children }: { children: React.ReactNode }) {
     const [balance, setBalance] = useState(0);
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [cooldowns, setCooldowns] = useState<Record<string, number>>({});
 
     useEffect(() => {
@@ -30,9 +40,11 @@ export function CoinProvider({ children }: { children: React.ReactNode }) {
         try {
             const storedBalance = await AsyncStorage.getItem('roblox_coins');
             const storedCooldowns = await AsyncStorage.getItem('roblox_cooldowns');
+            const storedHistory = await AsyncStorage.getItem('roblox_history');
 
             if (storedBalance) setBalance(parseInt(storedBalance, 10));
             if (storedCooldowns) setCooldowns(JSON.parse(storedCooldowns));
+            if (storedHistory) setTransactions(JSON.parse(storedHistory));
         } catch (e) {
             console.error("Failed to load data", e);
         }
@@ -41,8 +53,21 @@ export function CoinProvider({ children }: { children: React.ReactNode }) {
     const addCoins = async (amount: number, source: string) => {
         const newBalance = balance + amount;
         setBalance(newBalance);
-        await AsyncStorage.setItem('roblox_coins', newBalance.toString());
-        // transactions could be saved here
+
+        const newTx: Transaction = {
+            id: Date.now().toString(),
+            type: 'earn',
+            amount,
+            source,
+            date: Date.now()
+        };
+        const newHistory = [newTx, ...transactions].slice(0, 50); // Keep last 50
+        setTransactions(newHistory);
+
+        await AsyncStorage.multiSet([
+            ['roblox_coins', newBalance.toString()],
+            ['roblox_history', JSON.stringify(newHistory)]
+        ]);
     };
 
     const subtractCoins = (amount: number) => {
@@ -92,7 +117,7 @@ export function CoinProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <CoinContext.Provider value={{ balance, addCoins, subtractCoins, checkCooldown, setCooldown, getRemainingTime }}>
+        <CoinContext.Provider value={{ balance, transactions, addCoins, subtractCoins, checkCooldown, setCooldown, getRemainingTime }}>
             {children}
         </CoinContext.Provider>
     );

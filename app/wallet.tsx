@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Linking, Alert } from 'react-native';
+import { View, Text, StyleSheet, Linking, Alert, ScrollView } from 'react-native';
 import { Container } from '../components/Container';
-import { Title } from '../components/Title';
 import { SafeButton } from '../components/SafeButton';
 import { Colors } from '../constants/Colors';
 import { useCoins } from '../context/CoinContext';
@@ -11,7 +10,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 const GOAL = 10000;
 
 export default function Wallet() {
-    const { balance } = useCoins();
+    const { balance, transactions } = useCoins();
     const progress = Math.min((balance / GOAL) * 100, 100);
     const canRedeem = balance >= GOAL;
 
@@ -25,7 +24,7 @@ export default function Wallet() {
 
     return (
         <Container>
-            <View style={styles.center}>
+            <ScrollView contentContainerStyle={styles.center} showsVerticalScrollIndicator={false}>
                 <View style={styles.balanceCard}>
                     <Text style={styles.label}>TOTAL BALANCE</Text>
                     <View style={styles.row}>
@@ -61,15 +60,32 @@ export default function Wallet() {
                         style={styles.redeemBtn}
                     />
                 </View>
-            </View>
+
+                <View style={styles.historySection}>
+                    <Text style={styles.historyTitle}>Recent Activity</Text>
+                    {transactions && transactions.length === 0 ? (
+                        <Text style={styles.emptyText}>No transactions yet</Text>
+                    ) : (
+                        transactions && transactions.map((tx) => (
+                            <View key={tx.id} style={styles.txRow}>
+                                <View>
+                                    <Text style={styles.txSource}>{tx.source}</Text>
+                                    <Text style={styles.txDate}>{new Date(tx.date).toLocaleDateString()}</Text>
+                                </View>
+                                <Text style={styles.txAmount}>+{tx.amount}</Text>
+                            </View>
+                        ))
+                    )}
+                </View>
+            </ScrollView>
         </Container>
     );
 }
 
 const styles = StyleSheet.create({
     center: {
-        flex: 1,
         paddingTop: 20,
+        paddingBottom: 40,
     },
     balanceCard: {
         backgroundColor: Colors.surface,
@@ -135,12 +151,47 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     actions: {
-        flex: 1,
+        marginBottom: 40,
         justifyContent: 'flex-end',
-        paddingBottom: 40,
     },
     redeemBtn: {
         width: '100%',
         height: 60,
+    },
+    historySection: {
+        marginTop: 10,
+    },
+    historyTitle: {
+        color: Colors.text,
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 15,
+    },
+    emptyText: {
+        color: Colors.textSecondary,
+        textAlign: 'center',
+        fontStyle: 'italic',
+    },
+    txRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: Colors.border,
+    },
+    txSource: {
+        color: Colors.text,
+        fontWeight: '600',
+        fontSize: 16,
+    },
+    txDate: {
+        color: Colors.textSecondary,
+        fontSize: 12,
+    },
+    txAmount: {
+        color: Colors.success,
+        fontWeight: 'bold',
+        fontSize: 18,
     }
 });
