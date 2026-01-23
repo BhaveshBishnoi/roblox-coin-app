@@ -1,110 +1,558 @@
-import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, Text, Image, Animated, Easing, ScrollView, ImageStyle, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Container } from '../components/Container';
-import { Title } from '../components/Title';
 import { SafeButton } from '../components/SafeButton';
 import { useCoins } from '../context/CoinContext';
-import {
-    Dices,
-    Gift,
-    Gamepad2,
-    CreditCard,
-    Zap,
-    BookOpen
-} from 'lucide-react-native';
+import { Colors } from '../constants/Colors';
+import { Menu, TrendingUp, Users, Award, Sparkles } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+
+const ICONS = {
+    daily: require('../assets/icons/calender.png'),
+    wheel: require('../assets/icons/target.png'),
+    scratch: require('../assets/icons/gift.png'),
+    quiz: require('../assets/icons/minecraft.png'),
+    flip: require('../assets/icons/fire.png'),
+    tips: require('../assets/icons/crown.png'),
+    coin: require('../assets/icons/coin.png')
+};
+
+const { width } = Dimensions.get('window');
 
 export default function Home() {
     const router = useRouter();
-
     const { balance } = useCoins();
 
+    const coinScale = useRef(new Animated.Value(1)).current;
+    const heroFloat = useRef(new Animated.Value(0)).current;
+    const sparkle1 = useRef(new Animated.Value(0)).current;
+    const sparkle2 = useRef(new Animated.Value(0)).current;
+    const sparkle3 = useRef(new Animated.Value(0)).current;
+
+    const [cardAnimations] = useState(
+        Array(6).fill(0).map(() => ({
+            scale: useRef(new Animated.Value(0)).current,
+            opacity: useRef(new Animated.Value(0)).current,
+        }))
+    );
+
+    useEffect(() => {
+        // Coin pulse animation
+        Animated.loop(
+            Animated.sequence([
+                Animated.timing(coinScale, {
+                    toValue: 1.15,
+                    duration: 1200,
+                    useNativeDriver: true,
+                    easing: Easing.inOut(Easing.ease),
+                }),
+                Animated.timing(coinScale, {
+                    toValue: 1,
+                    duration: 1200,
+                    useNativeDriver: true,
+                    easing: Easing.inOut(Easing.ease),
+                })
+            ])
+        ).start();
+
+        // Hero card float animation
+        Animated.loop(
+            Animated.sequence([
+                Animated.timing(heroFloat, {
+                    toValue: -6,
+                    duration: 2500,
+                    useNativeDriver: true,
+                    easing: Easing.inOut(Easing.ease),
+                }),
+                Animated.timing(heroFloat, {
+                    toValue: 0,
+                    duration: 2500,
+                    useNativeDriver: true,
+                    easing: Easing.inOut(Easing.ease),
+                })
+            ])
+        ).start();
+
+        // Sparkle animations
+        const createSparkleAnimation = (sparkle: Animated.Value, delay: number) => {
+            Animated.loop(
+                Animated.sequence([
+                    Animated.delay(delay),
+                    Animated.timing(sparkle, {
+                        toValue: 1,
+                        duration: 800,
+                        useNativeDriver: true,
+                        easing: Easing.out(Easing.ease),
+                    }),
+                    Animated.timing(sparkle, {
+                        toValue: 0,
+                        duration: 800,
+                        useNativeDriver: true,
+                        easing: Easing.in(Easing.ease),
+                    })
+                ])
+            ).start();
+        };
+
+        createSparkleAnimation(sparkle1, 0);
+        createSparkleAnimation(sparkle2, 400);
+        createSparkleAnimation(sparkle3, 800);
+
+        // Staggered card entrance animations
+        cardAnimations.forEach((anim, index) => {
+            Animated.parallel([
+                Animated.timing(anim.scale, {
+                    toValue: 1,
+                    duration: 500,
+                    delay: index * 80,
+                    useNativeDriver: true,
+                    easing: Easing.out(Easing.back(1.2)),
+                }),
+                Animated.timing(anim.opacity, {
+                    toValue: 1,
+                    duration: 400,
+                    delay: index * 80,
+                    useNativeDriver: true,
+                })
+            ]).start();
+        });
+    }, []);
+
     const features = [
-        { id: 'daily', title: 'Daily Coins', icon: Gift, route: '/daily', variant: 'primary' },
-        { id: 'wheel', title: 'Lucky Wheel', icon: Zap, route: '/wheel', variant: 'accent' },
-        { id: 'scratch', title: 'Scratch Card', icon: CreditCard, route: '/scratch', variant: 'secondary' },
-        { id: 'quiz', title: 'Roblox Quiz', icon: Gamepad2, route: '/quiz', variant: 'purple' },
-        { id: 'flip', title: 'Flip Cards', icon: Dices, route: '/flip', variant: 'danger' },
-        { id: 'tips', title: 'Tips & Tricks', icon: BookOpen, route: '/tips', variant: 'surface' },
+        { id: 'daily', title: 'Daily Coins', icon: ICONS.daily, route: '/daily', variant: 'primary', gradient: ['#22c55e', '#16a34a'] as const },
+        { id: 'wheel', title: 'Lucky Wheel', icon: ICONS.wheel, route: '/wheel', variant: 'accent', gradient: ['#f59e0b', '#d97706'] as const },
+        { id: 'scratch', title: 'Scratch Card', icon: ICONS.scratch, route: '/scratch', variant: 'secondary', gradient: ['#06b6d4', '#0891b2'] as const },
+        { id: 'quiz', title: 'Roblox Quiz', icon: ICONS.quiz, route: '/quiz', variant: 'purple', gradient: ['#a855f7', '#9333ea'] as const },
+        { id: 'flip', title: 'Flip Cards', icon: ICONS.flip, route: '/flip', variant: 'danger', gradient: ['#ef4444', '#dc2626'] as const },
+        { id: 'tips', title: 'Tips & Tricks', icon: ICONS.tips, route: '/tips', variant: 'accent', gradient: ['#fbbf24', '#f59e0b'] as const },
+    ];
+
+    const stats = [
+        { label: 'Active Users', value: '50K+', icon: Users, color: '#22c55e' },
+        { label: 'Coins Earned', value: '10M+', icon: TrendingUp, color: '#f59e0b' },
+        { label: 'Daily Rewards', value: '1000+', icon: Award, color: '#a855f7' },
     ];
 
     return (
-        <Container>
-            <View style={styles.header}>
-                <Text style={styles.subtitle}>GET FREE</Text>
-                <Title>ROBLOX COINS</Title>
-                <SafeButton
-                    title={`${balance} COINS`}
-                    icon={<CreditCard size={16} color="#000" />}
-                    onPress={() => router.push('/wallet')}
-                    style={{ marginTop: 10, paddingHorizontal: 20, height: 40, minHeight: 0 }}
-                    textStyle={{ fontSize: 14 }}
-                    variant="accent"
-                />
-            </View>
-
-            <View style={styles.grid}>
-                {features.map((feature) => (
-                    <View key={feature.id} style={styles.gridItem}>
-                        <SafeButton
-                            onPress={() => router.push(feature.route as any)}
-                            style={styles.card}
-                            variant={feature.variant as any}
-                        >
-                            <View style={styles.cardContent}>
-                                <feature.icon size={48} color="#000" strokeWidth={2.5} />
-                                <Text style={styles.cardText}>{feature.title}</Text>
-                            </View>
+        <Container safeArea={false}>
+            <ScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+                bounces={true}
+            >
+                {/* Header */}
+                <View style={styles.header}>
+                    <View style={styles.headerLeft}>
+                        <SafeButton onPress={() => { }} style={styles.menuBtn} variant="surface">
+                            <Menu color="#64748b" size={22} strokeWidth={2.5} />
                         </SafeButton>
+                        <View>
+                            <Text style={styles.welcomeText}>Welcome Back!</Text>
+                            <Text style={styles.welcomeSub}>Let's earn some coins 🎮</Text>
+                        </View>
                     </View>
-                ))}
-            </View>
+
+                    <LinearGradient
+                        colors={['#22c55e', '#16a34a']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.coinBadge}
+                    >
+                        <Image source={ICONS.coin} style={styles.coinIcon as ImageStyle} />
+                        <Text style={styles.coinText}>{balance.toLocaleString()}</Text>
+                    </LinearGradient>
+                </View>
+
+                {/* Hero Card */}
+                <Animated.View style={{ transform: [{ translateY: heroFloat }] }}>
+                    <LinearGradient
+                        colors={['#0f172a', '#1e293b', '#334155']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1.2, y: 1.2 }}
+                        style={styles.hero}
+                    >
+                        {/* Animated sparkles */}
+                        <Animated.View style={[styles.sparkle, {
+                            top: 20,
+                            left: 30,
+                            opacity: sparkle1,
+                            transform: [{ scale: sparkle1 }]
+                        }]}>
+                            <Sparkles size={16} color="#fbbf24" fill="#fbbf24" />
+                        </Animated.View>
+                        <Animated.View style={[styles.sparkle, {
+                            top: 60,
+                            left: 60,
+                            opacity: sparkle2,
+                            transform: [{ scale: sparkle2 }]
+                        }]}>
+                            <Sparkles size={12} color="#22c55e" fill="#22c55e" />
+                        </Animated.View>
+                        <Animated.View style={[styles.sparkle, {
+                            top: 40,
+                            right: 80,
+                            opacity: sparkle3,
+                            transform: [{ scale: sparkle3 }]
+                        }]}>
+                            <Sparkles size={14} color="#a855f7" fill="#a855f7" />
+                        </Animated.View>
+
+                        <View style={styles.heroGlow} />
+                        <LinearGradient
+                            colors={['rgba(34, 197, 94, 0.2)', 'transparent']}
+                            style={styles.heroGradientOverlay}
+                        />
+
+                        <View style={styles.heroContent}>
+                            <View style={styles.heroBadge}>
+                                <Sparkles size={12} color="#22c55e" strokeWidth={2.5} />
+                                <Text style={styles.heroBadgeText}>FREE ROBUX</Text>
+                            </View>
+                            <Text style={styles.heroTitle}>Get Free{'\n'}Roblox Coins</Text>
+                            <Text style={styles.heroSub}>Play games • Complete tasks • Earn rewards</Text>
+                        </View>
+
+                        <Animated.View style={[styles.heroCoinContainer, { transform: [{ scale: coinScale }] }]}>
+                            <Image source={ICONS.coin} style={styles.heroCoinImage as ImageStyle} />
+                        </Animated.View>
+                    </LinearGradient>
+                </Animated.View>
+
+                {/* Stats Section */}
+                <View style={styles.statsContainer}>
+                    {stats.map((stat, index) => (
+                        <View key={index} style={styles.statCard}>
+                            <View style={[styles.statIconContainer, { backgroundColor: `${stat.color}15` }]}>
+                                <stat.icon size={20} color={stat.color} strokeWidth={2.5} />
+                            </View>
+                            <Text style={styles.statValue}>{stat.value}</Text>
+                            <Text style={styles.statLabel}>{stat.label}</Text>
+                        </View>
+                    ))}
+                </View>
+
+                {/* Section Title */}
+                <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>Earn Coins</Text>
+                    <Text style={styles.sectionSubtitle}>Choose your favorite way to earn</Text>
+                </View>
+
+                {/* Grid */}
+                <View style={styles.grid}>
+                    {features.map((feature, index) => (
+                        <Animated.View
+                            key={feature.id}
+                            style={[
+                                styles.gridItem,
+                                {
+                                    opacity: cardAnimations[index].opacity,
+                                    transform: [{ scale: cardAnimations[index].scale }]
+                                }
+                            ]}
+                        >
+                            <SafeButton
+                                onPress={() => router.push(feature.route as any)}
+                                style={styles.card}
+                                variant={feature.variant as any}
+                            >
+                                <LinearGradient
+                                    colors={feature.gradient}
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 1 }}
+                                    style={styles.cardGradient}
+                                >
+                                    <View style={styles.cardShine} />
+                                    <View style={styles.cardContent}>
+                                        <View style={styles.cardIconContainer}>
+                                            <Image source={feature.icon} style={styles.cardIcon} resizeMode="contain" />
+                                        </View>
+                                        <Text style={styles.cardText} numberOfLines={2}>{feature.title}</Text>
+                                    </View>
+                                </LinearGradient>
+                            </SafeButton>
+                        </Animated.View>
+                    ))}
+                </View>
+            </ScrollView>
         </Container>
     );
 }
 
 const styles = StyleSheet.create({
-    header: {
-        alignItems: 'center',
-        marginBottom: 10,
+    scrollView: {
+        flex: 1,
     },
-    subtitle: {
-        color: '#FFFFFF',
-        opacity: 0.6,
+    scrollContent: {
+        paddingHorizontal: 20,
+        paddingTop: 60,
+        paddingBottom: 40,
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 24,
+    },
+    headerLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        flex: 1,
+    },
+    menuBtn: {
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        marginVertical: 0,
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 8,
+        elevation: 2,
+        borderWidth: 0.5,
+        borderColor: 'rgba(0,0,0,0.04)',
+    },
+    welcomeText: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: Colors.text,
+        letterSpacing: -0.3,
+    },
+    welcomeSub: {
+        fontSize: 13,
+        fontWeight: '500',
+        color: Colors.textSecondary,
+        marginTop: 2,
+    },
+    coinBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        paddingVertical: 8,
+        paddingHorizontal: 14,
+        paddingRight: 16,
+        borderRadius: 100,
+        shadowColor: '#22c55e',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.35,
+        shadowRadius: 12,
+        elevation: 6,
+    },
+    coinIcon: {
+        width: 20,
+        height: 20,
+    } as ImageStyle,
+    coinText: {
+        color: '#fff',
+        fontWeight: '700',
+        fontSize: 15,
+        letterSpacing: -0.3,
+    },
+    hero: {
+        height: 200,
+        borderRadius: 24,
+        padding: 24,
+        marginBottom: 24,
+        justifyContent: 'flex-end',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 12 },
+        shadowOpacity: 0.3,
+        shadowRadius: 24,
+        elevation: 12,
+        overflow: 'hidden',
+    },
+    heroGlow: {
+        position: 'absolute',
+        top: -50,
+        right: -50,
+        width: 200,
+        height: 200,
+        borderRadius: 100,
+        backgroundColor: 'rgba(34, 197, 94, 0.15)',
+    },
+    heroGradientOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+    },
+    sparkle: {
+        position: 'absolute',
+        zIndex: 2,
+    },
+    heroContent: {
+        zIndex: 1,
+    },
+    heroBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        backgroundColor: 'rgba(34, 197, 94, 0.2)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 100,
+        alignSelf: 'flex-start',
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(34, 197, 94, 0.3)',
+    },
+    heroBadgeText: {
+        color: '#22c55e',
+        fontSize: 11,
+        fontWeight: '800',
+        letterSpacing: 0.5,
+    },
+    heroTitle: {
+        color: '#fff',
+        fontSize: 32,
+        fontWeight: '900',
+        lineHeight: 38,
+        letterSpacing: -0.8,
+    },
+    heroSub: {
+        color: 'rgba(255,255,255,0.7)',
+        marginTop: 8,
         fontSize: 14,
-        fontWeight: 'bold',
-        letterSpacing: 2,
-        marginBottom: -15,
-        marginTop: 20,
+        fontWeight: '500',
+        letterSpacing: -0.2,
+    },
+    heroCoinContainer: {
+        position: 'absolute',
+        right: 20,
+        top: 20,
+    },
+    heroCoinImage: {
+        width: 80,
+        height: 80,
+        opacity: 0.9,
+    } as ImageStyle,
+    statsContainer: {
+        flexDirection: 'row',
+        gap: 12,
+        marginBottom: 28,
+    },
+    statCard: {
+        flex: 1,
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        padding: 14,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.04,
+        shadowRadius: 8,
+        elevation: 2,
+    },
+    statIconContainer: {
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 8,
+    },
+    statValue: {
+        fontSize: 18,
+        fontWeight: '800',
+        color: Colors.text,
+        letterSpacing: -0.5,
+    },
+    statLabel: {
+        fontSize: 11,
+        fontWeight: '600',
+        color: Colors.textSecondary,
+        marginTop: 2,
+        textAlign: 'center',
+    },
+    sectionHeader: {
+        marginBottom: 16,
+    },
+    sectionTitle: {
+        fontSize: 24,
+        fontWeight: '800',
+        color: Colors.text,
+        letterSpacing: -0.5,
+    },
+    sectionSubtitle: {
+        fontSize: 14,
+        fontWeight: '500',
+        color: Colors.textSecondary,
+        marginTop: 4,
     },
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent: 'space-between',
-        paddingTop: 10,
+        gap: 14,
     },
     gridItem: {
-        width: '48%',
+        width: (width - 54) / 2,
         aspectRatio: 1,
-        marginBottom: 16,
     },
     card: {
         flex: 1,
-        marginBottom: 0,
-        marginTop: 0,
-        borderRadius: 24,
+        borderRadius: 20,
+        marginVertical: 0,
+        height: '100%',
+        overflow: 'hidden',
+    },
+    cardGradient: {
+        flex: 1,
+        borderRadius: 20,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.15,
+        shadowRadius: 16,
+        elevation: 6,
+    },
+    cardShine: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        width: '50%',
+        height: '50%',
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        borderBottomLeftRadius: 100,
     },
     cardContent: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 20,
+        paddingHorizontal: 16,
+        gap: 12,
+    },
+    cardIconContainer: {
+        width: 64,
+        height: 64,
+        borderRadius: 16,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
         alignItems: 'center',
         justifyContent: 'center',
-        flex: 1,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
     },
+    cardIcon: {
+        width: 40,
+        height: 40,
+    } as ImageStyle,
     cardText: {
-        marginTop: 12,
-        fontSize: 14,
-        fontWeight: '900',
-        color: '#000',
+        fontSize: 15,
+        fontWeight: '700',
+        color: '#fff',
         textAlign: 'center',
-        textTransform: 'uppercase',
+        letterSpacing: -0.3,
+        lineHeight: 19,
+        textShadowColor: 'rgba(0,0,0,0.2)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 4,
     }
 });

@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Container } from '../components/Container';
-import { Title } from '../components/Title';
 import { SafeButton } from '../components/SafeButton';
 import { Colors } from '../constants/Colors';
 import { useCoins } from '../context/CoinContext';
-import { Clock } from 'lucide-react-native';
+import { Clock, Trophy, CheckCircle, XCircle } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const QUESTIONS = [
     {
         q: "Who is the creator of Roblox?",
         options: ["David Baszucki", "Erik Cassel", "Both", "None"],
-        correct: 2 // Both
+        correct: 2
     },
     {
         q: "What is the currency in Roblox?",
@@ -21,7 +21,7 @@ const QUESTIONS = [
     {
         q: "When was Roblox released?",
         options: ["2004", "2006", "2010", "2008"],
-        correct: 1 // 2006
+        correct: 1
     }
 ];
 
@@ -30,6 +30,8 @@ export default function Quiz() {
     const [current, setCurrent] = useState(0);
     const [score, setScore] = useState(0);
     const [showResult, setShowResult] = useState(false);
+    const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+    const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 
     const [available, setAvailable] = useState(false);
     const [timeLeft, setTimeLeft] = useState<string | null>(null);
@@ -49,14 +51,23 @@ export default function Quiz() {
     }, []);
 
     const handleAnswer = (index: number) => {
-        const isCorrect = index === QUESTIONS[current].correct;
-        if (isCorrect) setScore(score + 10);
+        if (selectedAnswer !== null) return;
 
-        if (current < QUESTIONS.length - 1) {
-            setCurrent(current + 1);
-        } else {
-            finishQuiz(score + (isCorrect ? 10 : 0));
-        }
+        setSelectedAnswer(index);
+        const correct = index === QUESTIONS[current].correct;
+        setIsCorrect(correct);
+
+        if (correct) setScore(score + 10);
+
+        setTimeout(() => {
+            if (current < QUESTIONS.length - 1) {
+                setCurrent(current + 1);
+                setSelectedAnswer(null);
+                setIsCorrect(null);
+            } else {
+                finishQuiz(score + (correct ? 10 : 0));
+            }
+        }, 1500);
     };
 
     const finishQuiz = (finalScore: number) => {
@@ -69,147 +80,318 @@ export default function Quiz() {
     };
 
     const reset = () => {
-        // Only allow reset if available? Or let them play for fun without rewards?
-        // Usually cooldown means usage limit.
-        // If they finished and got reward, they can't play again for 1h.
-        // So this button should probably take them back or be disabled.
-        // But if they failed (0 coins), maybe they CAN try again?
-        // Logic: "Limit of 1hr" typically applies to "winning" or "attempting".
-        // I will apply it to "finishing the quiz".
-        if (!available) {
-            Alert.alert("Cooldown", "Please wait for the cooldown to finish.");
-            return;
-        }
         setCurrent(0);
         setScore(0);
         setShowResult(false);
-    }
+        setSelectedAnswer(null);
+        setIsCorrect(null);
+    };
 
     if (!available && !showResult) {
         return (
-            <Container>
-                <View style={styles.center}>
-                    <Title>ROBLOX QUIZ</Title>
-                    <View style={styles.cooldownContainer}>
-                        <Clock size={40} color={Colors.red} style={{ marginBottom: 20 }} />
-                        <Text style={styles.cooldownTitle}>Quiz Locked</Text>
-                        <Text style={styles.cooldownText}>Next Quiz in {timeLeft}</Text>
+            <Container safeArea={false}>
+                <ScrollView
+                    contentContainerStyle={styles.scrollContent}
+                    showsVerticalScrollIndicator={false}
+                >
+                    <LinearGradient
+                        colors={['#a855f7', '#9333ea']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={styles.iconContainer}
+                    >
+                        <Clock size={48} color="#fff" strokeWidth={2.5} />
+                    </LinearGradient>
+                    <Text style={styles.title}>Quiz Locked</Text>
+                    <Text style={styles.subtitle}>Come back later to test your knowledge</Text>
+
+                    <View style={styles.lockedCard}>
+                        <Text style={styles.lockedLabel}>Next quiz in</Text>
+                        <Text style={styles.lockedTime}>{timeLeft}</Text>
                     </View>
-                </View>
+                </ScrollView>
             </Container>
         );
     }
 
     if (showResult) {
         return (
-            <Container>
-                <View style={styles.center}>
-                    <Title>QUIZ COMPLETE!</Title>
-                    <Text style={styles.scoreTitle}>You Earned:</Text>
-                    <Text style={styles.score}>{score} Coins</Text>
+            <Container safeArea={false}>
+                <ScrollView
+                    contentContainerStyle={styles.scrollContent}
+                    showsVerticalScrollIndicator={false}
+                >
+                    <LinearGradient
+                        colors={['#22c55e', '#16a34a']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={styles.iconContainer}
+                    >
+                        <Trophy size={48} color="#fff" strokeWidth={2.5} />
+                    </LinearGradient>
+                    <Text style={styles.title}>Quiz Complete!</Text>
+                    <Text style={styles.subtitle}>Great job on completing the quiz</Text>
+
+                    <View style={styles.resultCard}>
+                        <Text style={styles.resultLabel}>You Earned</Text>
+                        <Text style={styles.resultScore}>{score}</Text>
+                        <Text style={styles.resultCoins}>COINS</Text>
+
+                        <View style={styles.resultStats}>
+                            <View style={styles.statItem}>
+                                <Text style={styles.statValue}>{Math.round((score / 30) * 100)}%</Text>
+                                <Text style={styles.statLabel}>Accuracy</Text>
+                            </View>
+                            <View style={styles.statDivider} />
+                            <View style={styles.statItem}>
+                                <Text style={styles.statValue}>{score / 10}/{QUESTIONS.length}</Text>
+                                <Text style={styles.statLabel}>Correct</Text>
+                            </View>
+                        </View>
+                    </View>
+
                     <SafeButton
-                        title="BACK TO HOME"
-                        onPress={() => { }} // Navigation would be handled by router.back() usually, but here we just leave it. The user can use back button.
+                        title="DONE"
+                        onPress={reset}
                         variant="primary"
-                        style={{ marginTop: 40, width: 200 }}
+                        style={styles.doneBtn}
                     />
-                </View>
+                </ScrollView>
             </Container>
-        )
+        );
     }
 
     const question = QUESTIONS[current];
 
     return (
-        <Container>
-            <View style={styles.header}>
-                <Title>ROBLOX QUIZ</Title>
-                <Text style={styles.progress}>Question {current + 1} / {QUESTIONS.length}</Text>
-            </View>
+        <Container safeArea={false}>
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+            >
+                {/* Progress */}
+                <View style={styles.progressContainer}>
+                    <Text style={styles.progressText}>Question {current + 1} of {QUESTIONS.length}</Text>
+                    <View style={styles.progressBar}>
+                        <View style={[styles.progressFill, { width: `${((current + 1) / QUESTIONS.length) * 100}%` }]} />
+                    </View>
+                </View>
 
-            <View style={styles.questionCard}>
-                <Text style={styles.questionText}>{question.q}</Text>
-            </View>
+                {/* Question Card */}
+                <View style={styles.questionCard}>
+                    <Text style={styles.questionText}>{question.q}</Text>
+                </View>
 
-            <View style={styles.options}>
-                {question.options.map((opt, idx) => (
-                    <SafeButton
-                        key={idx}
-                        title={opt}
-                        onPress={() => handleAnswer(idx)}
-                        variant="primary"
-                        gradientColors={['#2A2A2A', '#222']}
-                        style={styles.optionBtn}
-                        textStyle={{ color: '#FFF' }}
-                    />
-                ))}
-            </View>
+                {/* Options */}
+                <View style={styles.options}>
+                    {question.options.map((opt, idx) => {
+                        const isSelected = selectedAnswer === idx;
+                        const isCorrectAnswer = idx === question.correct;
+                        const showCorrect = selectedAnswer !== null && isCorrectAnswer;
+                        const showWrong = isSelected && !isCorrect;
+
+                        return (
+                            <SafeButton
+                                key={idx}
+                                title={opt}
+                                onPress={() => handleAnswer(idx)}
+                                variant={showCorrect ? "primary" : showWrong ? "danger" : "surface"}
+                                style={[
+                                    styles.optionBtn,
+                                    isSelected ? styles.optionSelected : undefined
+                                ]}
+                                icon={
+                                    showCorrect ? <CheckCircle size={20} color="#fff" strokeWidth={2.5} /> :
+                                        showWrong ? <XCircle size={20} color="#fff" strokeWidth={2.5} /> :
+                                            undefined
+                                }
+                                disabled={selectedAnswer !== null}
+                            />
+                        );
+                    })}
+                </View>
+            </ScrollView>
         </Container>
     );
 }
 
 const styles = StyleSheet.create({
-    center: {
-        flex: 1,
+    scrollContent: {
+        paddingHorizontal: 20,
+        paddingTop: 100,
+        paddingBottom: 40,
+        alignItems: 'center',
+    },
+    iconContainer: {
+        width: 96,
+        height: 96,
+        borderRadius: 24,
         alignItems: 'center',
         justifyContent: 'center',
-    },
-    header: {
-        alignItems: 'center',
         marginBottom: 20,
+        shadowColor: '#a855f7',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.3,
+        shadowRadius: 16,
+        elevation: 8,
     },
-    progress: {
+    title: {
+        fontSize: 32,
+        fontWeight: '900',
+        color: Colors.text,
+        marginBottom: 8,
+        letterSpacing: -0.5,
+    },
+    subtitle: {
+        fontSize: 15,
         color: Colors.textSecondary,
+        textAlign: 'center',
+        marginBottom: 32,
+        fontWeight: '500',
     },
-    scoreTitle: {
-        fontSize: 24,
-        color: Colors.text,
-        marginBottom: 10,
-    },
-    score: {
-        fontSize: 48,
-        color: Colors.primary,
-        fontWeight: 'bold',
-    },
-    questionCard: {
-        backgroundColor: Colors.surface,
-        padding: 30,
-        borderRadius: 20,
-        marginBottom: 30,
+    lockedCard: {
+        width: '100%',
+        backgroundColor: '#fff',
+        borderRadius: 24,
+        padding: 32,
         alignItems: 'center',
-        borderWidth: 1,
-        borderColor: Colors.border,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+        elevation: 4,
     },
-    questionText: {
-        fontSize: 22,
-        fontWeight: 'bold',
+    lockedLabel: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: Colors.textSecondary,
+        marginBottom: 12,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+    },
+    lockedTime: {
+        fontSize: 36,
+        fontWeight: '900',
         color: Colors.text,
+        fontVariant: ['tabular-nums'],
+        letterSpacing: -1,
+    },
+    resultCard: {
+        width: '100%',
+        backgroundColor: '#fff',
+        borderRadius: 24,
+        padding: 32,
+        alignItems: 'center',
+        marginBottom: 24,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.08,
+        shadowRadius: 16,
+        elevation: 6,
+    },
+    resultLabel: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: Colors.textSecondary,
+        marginBottom: 8,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+    },
+    resultScore: {
+        fontSize: 64,
+        fontWeight: '900',
+        color: Colors.success,
+        letterSpacing: -2,
+    },
+    resultCoins: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: Colors.success,
+        marginBottom: 24,
+        letterSpacing: 2,
+    },
+    resultStats: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 24,
+    },
+    statItem: {
+        alignItems: 'center',
+    },
+    statValue: {
+        fontSize: 24,
+        fontWeight: '700',
+        color: Colors.text,
+        marginBottom: 4,
+        letterSpacing: -0.5,
+    },
+    statLabel: {
+        fontSize: 12,
+        fontWeight: '600',
+        color: Colors.textSecondary,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+    },
+    statDivider: {
+        width: 1,
+        height: 40,
+        backgroundColor: Colors.border,
+    },
+    doneBtn: {
+        width: '100%',
+        height: 56,
+    },
+    progressContainer: {
+        width: '100%',
+        marginBottom: 24,
+    },
+    progressText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: Colors.textSecondary,
+        marginBottom: 8,
         textAlign: 'center',
     },
+    progressBar: {
+        height: 6,
+        backgroundColor: '#f1f5f9',
+        borderRadius: 100,
+        overflow: 'hidden',
+    },
+    progressFill: {
+        height: '100%',
+        backgroundColor: Colors.primary,
+        borderRadius: 100,
+    },
+    questionCard: {
+        width: '100%',
+        backgroundColor: '#fff',
+        padding: 28,
+        borderRadius: 24,
+        marginBottom: 24,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+        elevation: 4,
+    },
+    questionText: {
+        fontSize: 20,
+        fontWeight: '700',
+        color: Colors.text,
+        textAlign: 'center',
+        lineHeight: 28,
+        letterSpacing: -0.4,
+    },
     options: {
-        gap: 10,
+        width: '100%',
+        gap: 12,
     },
     optionBtn: {
-        borderWidth: 1,
-        borderColor: Colors.border,
-    },
-    cooldownContainer: {
-        alignItems: 'center',
-        padding: 40,
-        backgroundColor: Colors.surface,
-        borderRadius: 20,
         width: '100%',
-        borderWidth: 1,
-        borderColor: Colors.red,
+        height: 56,
     },
-    cooldownTitle: {
-        color: Colors.red,
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 10,
+    optionSelected: {
+        transform: [{ scale: 0.98 }],
     },
-    cooldownText: {
-        color: Colors.textSecondary,
-        fontSize: 18,
-    }
 });

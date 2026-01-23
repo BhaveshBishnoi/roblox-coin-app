@@ -7,16 +7,16 @@ import { StatusBar } from 'expo-status-bar';
 export function Container({ children, style, safeArea = true }: { children: React.ReactNode, style?: any, safeArea?: boolean }) {
     return (
         <View style={{ flex: 1 }}>
-            <StatusBar style="light" backgroundColor={Colors.background} />
+            <StatusBar style="dark" backgroundColor="transparent" translucent />
             <LinearGradient
-                colors={[Colors.background, '#1a0b1a']} // Subtle gradient to dark purple/black
+                colors={[Colors.backgroundHighlight, Colors.background]}
                 start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={[styles.background]}
+                end={{ x: 0, y: 1 }}
+                style={styles.background}
             >
                 {safeArea ? (
                     <SafeAreaView style={{ flex: 1, paddingTop: Platform.OS === 'android' ? RNStatusBar.currentHeight : 0 }}>
-                        <View style={[{ flex: 1, paddingHorizontal: 16 }, style]}>
+                        <View style={[{ flex: 1 }, style]}>
                             {children}
                         </View>
                     </SafeAreaView>
