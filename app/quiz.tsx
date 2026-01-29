@@ -90,13 +90,24 @@ export default function QuizPage() {
     if (!available && !showResult) {
         return (
             <Container safeArea={false}>
-
                 <ScrollView
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}
                 >
+                    <LinearGradient
+                        colors={['#8B5CF6', '#7C3AED']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={styles.lockedIconContainer}
+                    >
+                        <Text style={styles.lockedIcon}>🔒</Text>
+                    </LinearGradient>
+
+                    <Text style={styles.lockedTitle}>Quiz Locked</Text>
+                    <Text style={styles.lockedSubtitle}>Come back later to test your Roblox knowledge!</Text>
+
                     <View style={styles.lockedCard}>
-                        <Text style={styles.lockedLabel}>Next quiz in</Text>
+                        <Text style={styles.lockedLabel}>Next quiz available in</Text>
                         <Text style={styles.lockedTime}>{timeLeft}</Text>
                     </View>
                 </ScrollView>
@@ -302,6 +313,38 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 28,
         fontWeight: '500',
+        paddingHorizontal: 20,
+    },
+    lockedIconContainer: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 24,
+        shadowColor: '#8B5CF6',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.3,
+        shadowRadius: 16,
+        elevation: 8,
+    },
+    lockedIcon: {
+        fontSize: 48,
+    },
+    lockedTitle: {
+        fontSize: 28,
+        fontWeight: '900',
+        color: Colors.text,
+        letterSpacing: -0.5,
+        marginBottom: 12,
+        textAlign: 'center',
+    },
+    lockedSubtitle: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: Colors.textSecondary,
+        textAlign: 'center',
+        marginBottom: 32,
         paddingHorizontal: 20,
     },
     lockedCard: {

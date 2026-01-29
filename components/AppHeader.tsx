@@ -1,9 +1,9 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Platform, StatusBar as RNStatusBar, TouchableOpacity } from 'react-native';
-import { MenuDrawer } from './MenuDrawer';
+import React from 'react';
+import { View, Text, StyleSheet, Platform, StatusBar as RNStatusBar, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useCoins } from '../context/CoinContext';
 import { Colors } from '../constants/Colors';
-import { Menu } from 'lucide-react-native';
+import { Settings } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image, ImageStyle } from 'react-native';
 
@@ -18,60 +18,37 @@ interface AppHeaderProps {
 
 export function AppHeader({ title, showTitle = true }: AppHeaderProps) {
     const { balance } = useCoins();
-    const [menuVisible, setMenuVisible] = useState(false);
-    const menuSlideAnim = useRef(new Animated.Value(0)).current;
+    const router = useRouter();
 
-    const openMenu = () => {
-        setMenuVisible(true);
-        Animated.spring(menuSlideAnim, {
-            toValue: 1,
-            useNativeDriver: true,
-            tension: 65,
-            friction: 11,
-        }).start();
-    };
-
-    const closeMenu = () => {
-        Animated.timing(menuSlideAnim, {
-            toValue: 0,
-            duration: 250,
-            useNativeDriver: true,
-        }).start(() => setMenuVisible(false));
+    const openSettings = () => {
+        router.push('/settings');
     };
 
     return (
-        <>
-            <View style={styles.header}>
-                <View style={styles.headerContent}>
-                    {/* Menu Button */}
-                    <TouchableOpacity onPress={openMenu} style={styles.menuBtn} activeOpacity={0.7}>
-                        <Menu color={Colors.text} size={26} strokeWidth={2.5} />
-                    </TouchableOpacity>
+        <View style={styles.header}>
+            <View style={styles.headerContent}>
+                {/* Settings Button */}
+                <TouchableOpacity onPress={openSettings} style={styles.settingsBtn} activeOpacity={0.7}>
+                    <Settings color={Colors.text} size={26} strokeWidth={2.5} />
+                </TouchableOpacity>
 
-                    {/* Title */}
-                    {showTitle && title && (
-                        <Text style={styles.headerTitle} numberOfLines={1}>{title}</Text>
-                    )}
+                {/* Title */}
+                {showTitle && title && (
+                    <Text style={styles.headerTitle} numberOfLines={1}>{title}</Text>
+                )}
 
-                    {/* Coin Badge */}
-                    <LinearGradient
-                        colors={['#10B981', '#059669']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.coinBadge}
-                    >
-                        <Image source={ICONS.coin} style={styles.coinIcon as ImageStyle} />
-                        <Text style={styles.coinText}>{balance.toLocaleString()}</Text>
-                    </LinearGradient>
-                </View>
+                {/* Coin Badge */}
+                <LinearGradient
+                    colors={['#10B981', '#059669']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.coinBadge}
+                >
+                    <Image source={ICONS.coin} style={styles.coinIcon as ImageStyle} />
+                    <Text style={styles.coinText}>{balance.toLocaleString()}</Text>
+                </LinearGradient>
             </View>
-
-            <MenuDrawer
-                visible={menuVisible}
-                onClose={closeMenu}
-                slideAnim={menuSlideAnim}
-            />
-        </>
+        </View>
     );
 }
 
@@ -103,7 +80,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 14,
     },
-    menuBtn: {
+    settingsBtn: {
         width: 50,
         height: 50,
         borderRadius: 16,

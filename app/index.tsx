@@ -16,6 +16,8 @@ const ICONS = {
     quiz: require('../assets/icons/minecraft.png'),
     flip: require('../assets/icons/fire.png'),
     tips: require('../assets/icons/crown.png'),
+    wallet: require('../assets/icons/coin.png'),
+    settings: require('../assets/icons/target.png'),
     coin: require('../assets/icons/coin.png')
 };
 
@@ -32,7 +34,7 @@ export default function Home() {
     const sparkle3 = useRef(new Animated.Value(0)).current;
 
     const [cardAnimations] = useState(
-        Array(6).fill(0).map(() => ({
+        Array(8).fill(0).map(() => ({
             scale: useRef(new Animated.Value(0)).current,
             opacity: useRef(new Animated.Value(0)).current,
         }))
@@ -127,6 +129,8 @@ export default function Home() {
         { id: 'quiz', title: 'Roblox Quiz', icon: ICONS.quiz, route: '/quiz', variant: 'purple', gradient: ['#8B5CF6', '#7C3AED'] as const },
         { id: 'flip', title: 'Flip Cards', icon: ICONS.flip, route: '/flip', variant: 'danger', gradient: ['#EF4444', '#DC2626'] as const },
         { id: 'tips', title: 'Tips & Tricks', icon: ICONS.tips, route: '/tips', variant: 'accent', gradient: ['#F59E0B', '#D97706'] as const },
+        { id: 'wallet', title: 'My Wallet', icon: ICONS.wallet, route: '/wallet', variant: 'secondary', gradient: ['#06B6D4', '#0891B2'] as const },
+        { id: 'settings', title: 'Settings', icon: ICONS.settings, route: '/settings', variant: 'purple', gradient: ['#6366F1', '#4F46E5'] as const },
     ];
 
     const stats = [
@@ -147,8 +151,8 @@ export default function Home() {
             >
                 {/* Welcome Section */}
                 <View style={styles.welcomeSection}>
-                    <Text style={styles.welcomeText}>Welcome Back!</Text>
-                    <Text style={styles.welcomeSub}>Let's earn some coins 🎮</Text>
+                    <Text style={styles.welcomeText}></Text>
+                    <Text style={styles.welcomeSub}></Text>
                 </View>
 
                 {/* Hero Card */}

@@ -22,16 +22,25 @@ export default function Wheel() {
 
     useEffect(() => {
         const updateStatus = () => {
-            const isReady = checkCooldown('wheel', 3); // 3 hours cooldown
-            setAvailable(isReady);
-            if (!isReady) {
-                setTimeLeft(getRemainingTime('wheel', 3));
+            try {
+                const isReady = checkCooldown('wheel', 3); // 3 hours cooldown
+                setAvailable(isReady);
+                if (!isReady) {
+                    const remaining = getRemainingTime('wheel', 3);
+                    setTimeLeft(remaining || '0h 0m');
+                } else {
+                    setTimeLeft(null);
+                }
+            } catch (error) {
+                console.error('Error updating wheel status:', error);
+                setAvailable(false);
             }
         };
+
         updateStatus();
         const interval = setInterval(updateStatus, 1000);
         return () => clearInterval(interval);
-    }, []);
+    }, [checkCooldown, getRemainingTime]);
 
     const animatedStyle = useAnimatedStyle(() => {
         return {
@@ -53,31 +62,45 @@ export default function Wheel() {
     };
 
     const handleResult = () => {
-        setSpinning(false);
-        // Mock result: 100 coins
-        addCoins(100, 'Wheel Spin');
-        setCooldown('wheel');
-        setAvailable(false);
-        Alert.alert("WINNER!", "You won 100 Coins!");
+        try {
+            setSpinning(false);
+            // Mock result: 100 coins
+            addCoins(100, 'Wheel Spin');
+            setCooldown('wheel');
+            setAvailable(false);
+            Alert.alert("WINNER!", "You won 100 Coins!");
+        } catch (error) {
+            console.error('Error handling wheel result:', error);
+            setSpinning(false);
+            Alert.alert("Error", "Something went wrong. Please try again.");
+        }
     };
 
     const spin = () => {
-        if (!available) return;
-        setSpinning(true);
-        const randomRotation = 360 * 5 + Math.random() * 360;
-        rotation.value = withTiming(randomRotation, {
-            duration: 4000,
-            easing: Easing.out(Easing.cubic),
-        }, (finished) => {
-            if (finished) runOnJS(handleResult)();
-        });
+        if (!available || spinning) return;
+
+        try {
+            setSpinning(true);
+            const randomRotation = 360 * 5 + Math.random() * 360;
+            rotation.value = withTiming(randomRotation, {
+                duration: 4000,
+                easing: Easing.out(Easing.cubic),
+            }, (finished) => {
+                if (finished) {
+                    runOnJS(handleResult)();
+                }
+            });
+        } catch (error) {
+            console.error('Error spinning wheel:', error);
+            setSpinning(false);
+            Alert.alert("Error", "Failed to spin wheel. Please try again.");
+        }
     };
 
     return (
         <Container>
-
             <View style={styles.center}>
-                {!available && (
+                {!available && timeLeft && (
                     <View style={styles.cooldownContainer}>
                         <Clock size={16} color={Colors.danger} />
                         <Text style={styles.cooldownText}>Next Spin in {timeLeft}</Text>
