@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Container } from '../components/Container';
 import { SafeButton } from '../components/SafeButton';
+import { AppHeader } from '../components/AppHeader';
 import { Colors } from '../constants/Colors';
 import { useAdAction } from '../hooks/useAdAction';
 import { useCoins } from '../context/CoinContext';
@@ -16,7 +17,7 @@ export default function Daily() {
 
     useEffect(() => {
         const updateStatus = () => {
-            const isReady = checkCooldown('daily', 24);
+            const isReady = checkCooldown('daily', 24); // 24 hours cooldown
             setAvailable(isReady);
             if (!isReady) {
                 setTimeLeft(getRemainingTime('daily', 24));
@@ -40,6 +41,8 @@ export default function Daily() {
 
     return (
         <Container safeArea={false}>
+            <AppHeader title="Daily Bonus" />
+
             <ScrollView
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
@@ -47,19 +50,19 @@ export default function Daily() {
             >
                 {/* Icon Container */}
                 <LinearGradient
-                    colors={available ? ['#22c55e', '#16a34a'] : ['#64748b', '#475569']}
+                    colors={available ? ['#10B981', '#059669'] : ['#64748b', '#475569']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.iconContainer}
                 >
                     <View style={styles.iconGlow} />
-                    <Gift size={64} color="#fff" strokeWidth={2} />
+                    <Gift size={56} color="#fff" strokeWidth={2} />
                 </LinearGradient>
 
                 {/* Title */}
                 <Text style={styles.title}>Daily Bonus</Text>
                 <Text style={styles.subtitle}>
-                    Return every day to claim your free 100 coins!
+                    Return every 24 hours to claim your free 100 coins!
                 </Text>
 
                 {/* Status Card */}
@@ -78,11 +81,11 @@ export default function Daily() {
                     </View>
                 ) : (
                     <View style={styles.statusCard}>
-                        <View style={[styles.statusIconContainer, { backgroundColor: '#fee2e2' }]}>
-                            <Clock size={32} color={Colors.red} strokeWidth={2.5} />
+                        <View style={[styles.statusIconContainer, { backgroundColor: '#FEE2E2' }]}>
+                            <Clock size={32} color={Colors.danger} strokeWidth={2.5} />
                         </View>
                         <Text style={styles.statusTitle}>Already Claimed</Text>
-                        <Text style={styles.statusSub}>Come back tomorrow for your next reward</Text>
+                        <Text style={styles.statusSub}>Come back in 24 hours for your next reward</Text>
 
                         <View style={styles.timerBox}>
                             <Text style={styles.timerLabel}>Next reward in</Text>
@@ -121,23 +124,23 @@ export default function Daily() {
 
 const styles = StyleSheet.create({
     scrollContent: {
-        paddingHorizontal: 20,
-        paddingTop: 100,
+        paddingHorizontal: 18,
+        paddingTop: 16,
         paddingBottom: 40,
         alignItems: 'center',
     },
     iconContainer: {
-        width: 120,
-        height: 120,
-        borderRadius: 30,
+        width: 110,
+        height: 110,
+        borderRadius: 28,
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 24,
-        shadowColor: '#22c55e',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.3,
-        shadowRadius: 16,
-        elevation: 8,
+        shadowColor: '#10B981',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.25,
+        shadowRadius: 12,
+        elevation: 6,
         overflow: 'hidden',
     },
     iconGlow: {
@@ -150,7 +153,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
     },
     title: {
-        fontSize: 32,
+        fontSize: 28,
         fontWeight: '900',
         color: Colors.text,
         marginBottom: 8,
@@ -160,29 +163,31 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: Colors.textSecondary,
         textAlign: 'center',
-        marginBottom: 32,
+        marginBottom: 28,
         paddingHorizontal: 20,
         lineHeight: 22,
         fontWeight: '500',
     },
     statusCard: {
         width: '100%',
-        backgroundColor: '#fff',
-        borderRadius: 24,
+        backgroundColor: Colors.surface,
+        borderRadius: 20,
         padding: 28,
         alignItems: 'center',
         marginBottom: 20,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.08,
-        shadowRadius: 16,
-        elevation: 6,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 8,
+        elevation: 3,
+        borderWidth: 1,
+        borderColor: Colors.borderLight,
     },
     statusIconContainer: {
         width: 64,
         height: 64,
         borderRadius: 20,
-        backgroundColor: '#dcfce7',
+        backgroundColor: '#D1FAE5',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 16,
@@ -199,15 +204,16 @@ const styles = StyleSheet.create({
         color: Colors.textSecondary,
         marginBottom: 24,
         fontWeight: '500',
+        textAlign: 'center',
     },
     rewardBox: {
         alignItems: 'center',
         paddingVertical: 20,
         paddingHorizontal: 40,
-        backgroundColor: '#f0fdf4',
+        backgroundColor: Colors.primaryLight,
         borderRadius: 16,
         borderWidth: 2,
-        borderColor: '#22c55e',
+        borderColor: Colors.primary,
     },
     rewardAmount: {
         fontSize: 48,
@@ -227,10 +233,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 16,
         paddingHorizontal: 32,
-        backgroundColor: '#fef2f2',
+        backgroundColor: '#FEF2F2',
         borderRadius: 16,
         borderWidth: 2,
-        borderColor: '#fecaca',
+        borderColor: '#FECACA',
     },
     timerLabel: {
         fontSize: 13,
@@ -243,14 +249,14 @@ const styles = StyleSheet.create({
     timerText: {
         fontSize: 28,
         fontWeight: '700',
-        color: Colors.red,
+        color: Colors.danger,
         fontVariant: ['tabular-nums'],
         letterSpacing: -0.5,
     },
     claimBtn: {
         width: '100%',
         height: 56,
-        marginBottom: 32,
+        marginBottom: 28,
     },
     infoSection: {
         width: '100%',
@@ -259,15 +265,17 @@ const styles = StyleSheet.create({
     },
     infoCard: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: Colors.surface,
         borderRadius: 16,
         padding: 16,
         alignItems: 'center',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.04,
-        shadowRadius: 8,
-        elevation: 2,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.03,
+        shadowRadius: 4,
+        elevation: 1,
+        borderWidth: 1,
+        borderColor: Colors.borderLight,
     },
     infoIcon: {
         fontSize: 32,

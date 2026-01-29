@@ -23,10 +23,10 @@ export default function Wheel() {
 
     useEffect(() => {
         const updateStatus = () => {
-            const isReady = checkCooldown('wheel', 1);
+            const isReady = checkCooldown('wheel', 3); // 3 hours cooldown
             setAvailable(isReady);
             if (!isReady) {
-                setTimeLeft(getRemainingTime('wheel', 1));
+                setTimeLeft(getRemainingTime('wheel', 3));
             }
         };
         updateStatus();
@@ -81,7 +81,7 @@ export default function Wheel() {
 
                 {!available && (
                     <View style={styles.cooldownContainer}>
-                        <Clock size={16} color={Colors.red} />
+                        <Clock size={16} color={Colors.danger} />
                         <Text style={styles.cooldownText}>Next Spin in {timeLeft}</Text>
                     </View>
                 )}
@@ -134,7 +134,7 @@ export default function Wheel() {
                     onPress={spin}
                     disabled={spinning || !available}
                     variant={available ? "accent" : "secondary"}
-                    style={{ width: '80%', marginTop: 20 }}
+                    style={{ width: '80%', marginTop: 20, height: 56 }}
                 />
             </View>
         </Container>

@@ -3,9 +3,10 @@ import { View, StyleSheet, Text, Image, Animated, Easing, ScrollView, ImageStyle
 import { useRouter } from 'expo-router';
 import { Container } from '../components/Container';
 import { SafeButton } from '../components/SafeButton';
+import { AppHeader } from '../components/AppHeader';
 import { useCoins } from '../context/CoinContext';
 import { Colors } from '../constants/Colors';
-import { Menu, TrendingUp, Users, Award, Sparkles } from 'lucide-react-native';
+import { TrendingUp, Users, Award, Sparkles } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const ICONS = {
@@ -120,57 +121,42 @@ export default function Home() {
     }, []);
 
     const features = [
-        { id: 'daily', title: 'Daily Coins', icon: ICONS.daily, route: '/daily', variant: 'primary', gradient: ['#22c55e', '#16a34a'] as const },
-        { id: 'wheel', title: 'Lucky Wheel', icon: ICONS.wheel, route: '/wheel', variant: 'accent', gradient: ['#f59e0b', '#d97706'] as const },
-        { id: 'scratch', title: 'Scratch Card', icon: ICONS.scratch, route: '/scratch', variant: 'secondary', gradient: ['#06b6d4', '#0891b2'] as const },
-        { id: 'quiz', title: 'Roblox Quiz', icon: ICONS.quiz, route: '/quiz', variant: 'purple', gradient: ['#a855f7', '#9333ea'] as const },
-        { id: 'flip', title: 'Flip Cards', icon: ICONS.flip, route: '/flip', variant: 'danger', gradient: ['#ef4444', '#dc2626'] as const },
-        { id: 'tips', title: 'Tips & Tricks', icon: ICONS.tips, route: '/tips', variant: 'accent', gradient: ['#fbbf24', '#f59e0b'] as const },
+        { id: 'daily', title: 'Daily Coins', icon: ICONS.daily, route: '/daily', variant: 'primary', gradient: ['#10B981', '#059669'] as const },
+        { id: 'wheel', title: 'Lucky Wheel', icon: ICONS.wheel, route: '/wheel', variant: 'accent', gradient: ['#F59E0B', '#D97706'] as const },
+        { id: 'scratch', title: 'Scratch Card', icon: ICONS.scratch, route: '/scratch', variant: 'secondary', gradient: ['#6366F1', '#4F46E5'] as const },
+        { id: 'quiz', title: 'Roblox Quiz', icon: ICONS.quiz, route: '/quiz', variant: 'purple', gradient: ['#8B5CF6', '#7C3AED'] as const },
+        { id: 'flip', title: 'Flip Cards', icon: ICONS.flip, route: '/flip', variant: 'danger', gradient: ['#EF4444', '#DC2626'] as const },
+        { id: 'tips', title: 'Tips & Tricks', icon: ICONS.tips, route: '/tips', variant: 'accent', gradient: ['#F59E0B', '#D97706'] as const },
     ];
 
     const stats = [
-        { label: 'Active Users', value: '50K+', icon: Users, color: '#22c55e' },
-        { label: 'Coins Earned', value: '10M+', icon: TrendingUp, color: '#f59e0b' },
-        { label: 'Daily Rewards', value: '1000+', icon: Award, color: '#a855f7' },
+        { label: 'Active Users', value: '50K+', icon: Users, color: '#10B981' },
+        { label: 'Coins Earned', value: '10M+', icon: TrendingUp, color: '#F59E0B' },
+        { label: 'Daily Rewards', value: '1000+', icon: Award, color: '#8B5CF6' },
     ];
 
     return (
         <Container safeArea={false}>
+            <AppHeader showTitle={false} />
+
             <ScrollView
                 style={styles.scrollView}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
                 bounces={true}
             >
-                {/* Header */}
-                <View style={styles.header}>
-                    <View style={styles.headerLeft}>
-                        <SafeButton onPress={() => { }} style={styles.menuBtn} variant="surface">
-                            <Menu color="#64748b" size={22} strokeWidth={2.5} />
-                        </SafeButton>
-                        <View>
-                            <Text style={styles.welcomeText}>Welcome Back!</Text>
-                            <Text style={styles.welcomeSub}>Let's earn some coins 🎮</Text>
-                        </View>
-                    </View>
-
-                    <LinearGradient
-                        colors={['#22c55e', '#16a34a']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.coinBadge}
-                    >
-                        <Image source={ICONS.coin} style={styles.coinIcon as ImageStyle} />
-                        <Text style={styles.coinText}>{balance.toLocaleString()}</Text>
-                    </LinearGradient>
+                {/* Welcome Section */}
+                <View style={styles.welcomeSection}>
+                    <Text style={styles.welcomeText}>Welcome Back!</Text>
+                    <Text style={styles.welcomeSub}>Let's earn some coins 🎮</Text>
                 </View>
 
                 {/* Hero Card */}
                 <Animated.View style={{ transform: [{ translateY: heroFloat }] }}>
                     <LinearGradient
-                        colors={['#0f172a', '#1e293b', '#334155']}
+                        colors={['#1E293B', '#334155', '#475569']}
                         start={{ x: 0, y: 0 }}
-                        end={{ x: 1.2, y: 1.2 }}
+                        end={{ x: 1, y: 1 }}
                         style={styles.hero}
                     >
                         {/* Animated sparkles */}
@@ -201,13 +187,13 @@ export default function Home() {
 
                         <View style={styles.heroGlow} />
                         <LinearGradient
-                            colors={['rgba(34, 197, 94, 0.2)', 'transparent']}
+                            colors={['rgba(16, 185, 129, 0.15)', 'transparent']}
                             style={styles.heroGradientOverlay}
                         />
 
                         <View style={styles.heroContent}>
                             <View style={styles.heroBadge}>
-                                <Sparkles size={12} color="#22c55e" strokeWidth={2.5} />
+                                <Sparkles size={12} color="#10B981" strokeWidth={2.5} />
                                 <Text style={styles.heroBadgeText}>FREE ROBUX</Text>
                             </View>
                             <Text style={styles.heroTitle}>Get Free{'\n'}Roblox Coins</Text>
@@ -285,85 +271,36 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     scrollContent: {
-        paddingHorizontal: 20,
-        paddingTop: 60,
+        paddingHorizontal: 18,
+        paddingTop: 16,
         paddingBottom: 40,
     },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 24,
-    },
-    headerLeft: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-        flex: 1,
-    },
-    menuBtn: {
-        width: 44,
-        height: 44,
-        borderRadius: 12,
-        marginVertical: 0,
-        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-        elevation: 2,
-        borderWidth: 0.5,
-        borderColor: 'rgba(0,0,0,0.04)',
+    welcomeSection: {
+        marginBottom: 20,
     },
     welcomeText: {
-        fontSize: 16,
-        fontWeight: '700',
+        fontSize: 24,
+        fontWeight: '800',
         color: Colors.text,
-        letterSpacing: -0.3,
+        letterSpacing: -0.5,
+        marginBottom: 4,
     },
     welcomeSub: {
-        fontSize: 13,
+        fontSize: 15,
         fontWeight: '500',
         color: Colors.textSecondary,
-        marginTop: 2,
-    },
-    coinBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-        paddingVertical: 8,
-        paddingHorizontal: 14,
-        paddingRight: 16,
-        borderRadius: 100,
-        shadowColor: '#22c55e',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.35,
-        shadowRadius: 12,
-        elevation: 6,
-    },
-    coinIcon: {
-        width: 20,
-        height: 20,
-    } as ImageStyle,
-    coinText: {
-        color: '#fff',
-        fontWeight: '700',
-        fontSize: 15,
-        letterSpacing: -0.3,
     },
     hero: {
         height: 200,
-        borderRadius: 24,
+        borderRadius: 20,
         padding: 24,
         marginBottom: 24,
         justifyContent: 'flex-end',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 0.3,
-        shadowRadius: 24,
-        elevation: 12,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        elevation: 6,
         overflow: 'hidden',
     },
     heroGlow: {
@@ -373,7 +310,7 @@ const styles = StyleSheet.create({
         width: 200,
         height: 200,
         borderRadius: 100,
-        backgroundColor: 'rgba(34, 197, 94, 0.15)',
+        backgroundColor: 'rgba(16, 185, 129, 0.12)',
     },
     heroGradientOverlay: {
         position: 'absolute',
@@ -393,17 +330,17 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
-        backgroundColor: 'rgba(34, 197, 94, 0.2)',
+        backgroundColor: 'rgba(16, 185, 129, 0.18)',
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 100,
         alignSelf: 'flex-start',
         marginBottom: 12,
         borderWidth: 1,
-        borderColor: 'rgba(34, 197, 94, 0.3)',
+        borderColor: 'rgba(16, 185, 129, 0.25)',
     },
     heroBadgeText: {
-        color: '#22c55e',
+        color: '#10B981',
         fontSize: 11,
         fontWeight: '800',
         letterSpacing: 0.5,
@@ -439,15 +376,17 @@ const styles = StyleSheet.create({
     },
     statCard: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: Colors.surface,
         borderRadius: 16,
-        padding: 14,
+        padding: 16,
         alignItems: 'center',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.04,
-        shadowRadius: 8,
-        elevation: 2,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.03,
+        shadowRadius: 4,
+        elevation: 1,
+        borderWidth: 1,
+        borderColor: Colors.borderLight,
     },
     statIconContainer: {
         width: 36,
@@ -496,20 +435,20 @@ const styles = StyleSheet.create({
     },
     card: {
         flex: 1,
-        borderRadius: 20,
+        borderRadius: 18,
         marginVertical: 0,
         height: '100%',
         overflow: 'hidden',
     },
     cardGradient: {
         flex: 1,
-        borderRadius: 20,
+        borderRadius: 18,
         overflow: 'hidden',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.15,
-        shadowRadius: 16,
-        elevation: 6,
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.12,
+        shadowRadius: 8,
+        elevation: 4,
     },
     cardShine: {
         position: 'absolute',
@@ -529,16 +468,16 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     cardIconContainer: {
-        width: 64,
-        height: 64,
+        width: 60,
+        height: 60,
         borderRadius: 16,
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        backgroundColor: 'rgba(255, 255, 255, 0.25)',
         alignItems: 'center',
         justifyContent: 'center',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
     },
     cardIcon: {
         width: 40,
