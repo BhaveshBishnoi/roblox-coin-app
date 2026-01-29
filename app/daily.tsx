@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Container } from '../components/Container';
 import { SafeButton } from '../components/SafeButton';
-import { AppHeader } from '../components/AppHeader';
 import { Colors } from '../constants/Colors';
 import { useAdAction } from '../hooks/useAdAction';
 import { useCoins } from '../context/CoinContext';
@@ -39,10 +38,9 @@ export default function Daily() {
         });
     };
 
+
     return (
         <Container safeArea={false}>
-            <AppHeader title="Daily Bonus" />
-
             <ScrollView
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
@@ -58,12 +56,6 @@ export default function Daily() {
                     <View style={styles.iconGlow} />
                     <Gift size={56} color="#fff" strokeWidth={2} />
                 </LinearGradient>
-
-                {/* Title */}
-                <Text style={styles.title}>Daily Bonus</Text>
-                <Text style={styles.subtitle}>
-                    Return every 24 hours to claim your free 100 coins!
-                </Text>
 
                 {/* Status Card */}
                 {available ? (

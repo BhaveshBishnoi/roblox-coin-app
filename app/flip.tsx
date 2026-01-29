@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Pressable, Text, Alert } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, interpolate } from 'react-native-reanimated';
 import { Container } from '../components/Container';
-import { Title } from '../components/Title';
 import { Colors } from '../constants/Colors';
 import { useAdAction } from '../hooks/useAdAction';
 import { useCoins } from '../context/CoinContext';
@@ -86,7 +85,6 @@ export default function Flip() {
 
     return (
         <Container>
-            <Title>FLIP & WIN</Title>
 
             {available ? (
                 <Text style={styles.subtitle}>Tap a card to flip it!</Text>

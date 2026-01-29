@@ -145,6 +145,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 12,
         elevation: 16,
+        flexDirection: 'column',
     },
     header: {
         paddingTop: 60,
@@ -181,6 +182,7 @@ const styles = StyleSheet.create({
     menuContent: {
         flex: 1,
         paddingTop: 8,
+        overflow: 'hidden',
     },
     menuItem: {
         flexDirection: 'row',

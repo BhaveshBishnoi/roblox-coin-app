@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { Container } from '../components/Container';
 import { SafeButton } from '../components/SafeButton';
-import { AppHeader } from '../components/AppHeader';
 import { Colors } from '../constants/Colors';
 import { QUIZZES, Quiz, getRandomQuiz } from '../constants/QuizData';
 import { useCoins } from '../context/CoinContext';
-import { Clock, Trophy, CheckCircle, XCircle, Brain, Star } from 'lucide-react-native';
+import { CheckCircle, XCircle, Star } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
@@ -91,21 +90,11 @@ export default function QuizPage() {
     if (!available && !showResult) {
         return (
             <Container safeArea={false}>
+
                 <ScrollView
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}
                 >
-                    <LinearGradient
-                        colors={['#8B5CF6', '#7C3AED']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.iconContainer}
-                    >
-                        <Clock size={48} color="#fff" strokeWidth={2.5} />
-                    </LinearGradient>
-                    <Text style={styles.title}>Quiz Locked</Text>
-                    <Text style={styles.subtitle}>Come back later to test your knowledge</Text>
-
                     <View style={styles.lockedCard}>
                         <Text style={styles.lockedLabel}>Next quiz in</Text>
                         <Text style={styles.lockedTime}>{timeLeft}</Text>
@@ -122,21 +111,11 @@ export default function QuizPage() {
 
         return (
             <Container safeArea={false}>
+
                 <ScrollView
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}
                 >
-                    <LinearGradient
-                        colors={['#10B981', '#059669']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.iconContainer}
-                    >
-                        <Trophy size={48} color="#fff" strokeWidth={2.5} />
-                    </LinearGradient>
-                    <Text style={styles.title}>Quiz Complete!</Text>
-                    <Text style={styles.subtitle}>Great job on completing {currentQuiz.title}</Text>
-
                     <View style={styles.resultCard}>
                         <Text style={styles.resultLabel}>You Earned</Text>
                         <Text style={styles.resultScore}>{Math.round(score)}</Text>
@@ -170,21 +149,11 @@ export default function QuizPage() {
     if (showQuizSelection) {
         return (
             <Container safeArea={false}>
+
                 <ScrollView
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}
                 >
-                    <LinearGradient
-                        colors={['#8B5CF6', '#7C3AED']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.iconContainer}
-                    >
-                        <Brain size={48} color="#fff" strokeWidth={2.5} />
-                    </LinearGradient>
-                    <Text style={styles.title}>Choose a Quiz</Text>
-                    <Text style={styles.subtitle}>Test your Roblox knowledge and earn coins!</Text>
-
                     <View style={styles.quizGrid}>
                         {QUIZZES.map((quiz) => (
                             <View key={quiz.id} style={styles.quizCardWrapper}>
@@ -237,7 +206,6 @@ export default function QuizPage() {
 
     return (
         <Container safeArea={false}>
-            <AppHeader title={currentQuiz.title} />
 
             <ScrollView
                 contentContainerStyle={styles.scrollContent}

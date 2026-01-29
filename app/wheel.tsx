@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, Alert } from 'react-native';
 import { Container } from '../components/Container';
-import { Title } from '../components/Title';
 import { SafeButton } from '../components/SafeButton';
 import { Colors } from '../constants/Colors';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS } from 'react-native-reanimated';
@@ -76,9 +75,8 @@ export default function Wheel() {
 
     return (
         <Container>
-            <View style={styles.center}>
-                <Title>LUCKY WHEEL</Title>
 
+            <View style={styles.center}>
                 {!available && (
                     <View style={styles.cooldownContainer}>
                         <Clock size={16} color={Colors.danger} />

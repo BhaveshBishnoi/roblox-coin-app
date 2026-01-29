@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Platform, StatusBar as RNStatusBar } from 'react-native';
-import { SafeButton } from './SafeButton';
+import { View, Text, StyleSheet, Animated, Platform, StatusBar as RNStatusBar, TouchableOpacity } from 'react-native';
 import { MenuDrawer } from './MenuDrawer';
 import { useCoins } from '../context/CoinContext';
 import { Colors } from '../constants/Colors';
@@ -44,14 +43,17 @@ export function AppHeader({ title, showTitle = true }: AppHeaderProps) {
         <>
             <View style={styles.header}>
                 <View style={styles.headerContent}>
-                    <SafeButton onPress={openMenu} style={styles.menuBtn} variant="surface">
-                        <Menu color="#64748b" size={22} strokeWidth={2.5} />
-                    </SafeButton>
+                    {/* Menu Button */}
+                    <TouchableOpacity onPress={openMenu} style={styles.menuBtn} activeOpacity={0.7}>
+                        <Menu color={Colors.text} size={26} strokeWidth={2.5} />
+                    </TouchableOpacity>
 
+                    {/* Title */}
                     {showTitle && title && (
                         <Text style={styles.headerTitle} numberOfLines={1}>{title}</Text>
                     )}
 
+                    {/* Coin Badge */}
                     <LinearGradient
                         colors={['#10B981', '#059669']}
                         start={{ x: 0, y: 0 }}
@@ -75,68 +77,77 @@ export function AppHeader({ title, showTitle = true }: AppHeaderProps) {
 
 const styles = StyleSheet.create({
     header: {
-        backgroundColor: Colors.background,
-        paddingTop: Platform.OS === 'android' ? (RNStatusBar.currentHeight || 0) + 8 : 8,
-        paddingBottom: 12,
-        paddingHorizontal: 18,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: '#FFFFFF',
+        paddingTop: Platform.OS === 'ios' ? 50 : (RNStatusBar.currentHeight || 0) + 12,
+        paddingBottom: 16,
+        paddingHorizontal: 20,
         borderBottomWidth: 1,
-        borderBottomColor: Colors.borderLight,
+        borderBottomColor: 'rgba(0, 0, 0, 0.06)',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.03,
-        shadowRadius: 4,
-        elevation: 2,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+        elevation: 8,
+        zIndex: 100,
     },
     headerContent: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12,
+        gap: 14,
     },
     menuBtn: {
-        width: 44,
-        height: 44,
-        borderRadius: 14,
+        width: 50,
+        height: 50,
+        borderRadius: 16,
         marginVertical: 0,
         backgroundColor: Colors.surface,
         justifyContent: 'center',
         alignItems: 'center',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 1,
-        borderWidth: 1,
-        borderColor: Colors.borderLight,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        elevation: 3,
+        borderWidth: 1.5,
+        borderColor: 'rgba(0, 0, 0, 0.06)',
     },
     headerTitle: {
         flex: 1,
-        fontSize: 18,
-        fontWeight: '700',
+        fontSize: 20,
+        fontWeight: '800',
         color: Colors.text,
-        letterSpacing: -0.4,
+        letterSpacing: -0.5,
     },
     coinBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6,
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        paddingRight: 14,
+        gap: 8,
+        paddingVertical: 10,
+        paddingHorizontal: 14,
+        paddingRight: 16,
         borderRadius: 100,
         shadowColor: '#10B981',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 8,
-        elevation: 4,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+        elevation: 6,
     },
     coinIcon: {
-        width: 18,
-        height: 18,
+        width: 22,
+        height: 22,
     } as ImageStyle,
     coinText: {
         color: '#fff',
-        fontWeight: '700',
-        fontSize: 14,
-        letterSpacing: -0.3,
+        fontWeight: '800',
+        fontSize: 16,
+        letterSpacing: -0.4,
     },
 });

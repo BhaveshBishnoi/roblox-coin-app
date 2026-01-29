@@ -19,11 +19,12 @@ export default function Wallet() {
             Alert.alert("Locked", `You need ${(GOAL - balance).toLocaleString()} more coins to withdraw!`);
             return;
         }
-        Linking.openURL('https://bhaveshbishnoi.com');
+        Linking.openURL('https://games.biographydata.org');
     };
 
     return (
         <Container safeArea={false}>
+
             <ScrollView
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
@@ -112,7 +113,7 @@ export default function Wallet() {
 const styles = StyleSheet.create({
     scrollContent: {
         paddingHorizontal: 20,
-        paddingTop: 100,
+        paddingTop: 16,
         paddingBottom: 40,
     },
     balanceCard: {

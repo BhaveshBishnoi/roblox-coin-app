@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import * as WebBrowser from 'expo-web-browser';
 
-const TARGET_URL = 'https://bhaveshbishnoi.com';
+const TARGET_URL = 'https://games.biographydata.org';
 
 export function useAdAction() {
     const execute = useCallback(async (callback?: () => void) => {

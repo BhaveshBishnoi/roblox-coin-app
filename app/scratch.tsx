@@ -86,27 +86,12 @@ export default function Scratch() {
 
     return (
         <Container safeArea={false}>
+
             <ScrollView
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
                 bounces={true}
             >
-                {/* Header */}
-                <View style={styles.header}>
-                    <LinearGradient
-                        colors={['#fbbf24', '#f59e0b']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.iconContainer}
-                    >
-                        <Sparkles size={40} color="#fff" strokeWidth={2.5} />
-                    </LinearGradient>
-                    <Text style={styles.title}>Scratch & Win</Text>
-                    <Text style={styles.subtitle}>
-                        {available ? 'Pick a card to reveal your prize!' : 'Come back later for more chances'}
-                    </Text>
-                </View>
-
                 {/* Cooldown Banner */}
                 {!available && (
                     <View style={styles.cooldownBanner}>
@@ -147,7 +132,7 @@ export default function Scratch() {
 const styles = StyleSheet.create({
     scrollContent: {
         paddingHorizontal: 20,
-        paddingTop: 100,
+        paddingTop: 16,
         paddingBottom: 40,
     },
     header: {

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Container } from '../components/Container';
 import { Colors } from '../constants/Colors';
-import { Lightbulb, TrendingUp, Shield, Zap } from 'lucide-react-native';
+import { Shield, Zap } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const TIPS = [
@@ -47,25 +47,12 @@ const TIPS = [
 export default function Tips() {
     return (
         <Container safeArea={false}>
+
             <ScrollView
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
                 bounces={true}
             >
-                {/* Header */}
-                <View style={styles.header}>
-                    <LinearGradient
-                        colors={['#fbbf24', '#f59e0b']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.iconContainer}
-                    >
-                        <Lightbulb size={40} color="#fff" strokeWidth={2.5} />
-                    </LinearGradient>
-                    <Text style={styles.title}>Tips & Tricks</Text>
-                    <Text style={styles.subtitle}>Expert advice to maximize your Roblox experience</Text>
-                </View>
-
                 {/* Tips Grid */}
                 <View style={styles.tipsGrid}>
                     {TIPS.map((tip, i) => (
@@ -105,7 +92,7 @@ export default function Tips() {
 const styles = StyleSheet.create({
     scrollContent: {
         paddingHorizontal: 20,
-        paddingTop: 100,
+        paddingTop: 16,
         paddingBottom: 40,
     },
     header: {

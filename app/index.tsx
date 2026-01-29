@@ -137,7 +137,7 @@ export default function Home() {
 
     return (
         <Container safeArea={false}>
-            <AppHeader showTitle={false} />
+            <AppHeader title="Roblox Coins" />
 
             <ScrollView
                 style={styles.scrollView}
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         paddingHorizontal: 18,
-        paddingTop: 16,
+        paddingTop: 80,
         paddingBottom: 40,
     },
     welcomeSection: {
