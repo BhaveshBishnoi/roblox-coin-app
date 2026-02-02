@@ -19,21 +19,33 @@ export default function Wheel() {
     const [spinning, setSpinning] = useState(false);
     const [available, setAvailable] = useState(false);
     const [timeLeft, setTimeLeft] = useState<string | null>(null);
+    const isMounted = React.useRef(true);
+
+    useEffect(() => {
+        isMounted.current = true;
+        return () => {
+            isMounted.current = false;
+        };
+    }, []);
 
     useEffect(() => {
         const updateStatus = () => {
             try {
                 const isReady = checkCooldown('wheel', 3); // 3 hours cooldown
-                setAvailable(isReady);
-                if (!isReady) {
-                    const remaining = getRemainingTime('wheel', 3);
-                    setTimeLeft(remaining || '0h 0m');
-                } else {
-                    setTimeLeft(null);
+                if (isMounted.current) {
+                    setAvailable(isReady);
+                    if (!isReady) {
+                        const remaining = getRemainingTime('wheel', 3);
+                        setTimeLeft(remaining || '0h 0m');
+                    } else {
+                        setTimeLeft(null);
+                    }
                 }
             } catch (error) {
                 console.error('Error updating wheel status:', error);
-                setAvailable(false);
+                if (isMounted.current) {
+                    setAvailable(false);
+                }
             }
         };
 
@@ -61,17 +73,47 @@ export default function Wheel() {
         return `M${RADIUS},${RADIUS} L${x1},${y1} A${RADIUS},${RADIUS} 0 0,1 ${x2},${y2} Z`;
     };
 
-    const handleResult = () => {
+    const calculateWinningSegment = (finalRotation: number) => {
+        // Normalize rotation to 0-360
+        const normalizedRotation = finalRotation % 360;
+        // Calculate which segment the arrow points to (top of wheel)
+        // Arrow points up, so we need to account for that
+        const segmentAngle = 360 / SEGMENTS.length;
+        const adjustedRotation = (360 - normalizedRotation + (segmentAngle / 2)) % 360;
+        const segmentIndex = Math.floor(adjustedRotation / segmentAngle) % SEGMENTS.length;
+        return SEGMENTS[segmentIndex];
+    };
+
+    const handleResult = (finalRotation: number) => {
+        if (!isMounted.current) return;
+
         try {
+            const winningSegment = calculateWinningSegment(finalRotation);
+
             setSpinning(false);
-            // Mock result: 100 coins
-            addCoins(100, 'Wheel Spin');
-            setCooldown('wheel');
-            setAvailable(false);
-            Alert.alert("WINNER!", "You won 100 Coins!");
+
+            if (winningSegment === 'LOSE') {
+                setCooldown('wheel');
+                setAvailable(false);
+                Alert.alert("😢 Better Luck Next Time!", "You didn't win this time. Try again in 3 hours!");
+            } else if (winningSegment === 'JACKPOT') {
+                const jackpotAmount = 1000;
+                addCoins(jackpotAmount, 'Wheel Jackpot');
+                setCooldown('wheel');
+                setAvailable(false);
+                Alert.alert("🎉 JACKPOT!", `Amazing! You won ${jackpotAmount} Coins!`);
+            } else {
+                const amount = parseInt(winningSegment, 10);
+                addCoins(amount, 'Wheel Spin');
+                setCooldown('wheel');
+                setAvailable(false);
+                Alert.alert("🎊 WINNER!", `Congratulations! You won ${amount} Coins!`);
+            }
         } catch (error) {
             console.error('Error handling wheel result:', error);
-            setSpinning(false);
+            if (isMounted.current) {
+                setSpinning(false);
+            }
             Alert.alert("Error", "Something went wrong. Please try again.");
         }
     };
@@ -81,18 +123,24 @@ export default function Wheel() {
 
         try {
             setSpinning(true);
-            const randomRotation = 360 * 5 + Math.random() * 360;
-            rotation.value = withTiming(randomRotation, {
+            // Generate random final rotation (5-7 full spins + random position)
+            const fullSpins = 5 + Math.floor(Math.random() * 3); // 5-7 full rotations
+            const randomAngle = Math.random() * 360;
+            const finalRotation = fullSpins * 360 + randomAngle;
+
+            rotation.value = withTiming(finalRotation, {
                 duration: 4000,
                 easing: Easing.out(Easing.cubic),
             }, (finished) => {
-                if (finished) {
-                    runOnJS(handleResult)();
+                if (finished && isMounted.current) {
+                    runOnJS(handleResult)(finalRotation);
                 }
             });
         } catch (error) {
             console.error('Error spinning wheel:', error);
-            setSpinning(false);
+            if (isMounted.current) {
+                setSpinning(false);
+            }
             Alert.alert("Error", "Failed to spin wheel. Please try again.");
         }
     };

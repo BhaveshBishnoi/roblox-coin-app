@@ -89,7 +89,7 @@ export default function QuizPage() {
     // Locked state
     if (!available && !showResult) {
         return (
-            <Container safeArea={false}>
+            <Container>
                 <ScrollView
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}
@@ -121,12 +121,19 @@ export default function QuizPage() {
         const correctAnswers = Math.round(score / (currentQuiz.reward / currentQuiz.questions.length));
 
         return (
-            <Container safeArea={false}>
-
+            <Container>
                 <ScrollView
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}
                 >
+                    {/* Header */}
+                    <View style={styles.header}>
+                        <Text style={styles.headerTitle}>🎉 Quiz Complete!</Text>
+                        <Text style={styles.headerSubtitle}>
+                            Great job! Here are your results
+                        </Text>
+                    </View>
+
                     <View style={styles.resultCard}>
                         <Text style={styles.resultLabel}>You Earned</Text>
                         <Text style={styles.resultScore}>{Math.round(score)}</Text>
@@ -159,12 +166,20 @@ export default function QuizPage() {
     // Quiz selection state
     if (showQuizSelection) {
         return (
-            <Container safeArea={false}>
-
+            <Container>
                 <ScrollView
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}
                 >
+                    {/* Header */}
+                    <View style={styles.header}>
+                        <Text style={styles.headerTitle}>🧠 Quiz Challenge</Text>
+                        <Text style={styles.headerSubtitle}>
+                            Test your Roblox knowledge and earn coins!
+                        </Text>
+                    </View>
+
+                    {/* Quiz Grid */}
                     <View style={styles.quizGrid}>
                         {QUIZZES.map((quiz) => (
                             <View key={quiz.id} style={styles.quizCardWrapper}>
@@ -174,29 +189,31 @@ export default function QuizPage() {
                                     variant="surface"
                                 >
                                     <View style={styles.quizCardContent}>
-                                        <View style={[
-                                            styles.difficultyBadge,
-                                            {
-                                                backgroundColor:
-                                                    quiz.difficulty === 'Easy' ? '#D1FAE5' :
-                                                        quiz.difficulty === 'Medium' ? '#FEF3C7' : '#FEE2E2'
+                                        {/* Difficulty Badge */}
+                                        <LinearGradient
+                                            colors={
+                                                quiz.difficulty === 'Easy' ? ['#10B981', '#059669'] :
+                                                    quiz.difficulty === 'Medium' ? ['#F59E0B', '#D97706'] :
+                                                        ['#EF4444', '#DC2626']
                                             }
-                                        ]}>
-                                            <Text style={[
-                                                styles.difficultyText,
-                                                {
-                                                    color:
-                                                        quiz.difficulty === 'Easy' ? '#059669' :
-                                                            quiz.difficulty === 'Medium' ? '#D97706' : '#DC2626'
-                                                }
-                                            ]}>{quiz.difficulty}</Text>
-                                        </View>
-                                        <Text style={styles.quizTitle}>{quiz.title}</Text>
-                                        <Text style={styles.quizCategory}>{quiz.category}</Text>
+                                            start={{ x: 0, y: 0 }}
+                                            end={{ x: 1, y: 0 }}
+                                            style={styles.difficultyBadge}
+                                        >
+                                            <Text style={styles.difficultyText}>{quiz.difficulty}</Text>
+                                        </LinearGradient>
+
+                                        {/* Quiz Info */}
+                                        <Text style={styles.quizTitle} numberOfLines={2}>{quiz.title}</Text>
+                                        <Text style={styles.quizCategory} numberOfLines={1}>{quiz.category}</Text>
+
+                                        {/* Footer */}
                                         <View style={styles.quizFooter}>
-                                            <Text style={styles.quizQuestions}>{quiz.questions.length} Questions</Text>
+                                            <View style={styles.questionsInfo}>
+                                                <Text style={styles.quizQuestions}>📝 {quiz.questions.length} Qs</Text>
+                                            </View>
                                             <View style={styles.rewardBadge}>
-                                                <Star size={12} color={Colors.accent} fill={Colors.accent} />
+                                                <Star size={14} color={Colors.accent} fill={Colors.accent} />
                                                 <Text style={styles.rewardText}>{quiz.reward}</Text>
                                             </View>
                                         </View>
@@ -204,6 +221,15 @@ export default function QuizPage() {
                                 </SafeButton>
                             </View>
                         ))}
+                    </View>
+
+                    {/* Info Card */}
+                    <View style={styles.infoCard}>
+                        <Text style={styles.infoIcon}>💡</Text>
+                        <Text style={styles.infoTitle}>How it works</Text>
+                        <Text style={styles.infoText}>
+                            Choose a quiz, answer all questions correctly to earn maximum coins. You can play once every 2 hours!
+                        </Text>
                     </View>
                 </ScrollView>
             </Container>
@@ -216,21 +242,25 @@ export default function QuizPage() {
     const question = currentQuiz.questions[current];
 
     return (
-        <Container safeArea={false}>
-
+        <Container>
             <ScrollView
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
                 {/* Progress */}
                 <View style={styles.progressContainer}>
-                    <Text style={styles.progressText}>Question {current + 1} of {currentQuiz.questions.length}</Text>
+                    <Text style={styles.progressText}>
+                        Question {current + 1} of {currentQuiz.questions.length}
+                    </Text>
                     <View style={styles.progressBar}>
                         <LinearGradient
                             colors={['#8B5CF6', '#7C3AED']}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 0 }}
-                            style={[styles.progressFill, { width: `${((current + 1) / currentQuiz.questions.length) * 100}%` }]}
+                            style={[
+                                styles.progressFill,
+                                { width: `${((current + 1) / currentQuiz.questions.length) * 100}%` }
+                            ]}
                         />
                     </View>
                 </View>
@@ -238,7 +268,10 @@ export default function QuizPage() {
                 {/* Quiz Info */}
                 <View style={styles.quizInfo}>
                     <Text style={styles.quizInfoTitle}>{currentQuiz.title}</Text>
-                    <Text style={styles.quizInfoScore}>Score: {Math.round(score)}</Text>
+                    <View style={styles.scoreContainer}>
+                        <Star size={16} color={Colors.purple} fill={Colors.purple} />
+                        <Text style={styles.quizInfoScore}>{Math.round(score)}</Text>
+                    </View>
                 </View>
 
                 {/* Question Card */}
@@ -281,10 +314,9 @@ export default function QuizPage() {
 
 const styles = StyleSheet.create({
     scrollContent: {
-        paddingHorizontal: 18,
+        paddingHorizontal: 20,
         paddingTop: 16,
         paddingBottom: 40,
-        alignItems: 'center',
     },
     iconContainer: {
         width: 96,
@@ -443,14 +475,65 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 56,
     },
+    header: {
+        alignItems: 'center',
+        marginBottom: 24,
+    },
+    headerTitle: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        color: Colors.text,
+        marginBottom: 8,
+    },
+    headerSubtitle: {
+        fontSize: 14,
+        color: Colors.textSecondary,
+        textAlign: 'center',
+        lineHeight: 20,
+    },
+    infoCard: {
+        backgroundColor: Colors.surface,
+        borderRadius: 16,
+        padding: 20,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+        elevation: 2,
+        borderWidth: 1,
+        borderColor: Colors.borderLight,
+    },
+    infoIcon: {
+        fontSize: 36,
+        marginBottom: 10,
+    },
+    infoTitle: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: Colors.text,
+        marginBottom: 6,
+        letterSpacing: -0.3,
+    },
+    infoText: {
+        fontSize: 13,
+        color: Colors.textSecondary,
+        textAlign: 'center',
+        lineHeight: 19,
+        fontWeight: '500',
+    },
+    questionsInfo: {
+        flex: 1,
+    },
     quizGrid: {
         width: '100%',
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 12,
+        marginBottom: 24,
     },
     quizCardWrapper: {
-        width: (width - 48) / 2,
+        width: (width - 52) / 2,
     },
     quizCard: {
         width: '100%',
@@ -460,29 +543,33 @@ const styles = StyleSheet.create({
     },
     quizCardContent: {
         padding: 16,
-        minHeight: 160,
+        minHeight: 180,
+        justifyContent: 'space-between',
     },
     difficultyBadge: {
         alignSelf: 'flex-start',
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 12,
         marginBottom: 12,
     },
     difficultyText: {
         fontSize: 11,
         fontWeight: '700',
         letterSpacing: 0.5,
+        color: '#fff',
+        textTransform: 'uppercase',
     },
     quizTitle: {
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: '700',
         color: Colors.text,
-        marginBottom: 4,
+        marginBottom: 6,
         letterSpacing: -0.3,
+        lineHeight: 20,
     },
     quizCategory: {
-        fontSize: 13,
+        fontSize: 12,
         fontWeight: '500',
         color: Colors.textSecondary,
         marginBottom: 12,
@@ -502,29 +589,29 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
-        backgroundColor: Colors.primaryLight,
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 8,
+        backgroundColor: 'rgba(245, 158, 11, 0.15)',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 10,
     },
     rewardText: {
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: '700',
         color: Colors.accent,
     },
     progressContainer: {
         width: '100%',
-        marginBottom: 20,
+        marginBottom: 24,
     },
     progressText: {
         fontSize: 14,
         fontWeight: '600',
         color: Colors.textSecondary,
-        marginBottom: 8,
+        marginBottom: 10,
         textAlign: 'center',
     },
     progressBar: {
-        height: 6,
+        height: 8,
         backgroundColor: Colors.borderLight,
         borderRadius: 100,
         overflow: 'hidden',
@@ -538,13 +625,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 24,
         paddingHorizontal: 4,
     },
     quizInfoTitle: {
         fontSize: 16,
         fontWeight: '700',
         color: Colors.text,
+    },
+    scoreContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
     },
     quizInfoScore: {
         fontSize: 16,
@@ -554,9 +646,9 @@ const styles = StyleSheet.create({
     questionCard: {
         width: '100%',
         backgroundColor: Colors.surface,
-        padding: 24,
+        padding: 28,
         borderRadius: 20,
-        marginBottom: 20,
+        marginBottom: 24,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.06,
@@ -564,13 +656,15 @@ const styles = StyleSheet.create({
         elevation: 3,
         borderWidth: 1,
         borderColor: Colors.borderLight,
+        minHeight: 140,
+        justifyContent: 'center',
     },
     questionText: {
-        fontSize: 18,
+        fontSize: 19,
         fontWeight: '700',
         color: Colors.text,
         textAlign: 'center',
-        lineHeight: 26,
+        lineHeight: 28,
         letterSpacing: -0.3,
     },
     options: {
@@ -579,7 +673,7 @@ const styles = StyleSheet.create({
     },
     optionBtn: {
         width: '100%',
-        height: 56,
+        minHeight: 60,
     },
     optionSelected: {
         transform: [{ scale: 0.98 }],

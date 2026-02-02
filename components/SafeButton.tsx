@@ -86,8 +86,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'row',
-        width: '100%',
-        height: '100%', // FORCE FILL
+        borderRadius: 24,
     },
     text: {
         fontWeight: '800',
