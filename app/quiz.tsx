@@ -188,36 +188,58 @@ export default function QuizPage() {
                                     style={styles.quizCard}
                                     variant="surface"
                                 >
-                                    <View style={styles.quizCardContent}>
-                                        {/* Difficulty Badge */}
-                                        <LinearGradient
-                                            colors={
-                                                quiz.difficulty === 'Easy' ? ['#10B981', '#059669'] :
-                                                    quiz.difficulty === 'Medium' ? ['#F59E0B', '#D97706'] :
-                                                        ['#EF4444', '#DC2626']
-                                            }
-                                            start={{ x: 0, y: 0 }}
-                                            end={{ x: 1, y: 0 }}
-                                            style={styles.difficultyBadge}
-                                        >
-                                            <Text style={styles.difficultyText}>{quiz.difficulty}</Text>
-                                        </LinearGradient>
+                                    <LinearGradient
+                                        colors={[
+                                            quiz.difficulty === 'Easy' ? 'rgba(16, 185, 129, 0.08)' :
+                                                quiz.difficulty === 'Medium' ? 'rgba(245, 158, 11, 0.08)' :
+                                                    'rgba(239, 68, 68, 0.08)',
+                                            'rgba(255, 255, 255, 0)'
+                                        ]}
+                                        start={{ x: 0, y: 0 }}
+                                        end={{ x: 0, y: 1 }}
+                                        style={styles.quizCardGradient}
+                                    >
+                                        <View style={styles.quizCardContent}>
+                                            {/* Difficulty Badge */}
+                                            <LinearGradient
+                                                colors={
+                                                    quiz.difficulty === 'Easy' ? ['#10B981', '#059669'] :
+                                                        quiz.difficulty === 'Medium' ? ['#F59E0B', '#D97706'] :
+                                                            ['#EF4444', '#DC2626']
+                                                }
+                                                start={{ x: 0, y: 0 }}
+                                                end={{ x: 1, y: 0 }}
+                                                style={styles.difficultyBadge}
+                                            >
+                                                <Text style={styles.difficultyText}>{quiz.difficulty}</Text>
+                                            </LinearGradient>
 
-                                        {/* Quiz Info */}
-                                        <Text style={styles.quizTitle} numberOfLines={2}>{quiz.title}</Text>
-                                        <Text style={styles.quizCategory} numberOfLines={1}>{quiz.category}</Text>
-
-                                        {/* Footer */}
-                                        <View style={styles.quizFooter}>
-                                            <View style={styles.questionsInfo}>
-                                                <Text style={styles.quizQuestions}>📝 {quiz.questions.length} Qs</Text>
+                                            {/* Quiz Info */}
+                                            <View style={styles.quizTitleContainer}>
+                                                <Text style={styles.quizTitle} numberOfLines={2}>{quiz.title}</Text>
+                                                <Text style={styles.quizCategory} numberOfLines={1}>{quiz.category}</Text>
                                             </View>
-                                            <View style={styles.rewardBadge}>
-                                                <Star size={14} color={Colors.accent} fill={Colors.accent} />
-                                                <Text style={styles.rewardText}>{quiz.reward}</Text>
+
+                                            {/* Divider */}
+                                            <View style={styles.cardDivider} />
+
+                                            {/* Footer */}
+                                            <View style={styles.quizFooter}>
+                                                <View style={styles.questionsInfo}>
+                                                    <Text style={styles.quizQuestions}>📝 {quiz.questions.length} Questions</Text>
+                                                </View>
+                                                <LinearGradient
+                                                    colors={['rgba(245, 158, 11, 0.15)', 'rgba(245, 158, 11, 0.05)']}
+                                                    start={{ x: 0, y: 0 }}
+                                                    end={{ x: 1, y: 0 }}
+                                                    style={styles.rewardBadge}
+                                                >
+                                                    <Star size={16} color={Colors.accent} fill={Colors.accent} />
+                                                    <Text style={styles.rewardText}>{quiz.reward}</Text>
+                                                </LinearGradient>
                                             </View>
                                         </View>
-                                    </View>
+                                    </LinearGradient>
                                 </SafeButton>
                             </View>
                         ))}
@@ -529,61 +551,87 @@ const styles = StyleSheet.create({
         width: '100%',
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 12,
+        gap: 16,
         marginBottom: 24,
     },
     quizCardWrapper: {
-        width: (width - 52) / 2,
+        width: (width - 56) / 2,
     },
     quizCard: {
         width: '100%',
-        borderRadius: 16,
+        borderRadius: 20,
         marginVertical: 0,
         overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+        elevation: 4,
+        borderWidth: 1,
+        borderColor: 'rgba(0, 0, 0, 0.05)',
+    },
+    quizCardGradient: {
+        width: '100%',
+        height: '100%',
     },
     quizCardContent: {
-        padding: 16,
-        minHeight: 180,
+        padding: 18,
+        minHeight: 200,
         justifyContent: 'space-between',
+    },
+    quizTitleContainer: {
+        flex: 1,
+        marginBottom: 12,
+    },
+    cardDivider: {
+        height: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.06)',
+        marginBottom: 12,
     },
     difficultyBadge: {
         alignSelf: 'flex-start',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 12,
-        marginBottom: 12,
+        paddingHorizontal: 14,
+        paddingVertical: 7,
+        borderRadius: 14,
+        marginBottom: 14,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        elevation: 3,
     },
     difficultyText: {
-        fontSize: 11,
-        fontWeight: '700',
-        letterSpacing: 0.5,
+        fontSize: 10,
+        fontWeight: '800',
+        letterSpacing: 0.8,
         color: '#fff',
         textTransform: 'uppercase',
     },
     quizTitle: {
-        fontSize: 15,
-        fontWeight: '700',
+        fontSize: 16,
+        fontWeight: '800',
         color: Colors.text,
         marginBottom: 6,
-        letterSpacing: -0.3,
-        lineHeight: 20,
+        letterSpacing: -0.4,
+        lineHeight: 22,
     },
     quizCategory: {
-        fontSize: 12,
-        fontWeight: '500',
+        fontSize: 13,
+        fontWeight: '600',
         color: Colors.textSecondary,
-        marginBottom: 12,
+        opacity: 0.8,
     },
     quizFooter: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 'auto',
+        gap: 8,
     },
     quizQuestions: {
-        fontSize: 12,
-        fontWeight: '600',
+        fontSize: 11,
+        fontWeight: '700',
         color: Colors.textTertiary,
+        letterSpacing: 0.2,
     },
     rewardBadge: {
         flexDirection: 'row',
@@ -595,9 +643,10 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     rewardText: {
-        fontSize: 13,
-        fontWeight: '700',
+        fontSize: 14,
+        fontWeight: '800',
         color: Colors.accent,
+        letterSpacing: -0.2,
     },
     progressContainer: {
         width: '100%',

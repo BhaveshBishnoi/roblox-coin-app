@@ -9,14 +9,22 @@ export interface Transaction {
     date: number;
 }
 
+interface RewardPopup {
+    visible: boolean;
+    amount: number;
+    source: string;
+}
+
 interface CoinContextType {
     balance: number;
     transactions: Transaction[];
+    rewardPopup: RewardPopup;
     addCoins: (amount: number, source: string) => void;
     subtractCoins: (amount: number) => boolean;
     checkCooldown: (key: string, durationHours: number) => boolean;
     setCooldown: (key: string) => void;
     getRemainingTime: (key: string, durationHours: number) => string | null;
+    hideRewardPopup: () => void;
 }
 
 const CoinContext = createContext<CoinContextType | undefined>(undefined);
@@ -31,6 +39,11 @@ export function CoinProvider({ children }: { children: React.ReactNode }) {
     const [balance, setBalance] = useState(0);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [cooldowns, setCooldowns] = useState<Record<string, number>>({});
+    const [rewardPopup, setRewardPopup] = useState<RewardPopup>({
+        visible: false,
+        amount: 0,
+        source: '',
+    });
 
     useEffect(() => {
         loadData();
@@ -68,6 +81,21 @@ export function CoinProvider({ children }: { children: React.ReactNode }) {
             ['roblox_coins', newBalance.toString()],
             ['roblox_history', JSON.stringify(newHistory)]
         ]);
+
+        // Show reward popup
+        setRewardPopup({
+            visible: true,
+            amount,
+            source,
+        });
+    };
+
+    const hideRewardPopup = () => {
+        setRewardPopup({
+            visible: false,
+            amount: 0,
+            source: '',
+        });
     };
 
     const subtractCoins = (amount: number) => {
@@ -117,7 +145,7 @@ export function CoinProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <CoinContext.Provider value={{ balance, transactions, addCoins, subtractCoins, checkCooldown, setCooldown, getRemainingTime }}>
+        <CoinContext.Provider value={{ balance, transactions, rewardPopup, addCoins, subtractCoins, checkCooldown, setCooldown, getRemainingTime, hideRewardPopup }}>
             {children}
         </CoinContext.Provider>
     );

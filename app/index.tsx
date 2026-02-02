@@ -202,6 +202,14 @@ export default function Home() {
                             </View>
                             <Text style={styles.heroTitle}>Get Free{'\n'}Roblox Coins</Text>
                             <Text style={styles.heroSub}>Play games • Complete tasks • Earn rewards</Text>
+
+                            {/* Calculator Button */}
+                            <SafeButton
+                                title="💰 Robux Calculator"
+                                onPress={() => router.push('/calculator')}
+                                variant="surface"
+                                style={styles.calculatorButton}
+                            />
                         </View>
 
                         <Animated.View style={[styles.heroCoinContainer, { transform: [{ scale: coinScale }] }]}>
@@ -295,7 +303,7 @@ const styles = StyleSheet.create({
         color: Colors.textSecondary,
     },
     hero: {
-        height: 200,
+        height: 240,
         borderRadius: 20,
         padding: 24,
         marginBottom: 24,
@@ -362,6 +370,12 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '500',
         letterSpacing: -0.2,
+        marginBottom: 16,
+    },
+    calculatorButton: {
+        width: '100%',
+        height: 44,
+        marginVertical: 0,
     },
     heroCoinContainer: {
         position: 'absolute',

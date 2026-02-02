@@ -1,11 +1,14 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Colors } from '../constants/Colors';
-import { CoinProvider } from '../context/CoinContext';
+import { CoinProvider, useCoins } from '../context/CoinContext';
+import { CoinRewardPopup } from '../components/CoinRewardPopup';
 
-export default function RootLayout() {
+function AppContent() {
+    const { rewardPopup, hideRewardPopup } = useCoins();
+
     return (
-        <CoinProvider>
+        <>
             <StatusBar style="light" />
             <Stack
                 screenOptions={{
@@ -32,7 +35,30 @@ export default function RootLayout() {
                 <Stack.Screen name="flip" options={{ title: 'Flip Cards' }} />
                 <Stack.Screen name="tips" options={{ title: 'Tips & Tricks' }} />
                 <Stack.Screen name="wallet" options={{ title: 'My Wallet' }} />
+                <Stack.Screen name="calculator" options={{ title: 'Robux Calculators' }} />
+                <Stack.Screen name="calculators/usd-to-robux" options={{ title: 'USD to Robux' }} />
+                <Stack.Screen name="calculators/inr-to-robux" options={{ title: 'INR to Robux' }} />
+                <Stack.Screen name="calculators/robux-to-usd" options={{ title: 'Robux to USD' }} />
+                <Stack.Screen name="calculators/robux-to-inr" options={{ title: 'Robux to INR' }} />
+                <Stack.Screen name="calculators/btc-to-robux" options={{ title: 'Bitcoin to Robux' }} />
+                <Stack.Screen name="calculators/robux-to-btc" options={{ title: 'Robux to Bitcoin' }} />
+                <Stack.Screen name="calculators/obc-to-robux" options={{ title: 'OBC to Robux' }} />
+                <Stack.Screen name="calculators/bc-to-robux" options={{ title: 'BC to Robux' }} />
             </Stack>
+            <CoinRewardPopup
+                visible={rewardPopup.visible}
+                amount={rewardPopup.amount}
+                source={rewardPopup.source}
+                onClose={hideRewardPopup}
+            />
+        </>
+    );
+}
+
+export default function RootLayout() {
+    return (
+        <CoinProvider>
+            <AppContent />
         </CoinProvider>
     );
 }
