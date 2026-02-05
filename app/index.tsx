@@ -163,43 +163,11 @@ export default function Home() {
                         end={{ x: 1, y: 1 }}
                         style={styles.hero}
                     >
-                        {/* Animated sparkles */}
-                        <Animated.View style={[styles.sparkle, {
-                            top: 20,
-                            left: 30,
-                            opacity: sparkle1,
-                            transform: [{ scale: sparkle1 }]
-                        }]}>
-                            <Sparkles size={16} color="#fbbf24" fill="#fbbf24" />
-                        </Animated.View>
-                        <Animated.View style={[styles.sparkle, {
-                            top: 60,
-                            left: 60,
-                            opacity: sparkle2,
-                            transform: [{ scale: sparkle2 }]
-                        }]}>
-                            <Sparkles size={12} color="#22c55e" fill="#22c55e" />
-                        </Animated.View>
-                        <Animated.View style={[styles.sparkle, {
-                            top: 40,
-                            right: 80,
-                            opacity: sparkle3,
-                            transform: [{ scale: sparkle3 }]
-                        }]}>
-                            <Sparkles size={14} color="#a855f7" fill="#a855f7" />
-                        </Animated.View>
 
                         <View style={styles.heroGlow} />
-                        <LinearGradient
-                            colors={['rgba(16, 185, 129, 0.15)', 'transparent']}
-                            style={styles.heroGradientOverlay}
-                        />
+
 
                         <View style={styles.heroContent}>
-                            <View style={styles.heroBadge}>
-                                <Sparkles size={12} color="#10B981" strokeWidth={2.5} />
-                                <Text style={styles.heroBadgeText}>FREE ROBUX</Text>
-                            </View>
                             <Text style={styles.heroTitle}>Get Free{'\n'}Roblox Coins</Text>
                             <Text style={styles.heroSub}>Play games • Complete tasks • Earn rewards</Text>
 

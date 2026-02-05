@@ -1,16 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Container } from '../components/Container';
-import { SafeButton } from '../components/SafeButton';
+import { useAdAction } from '../hooks/useAdAction';
 import { Colors } from '../constants/Colors';
-import { Calculator, DollarSign, IndianRupee, Bitcoin, TrendingUp, Sparkles } from 'lucide-react-native';
+import { Calculator, DollarSign, IndianRupee, Bitcoin, TrendingUp, Sparkles, ArrowRight } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
 
 export default function CalculatorHub() {
     const router = useRouter();
+    const triggerAd = useAdAction();
 
     const calculators = [
         {
@@ -110,13 +111,17 @@ export default function CalculatorHub() {
                 {/* Calculator Grid */}
                 <View style={styles.grid}>
                     {calculators.map((calc) => (
-                        <View key={calc.id} style={styles.cardWrapper}>
-                            <SafeButton
-                                onPress={() => router.push(calc.route as any)}
-                                style={styles.card}
-                                variant="surface"
-                            >
-                                {/* Top Section (70%) - Gradient with Icon */}
+                        <TouchableOpacity
+                            key={calc.id}
+                            style={[
+                                styles.cardWrapper,
+                                { shadowColor: calc.gradient[0] } // Dynamic colored shadow
+                            ]}
+                            onPress={() => triggerAd(() => router.push(calc.route as any))}
+                            activeOpacity={0.85}
+                        >
+                            <View style={styles.cardInner}>
+                                {/* Top Section - Gradient */}
                                 <LinearGradient
                                     colors={calc.gradient}
                                     start={{ x: 0, y: 0 }}
@@ -124,21 +129,25 @@ export default function CalculatorHub() {
                                     style={styles.cardTop}
                                 >
                                     <View style={styles.iconCircle}>
-                                        <calc.icon size={36} color={calc.gradient[0]} strokeWidth={2.5} />
+                                        <calc.icon size={32} color="#FFFFFF" strokeWidth={2.5} />
                                     </View>
+
+                                    {/* Decorative subtle overlay */}
+                                    <View style={styles.cardOverlay} />
                                 </LinearGradient>
 
-                                {/* Bottom Section (30%) - White with Title */}
+                                {/* Bottom Section - Content */}
                                 <View style={styles.cardBottom}>
                                     <Text style={styles.cardTitle} numberOfLines={1}>
                                         {calc.title}
                                     </Text>
+                                    <View style={styles.divider} />
                                     <Text style={styles.cardDescription} numberOfLines={1}>
                                         {calc.description}
                                     </Text>
                                 </View>
-                            </SafeButton>
-                        </View>
+                            </View>
+                        </TouchableOpacity>
                     ))}
                 </View>
 
@@ -230,70 +239,83 @@ const styles = StyleSheet.create({
     },
     cardWrapper: {
         width: (width - 56) / 2,
-        height: 220,
-    },
-    card: {
-        width: '100%',
-        height: '100%',
-        borderRadius: 20,
-        marginVertical: 0,
-        padding: 0,
-        overflow: 'hidden',
-        backgroundColor: '#ffffff',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.12,
-        shadowRadius: 25,
+        height: 190,
+        marginBottom: 8,
+        borderRadius: 24,
+        // Premium Shadow
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.25,
+        shadowRadius: 16,
         elevation: 8,
+        backgroundColor: 'transparent', // Needed for shadow to work on wrapper
+    },
+    cardInner: {
+        flex: 1,
+        borderRadius: 24,
+        backgroundColor: '#FFFFFF',
+        overflow: 'hidden',
     },
     cardTop: {
-        height: '70%',
+        flex: 0.65, // 65% height
         width: '100%',
         justifyContent: 'center',
         alignItems: 'center',
+        position: 'relative',
+    },
+    cardOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '30%',
+        backgroundColor: 'rgba(255,255,255,0.1)',
     },
     iconCircle: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        backgroundColor: '#ffffff',
+        width: 64,
+        height: 64,
+        borderRadius: 32,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)', // Glassy effect
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.3)',
         justifyContent: 'center',
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.2,
-        shadowRadius: 15,
-        elevation: 6,
     },
     cardBottom: {
-        height: '30%',
+        flex: 0.35, // 35% height
         width: '100%',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#FFFFFF',
     },
     cardTitle: {
         fontSize: 15,
         fontWeight: '700',
         color: '#111827',
         textAlign: 'center',
-        marginBottom: 4,
-        letterSpacing: -0.3,
+        letterSpacing: -0.2,
+    },
+    divider: {
+        width: 24,
+        height: 2,
+        backgroundColor: Colors.borderLight,
+        marginVertical: 6,
+        borderRadius: 1,
     },
     cardDescription: {
         fontSize: 11,
         fontWeight: '500',
-        color: '#6B7280',
+        color: Colors.textSecondary,
         textAlign: 'center',
     },
     noteCard: {
         backgroundColor: Colors.surface,
-        borderRadius: 12,
+        borderRadius: 16,
         padding: 16,
         borderWidth: 1,
         borderColor: Colors.borderLight,
+        alignItems: 'center',
     },
     noteText: {
         fontSize: 12,
