@@ -93,7 +93,7 @@ export function MenuDrawer({ visible, onClose, slideAnim }: MenuDrawerProps) {
                     style={styles.header}
                 >
                     <View style={styles.headerContent}>
-                        <Text style={styles.headerTitle}>Roblox Coins</Text>
+                        <Text style={styles.headerTitle}>Robux Calculator & Rewards</Text>
                         <Text style={styles.headerSubtitle}>Earn Free Robux</Text>
                     </View>
                     <TouchableOpacity onPress={onClose} style={styles.closeBtn}>

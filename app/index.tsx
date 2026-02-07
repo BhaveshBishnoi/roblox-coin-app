@@ -141,7 +141,7 @@ export default function Home() {
 
     return (
         <Container safeArea={false}>
-            <AppHeader title="Roblox Coins" />
+            <AppHeader title="Robux Calculator & Rewards" />
 
             <ScrollView
                 style={styles.scrollView}
@@ -168,7 +168,7 @@ export default function Home() {
 
 
                         <View style={styles.heroContent}>
-                            <Text style={styles.heroTitle}>Get Free{'\n'}Roblox Coins</Text>
+                            <Text style={styles.heroTitle}>Get Free{'\n'}Robux</Text>
                             <Text style={styles.heroSub}>Play games • Complete tasks • Earn rewards</Text>
 
                             {/* Calculator Button */}
