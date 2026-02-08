@@ -12,9 +12,10 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "scheme": "rbxcalc-rewards",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.bhaveshbishnoi.robuxcalculatorrewards"
+      "bundleIdentifier": "com.kappytech.rbxcalc"
     },
     "android": {
       "adaptiveIcon": {
@@ -23,7 +24,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.bhaveshbishnoi.robuxcalculatorrewards"
+      "package": "com.kappytech.rbxcalc"
     },
     "web": {
       "favicon": "./assets/favicon.png"

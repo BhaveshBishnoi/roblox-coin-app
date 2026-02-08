@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Text, Image, Animated, Easing, ScrollView, ImageStyle, Dimensions } from 'react-native';
+import { View, StyleSheet, Text, Image, Animated, Easing, ScrollView, ImageStyle, Dimensions, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Container } from '../components/Container';
 import { SafeButton } from '../components/SafeButton';
@@ -141,7 +141,7 @@ export default function Home() {
 
     return (
         <Container safeArea={false}>
-            <AppHeader title="Robux Calculator & Rewards" />
+            <AppHeader title="RBX Calc & Rewards" />
 
             <ScrollView
                 style={styles.scrollView}
@@ -177,6 +177,7 @@ export default function Home() {
                                 onPress={() => router.push('/calculator')}
                                 variant="surface"
                                 style={styles.calculatorButton}
+                                textStyle={{ fontSize: 15, color: '#0F172A' }}
                             />
                         </View>
 
@@ -218,10 +219,10 @@ export default function Home() {
                                 }
                             ]}
                         >
-                            <SafeButton
+                            <TouchableOpacity
+                                activeOpacity={0.9}
                                 onPress={() => router.push(feature.route as any)}
-                                style={styles.card}
-                                variant={feature.variant as any}
+                                style={styles.cardContainer}
                             >
                                 <LinearGradient
                                     colors={feature.gradient}
@@ -231,13 +232,13 @@ export default function Home() {
                                 >
                                     <View style={styles.cardShine} />
                                     <View style={styles.cardContent}>
-                                        <View style={styles.cardIconContainer}>
+                                        <View style={styles.cardIconHighlight}>
                                             <Image source={feature.icon} style={styles.cardIcon} resizeMode="contain" />
                                         </View>
-                                        <Text style={styles.cardText} numberOfLines={2}>{feature.title}</Text>
+                                        <Text style={styles.cardText}>{feature.title}</Text>
                                     </View>
                                 </LinearGradient>
-                            </SafeButton>
+                            </TouchableOpacity>
                         </Animated.View>
                     ))}
                 </View>
@@ -251,8 +252,8 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     scrollContent: {
-        paddingHorizontal: 18,
-        paddingTop: 80,
+        paddingHorizontal: 20,
+        paddingTop: 90,
         paddingBottom: 40,
     },
     welcomeSection: {
@@ -271,26 +272,26 @@ const styles = StyleSheet.create({
         color: Colors.textSecondary,
     },
     hero: {
-        height: 240,
-        borderRadius: 20,
+        minHeight: 220,
+        borderRadius: 24,
         padding: 24,
-        marginBottom: 24,
-        justifyContent: 'flex-end',
+        marginBottom: 32,
+        justifyContent: 'center',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 12,
-        elevation: 6,
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.2,
+        shadowRadius: 20,
+        elevation: 10,
         overflow: 'hidden',
     },
     heroGlow: {
         position: 'absolute',
-        top: -50,
-        right: -50,
-        width: 200,
-        height: 200,
-        borderRadius: 100,
-        backgroundColor: 'rgba(16, 185, 129, 0.12)',
+        top: -60,
+        right: -60,
+        width: 240,
+        height: 240,
+        borderRadius: 120,
+        backgroundColor: 'rgba(16, 185, 129, 0.15)',
     },
     heroGradientOverlay: {
         position: 'absolute',
@@ -305,6 +306,7 @@ const styles = StyleSheet.create({
     },
     heroContent: {
         zIndex: 1,
+        width: '65%',
     },
     heroBadge: {
         flexDirection: 'row',
@@ -327,79 +329,91 @@ const styles = StyleSheet.create({
     },
     heroTitle: {
         color: '#fff',
-        fontSize: 32,
+        fontSize: 34,
         fontWeight: '900',
-        lineHeight: 38,
-        letterSpacing: -0.8,
+        lineHeight: 40,
+        letterSpacing: -1,
+        marginBottom: 8,
     },
     heroSub: {
-        color: 'rgba(255,255,255,0.7)',
-        marginTop: 8,
+        color: 'rgba(255,255,255,0.8)',
+        marginTop: 4,
         fontSize: 14,
         fontWeight: '500',
         letterSpacing: -0.2,
-        marginBottom: 16,
+        marginBottom: 20,
     },
     calculatorButton: {
         width: '100%',
-        height: 44,
         marginVertical: 0,
+        minHeight: 48,
+        shadowColor: 'rgba(0,0,0,0.2)',
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 4 },
     },
     heroCoinContainer: {
         position: 'absolute',
-        right: 20,
+        right: 10,
+        bottom: 20,
         top: 20,
+        justifyContent: 'center',
     },
     heroCoinImage: {
-        width: 80,
-        height: 80,
-        opacity: 0.9,
+        width: 110,
+        height: 110,
+        opacity: 1,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.3,
+        shadowRadius: 10,
     } as ImageStyle,
     statsContainer: {
         flexDirection: 'row',
         gap: 12,
-        marginBottom: 28,
+        marginBottom: 32,
     },
     statCard: {
         flex: 1,
         backgroundColor: Colors.surface,
-        borderRadius: 16,
+        borderRadius: 20,
         padding: 16,
         alignItems: 'center',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.03,
-        shadowRadius: 4,
-        elevation: 1,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.04,
+        shadowRadius: 12,
+        elevation: 2,
         borderWidth: 1,
-        borderColor: Colors.borderLight,
+        borderColor: 'rgba(0,0,0,0.04)',
     },
     statIconContainer: {
-        width: 36,
-        height: 36,
-        borderRadius: 10,
+        width: 40,
+        height: 40,
+        borderRadius: 12,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 8,
+        marginBottom: 10,
     },
     statValue: {
         fontSize: 18,
         fontWeight: '800',
         color: Colors.text,
         letterSpacing: -0.5,
+        marginBottom: 2,
     },
     statLabel: {
         fontSize: 11,
         fontWeight: '600',
         color: Colors.textSecondary,
-        marginTop: 2,
         textAlign: 'center',
     },
     sectionHeader: {
         marginBottom: 16,
+        paddingHorizontal: 4,
     },
     sectionTitle: {
-        fontSize: 24,
+        fontSize: 22,
         fontWeight: '800',
         color: Colors.text,
         letterSpacing: -0.5,
@@ -413,71 +427,72 @@ const styles = StyleSheet.create({
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 14,
+        gap: 16,
     },
     gridItem: {
-        width: (width - 54) / 2,
-        aspectRatio: 1,
+        width: (width - 56) / 2,
+        aspectRatio: 0.85,
     },
-    card: {
+    cardContainer: {
         flex: 1,
-        borderRadius: 18,
-        marginVertical: 0,
-        height: '100%',
-        overflow: 'hidden',
+        borderRadius: 24,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.15,
+        shadowRadius: 16,
+        elevation: 6,
     },
     cardGradient: {
         flex: 1,
-        borderRadius: 18,
+        borderRadius: 24,
+        padding: 2, // Border effect
         overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.12,
-        shadowRadius: 8,
-        elevation: 4,
     },
     cardShine: {
         position: 'absolute',
-        top: 0,
-        right: 0,
-        width: '50%',
-        height: '50%',
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-        borderBottomLeftRadius: 100,
+        top: -50,
+        left: -50,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(255, 255, 255, 0.12)',
+        transform: [{ scaleX: 1.5 }],
     },
     cardContent: {
         flex: 1,
-        justifyContent: 'center',
+        backgroundColor: 'transparent',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 20,
-        paddingHorizontal: 16,
-        gap: 12,
+        padding: 20,
     },
-    cardIconContainer: {
-        width: 60,
-        height: 60,
-        borderRadius: 16,
-        backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    cardIconHighlight: {
+        width: 70,
+        height: 70,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
         alignItems: 'center',
         justifyContent: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 4,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.3)',
+        shadowColor: 'rgba(0,0,0,0.1)',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 1,
+        shadowRadius: 8,
+        marginTop: 10,
     },
     cardIcon: {
-        width: 40,
-        height: 40,
+        width: 42,
+        height: 42,
     } as ImageStyle,
     cardText: {
-        fontSize: 15,
-        fontWeight: '700',
+        fontSize: 16,
+        fontWeight: '800',
         color: '#fff',
         textAlign: 'center',
         letterSpacing: -0.3,
-        lineHeight: 19,
-        textShadowColor: 'rgba(0,0,0,0.2)',
-        textShadowOffset: { width: 0, height: 1 },
+        marginBottom: 8,
+        textShadowColor: 'rgba(0,0,0,0.15)',
+        textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 4,
     }
 });
