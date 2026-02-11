@@ -1,0 +1,29 @@
+{
+    "project_info": {
+        "project_number": "219843862282",
+        "project_id": "bhaves-rbx1",
+        "storage_bucket": "bhaves-rbx1.firebasestorage.app"
+    },
+    "client": [
+        {
+            "client_info": {
+                "mobilesdk_app_id": "1:219843862282:android:5fed28a50439b8f34b24f3",
+                "android_client_info": {
+                    "package_name": "com.kappytech.rbxcalc"
+                }
+            },
+            "oauth_client": [],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyBy6c6SxOQZ289KIq1zIKZIFP99rCeBjf0"
+                }
+            ],
+            "services": {
+                "appinvite_service": {
+                    "other_platform_oauth_client": []
+                }
+            }
+        }
+    ],
+    "configuration_version": "1"
+}

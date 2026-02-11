@@ -4,9 +4,56 @@ import { StatusBar } from 'expo-status-bar';
 import { Colors } from '../constants/Colors';
 import { CoinProvider, useCoins } from '../context/CoinContext';
 import { CoinRewardPopup } from '../components/CoinRewardPopup';
+import messaging from '@react-native-firebase/messaging';
+import { useEffect } from 'react';
+import { Alert, Platform, PermissionsAndroid } from 'react-native';
+
+// Register background handler
+messaging().setBackgroundMessageHandler(async remoteMessage => {
+    console.log('Message handled in the background!', remoteMessage);
+});
 
 function AppContent() {
     const { rewardPopup, hideRewardPopup } = useCoins();
+
+    useEffect(() => {
+        const setupFirebase = async () => {
+            // Request permission
+            if (Platform.OS === 'android' && Platform.Version >= 33) {
+                const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+                if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+                    console.log('Notification permission denied');
+                }
+            } else {
+                const authStatus = await messaging().requestPermission();
+                const enabled =
+                    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+                    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+                if (enabled) {
+                    console.log('Authorization status:', authStatus);
+                }
+            }
+
+            // Get FCM Token
+            try {
+                const token = await messaging().getToken();
+                console.log('FCM Token:', token);
+            } catch (error) {
+                console.log('Failed to get FCM token:', error);
+            }
+
+            // Foreground message handler
+            const unsubscribe = messaging().onMessage(async remoteMessage => {
+                Alert.alert('New Notification', remoteMessage.notification?.body || 'You have a new message!');
+                console.log('Foreground Message:', remoteMessage);
+            });
+
+            return unsubscribe;
+        };
+
+        setupFirebase();
+    }, []);
 
     return (
         <>
