@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Linking, Share, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Share, Alert } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
 import { Container } from '../components/Container';
 import { SafeButton } from '../components/SafeButton';
 import { Colors } from '../constants/Colors';
@@ -30,16 +31,16 @@ export default function Settings() {
         }
     };
 
-    const handleRate = () => {
-        Linking.openURL(PLAY_STORE_URL);
+    const handleRate = async () => {
+        await WebBrowser.openBrowserAsync(PLAY_STORE_URL);
     };
 
-    const handlePrivacy = () => {
-        Linking.openURL(PRIVACY_URL);
+    const handlePrivacy = async () => {
+        await WebBrowser.openBrowserAsync(PRIVACY_URL);
     };
 
-    const handleTelegram = () => {
-        Linking.openURL(TELEGRAM_URL);
+    const handleTelegram = async () => {
+        await WebBrowser.openBrowserAsync(TELEGRAM_URL);
     };
 
     const handleVersion = () => {

@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, Linking, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Alert, ScrollView } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
 import { Container } from '../components/Container';
 import { SafeButton } from '../components/SafeButton';
 import { Colors } from '../constants/Colors';
@@ -14,12 +15,12 @@ export default function Wallet() {
     const progress = Math.min((balance / GOAL) * 100, 100);
     const canRedeem = balance >= GOAL;
 
-    const handleRedeem = () => {
+    const handleRedeem = async () => {
         if (!canRedeem) {
             Alert.alert("Locked", `You need ${(GOAL - balance).toLocaleString()} more coins to withdraw!`);
             return;
         }
-        Linking.openURL('https://games.biographydata.org');
+        await WebBrowser.openBrowserAsync('https://games.biographydata.org');
     };
 
     return (
