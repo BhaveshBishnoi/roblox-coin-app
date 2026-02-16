@@ -6,6 +6,7 @@ import { useAdAction } from '../hooks/useAdAction';
 import { Colors } from '../constants/Colors';
 import { Calculator, DollarSign, IndianRupee, Bitcoin, TrendingUp, Sparkles, ArrowRight } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { AdBanner } from '../components/AdBanner';
 
 const { width } = Dimensions.get('window');
 
@@ -157,6 +158,8 @@ export default function CalculatorHub() {
                         💡 All conversion rates are approximate and based on current Roblox pricing
                     </Text>
                 </View>
+
+                <AdBanner />
             </ScrollView>
         </Container>
     );

@@ -8,6 +8,7 @@ import { useCoins } from '../context/CoinContext';
 import { Colors } from '../constants/Colors';
 import { TrendingUp, Users, Award, Sparkles } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { AdBanner } from '../components/AdBanner';
 
 const ICONS = {
     daily: require('../assets/icons/calender.png'),
@@ -242,6 +243,8 @@ export default function Home() {
                         </Animated.View>
                     ))}
                 </View>
+
+                <AdBanner />
             </ScrollView>
         </Container>
     );

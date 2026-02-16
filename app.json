@@ -44,7 +44,14 @@
       "expo-router",
       "expo-web-browser",
       "@react-native-firebase/app",
-      "@react-native-firebase/messaging"
+      "@react-native-firebase/messaging",
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-9148477234753146~7072373753",
+          "iosAppId": "ca-app-pub-9148477234753146~7072373753"
+        }
+      ]
     ],
     "extra": {
       "router": {},

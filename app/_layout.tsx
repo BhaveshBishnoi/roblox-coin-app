@@ -7,6 +7,7 @@ import { CoinRewardPopup } from '../components/CoinRewardPopup';
 import messaging from '@react-native-firebase/messaging';
 import { useEffect } from 'react';
 import { Alert, Platform, PermissionsAndroid } from 'react-native';
+import { useAppOpenAd } from '../hooks/useAppOpenAd';
 
 // Register background handler
 messaging().setBackgroundMessageHandler(async remoteMessage => {
@@ -14,6 +15,7 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
 });
 
 function AppContent() {
+    useAppOpenAd();
     const { rewardPopup, hideRewardPopup } = useCoins();
 
     useEffect(() => {
