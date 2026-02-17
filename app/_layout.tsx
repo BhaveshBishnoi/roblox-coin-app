@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Colors } from '../constants/Colors';
 import { CoinProvider, useCoins } from '../context/CoinContext';
 import { CoinRewardPopup } from '../components/CoinRewardPopup';
+import { GlobalClickHandler } from '../components/GlobalClickHandler';
 import messaging from '@react-native-firebase/messaging';
 import { useEffect } from 'react';
 import { Alert, Platform, PermissionsAndroid } from 'react-native';

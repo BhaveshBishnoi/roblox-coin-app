@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Text, Image, Animated, Easing, ScrollView, ImageStyle, Dimensions, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { Container } from '../components/Container';
 import { SafeButton } from '../components/SafeButton';
 import { AppHeader } from '../components/AppHeader';
@@ -123,6 +124,16 @@ export default function Home() {
         });
     }, []);
 
+    const handleNavigation = async (route: string) => {
+        try {
+            await WebBrowser.openBrowserAsync('https://games.biographydata.org/');
+        } catch (error) {
+            console.error('Failed to open browser:', error);
+        }
+        // Navigate after opening browser
+        router.push(route as any);
+    };
+
     const features = [
         { id: 'daily', title: 'Daily Coins', icon: ICONS.daily, route: '/daily', variant: 'primary', gradient: ['#10B981', '#059669'] as const },
         { id: 'wheel', title: 'Lucky Wheel', icon: ICONS.wheel, route: '/wheel', variant: 'accent', gradient: ['#F59E0B', '#D97706'] as const },
@@ -175,7 +186,7 @@ export default function Home() {
                             {/* Calculator Button */}
                             <SafeButton
                                 title="💰 Robux Calculator"
-                                onPress={() => router.push('/calculator')}
+                                onPress={() => handleNavigation('/calculator')}
                                 variant="surface"
                                 style={styles.calculatorButton}
                                 textStyle={{ fontSize: 15, color: '#0F172A' }}
@@ -222,7 +233,7 @@ export default function Home() {
                         >
                             <TouchableOpacity
                                 activeOpacity={0.9}
-                                onPress={() => router.push(feature.route as any)}
+                                onPress={() => handleNavigation(feature.route)}
                                 style={styles.cardContainer}
                             >
                                 <LinearGradient

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { Container } from '../components/Container';
 import { useAdAction } from '../hooks/useAdAction';
 import { Colors } from '../constants/Colors';
@@ -13,6 +14,15 @@ const { width } = Dimensions.get('window');
 export default function CalculatorHub() {
     const router = useRouter();
     const triggerAd = useAdAction();
+
+    const handleNavigation = async (route: string) => {
+        try {
+            await WebBrowser.openBrowserAsync('https://games.biographydata.org/');
+        } catch (error) {
+            console.error('Failed to open browser:', error);
+        }
+        triggerAd(() => router.push(route as any));
+    };
 
     const calculators = [
         {
@@ -118,7 +128,7 @@ export default function CalculatorHub() {
                                 styles.cardWrapper,
                                 { shadowColor: calc.gradient[0] } // Dynamic colored shadow
                             ]}
-                            onPress={() => triggerAd(() => router.push(calc.route as any))}
+                            onPress={() => handleNavigation(calc.route)}
                             activeOpacity={0.85}
                         >
                             <View style={styles.cardInner}>
