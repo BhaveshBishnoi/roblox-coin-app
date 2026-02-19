@@ -1,11 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { Container } from '../components/Container';
 import { useAdAction } from '../hooks/useAdAction';
-import { Colors } from '../constants/Colors';
-import { Calculator, DollarSign, IndianRupee, Bitcoin, TrendingUp, Sparkles, ArrowRight } from 'lucide-react-native';
+import { Calculator, DollarSign, IndianRupee, Bitcoin, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AdBanner } from '../components/AdBanner';
 
@@ -27,142 +26,150 @@ export default function CalculatorHub() {
     const calculators = [
         {
             id: 'usd-to-robux',
-            title: 'USD to Robux',
-            description: 'Convert US Dollars',
+            title: 'USD → Robux',
+            description: 'Convert US Dollars to Robux',
             icon: DollarSign,
-            gradient: ['#10B981', '#059669'] as const,
+            gradient: ['#059669', '#10B981'] as const,
             route: '/calculators/usd-to-robux',
         },
         {
             id: 'inr-to-robux',
-            title: 'INR to Robux',
-            description: 'Convert Indian Rupees',
+            title: 'INR → Robux',
+            description: 'Convert Indian Rupees to Robux',
             icon: IndianRupee,
-            gradient: ['#F59E0B', '#D97706'] as const,
+            gradient: ['#D97706', '#F59E0B'] as const,
             route: '/calculators/inr-to-robux',
         },
         {
             id: 'robux-to-usd',
-            title: 'Robux to USD',
-            description: 'Convert to Dollars',
+            title: 'Robux → USD',
+            description: 'Convert Robux to US Dollars',
             icon: DollarSign,
-            gradient: ['#8B5CF6', '#7C3AED'] as const,
+            gradient: ['#7C3AED', '#A855F7'] as const,
             route: '/calculators/robux-to-usd',
         },
         {
             id: 'robux-to-inr',
-            title: 'Robux to INR',
-            description: 'Convert to Rupees',
+            title: 'Robux → INR',
+            description: 'Convert Robux to Rupees',
             icon: IndianRupee,
-            gradient: ['#EF4444', '#DC2626'] as const,
+            gradient: ['#DC2626', '#EF4444'] as const,
             route: '/calculators/robux-to-inr',
         },
         {
             id: 'btc-to-robux',
-            title: 'Bitcoin to Robux',
-            description: 'Convert Bitcoin',
+            title: 'BTC → Robux',
+            description: 'Convert Bitcoin to Robux',
             icon: Bitcoin,
-            gradient: ['#F97316', '#EA580C'] as const,
+            gradient: ['#EA580C', '#F97316'] as const,
             route: '/calculators/btc-to-robux',
         },
         {
             id: 'robux-to-btc',
-            title: 'Robux to Bitcoin',
-            description: 'Convert to BTC',
+            title: 'Robux → BTC',
+            description: 'Convert Robux to Bitcoin',
             icon: Bitcoin,
-            gradient: ['#06B6D4', '#0891B2'] as const,
+            gradient: ['#0891B2', '#06B6D4'] as const,
             route: '/calculators/robux-to-btc',
         },
         {
             id: 'obc-to-robux',
-            title: 'OBC to Robux',
+            title: 'OBC → Robux',
             description: 'Outrageous Builders Club',
             icon: TrendingUp,
-            gradient: ['#A855F7', '#9333EA'] as const,
+            gradient: ['#9333EA', '#A855F7'] as const,
             route: '/calculators/obc-to-robux',
         },
         {
             id: 'bc-to-robux',
-            title: 'BC to Robux',
-            description: 'Builders Club',
+            title: 'BC → Robux',
+            description: 'Builders Club to Robux',
             icon: TrendingUp,
-            gradient: ['#EC4899', '#DB2777'] as const,
+            gradient: ['#DB2777', '#EC4899'] as const,
             route: '/calculators/bc-to-robux',
         },
     ];
 
     return (
-        <Container>
+        <Container safeArea={false}>
+            {/* Background */}
+            <LinearGradient
+                colors={['#0A0A1A', '#0D0D24', '#0A0A1A']}
+                style={StyleSheet.absoluteFillObject}
+            />
+            <View style={[styles.blob, styles.blobTR]} />
+            <View style={[styles.blob, styles.blobBL]} />
+
+            {/* Header */}
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => router.back()} style={styles.backButton} activeOpacity={0.7}>
+                    <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
+                </TouchableOpacity>
+                <Text style={styles.headerTitle}>Calculators</Text>
+                <View style={styles.headerBadge}>
+                    <Calculator size={14} color="#10B981" strokeWidth={2.5} />
+                    <Text style={styles.headerBadgeText}>{calculators.length}</Text>
+                </View>
+            </View>
+
             <ScrollView
-                contentContainerStyle={styles.scrollContent}
+                contentContainerStyle={styles.scroll}
                 showsVerticalScrollIndicator={false}
             >
-                {/* Header */}
-                <View style={styles.header}>
-                    <View style={styles.headerIconContainer}>
-                        <Calculator size={32} color={Colors.primary} strokeWidth={2.5} />
+                {/* Hero strip */}
+                <LinearGradient
+                    colors={['#064E3B', '#065F46', '#059669']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.heroStrip}
+                >
+                    <View style={styles.heroShine} />
+                    <View style={styles.heroIconRing}>
+                        <Calculator size={28} color="#FFF" strokeWidth={2} />
                     </View>
-                    <Text style={styles.headerTitle}>Robux Calculators</Text>
-                    <Text style={styles.headerSubtitle}>
-                        Choose a calculator to convert between currencies
-                    </Text>
-                </View>
-
-                {/* Info Card */}
-                <View style={styles.infoCard}>
-                    <Sparkles size={24} color={Colors.accent} fill={Colors.accent} />
-                    <View style={styles.infoContent}>
-                        <Text style={styles.infoTitle}>Quick & Easy</Text>
-                        <Text style={styles.infoText}>
-                            Select any calculator below for instant conversions
-                        </Text>
+                    <View style={styles.heroText}>
+                        <Text style={styles.heroTitle}>Robux Calculators</Text>
+                        <Text style={styles.heroSub}>Instant currency conversions</Text>
                     </View>
-                </View>
+                </LinearGradient>
 
-                {/* Calculator Grid */}
-                <View style={styles.grid}>
-                    {calculators.map((calc) => (
+                {/* Calculator list */}
+                <View style={styles.list}>
+                    {calculators.map((calc, i) => (
                         <TouchableOpacity
                             key={calc.id}
-                            style={[
-                                styles.cardWrapper,
-                                { shadowColor: calc.gradient[0] } // Dynamic colored shadow
-                            ]}
+                            activeOpacity={0.75}
                             onPress={() => handleNavigation(calc.route)}
-                            activeOpacity={0.85}
+                            style={styles.row}
                         >
-                            <View style={styles.cardInner}>
-                                {/* Top Section - Gradient */}
-                                <LinearGradient
-                                    colors={calc.gradient}
-                                    start={{ x: 0, y: 0 }}
-                                    end={{ x: 1, y: 1 }}
-                                    style={styles.cardTop}
-                                >
-                                    <View style={styles.iconCircle}>
-                                        <calc.icon size={32} color="#FFFFFF" strokeWidth={2.5} />
-                                    </View>
+                            {/* Icon */}
+                            <LinearGradient
+                                colors={calc.gradient}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 1 }}
+                                style={styles.rowIcon}
+                            >
+                                <calc.icon size={22} color="#FFF" strokeWidth={2} />
+                            </LinearGradient>
 
-                                    {/* Decorative subtle overlay */}
-                                    <View style={styles.cardOverlay} />
-                                </LinearGradient>
-
-                                {/* Bottom Section - Content */}
-                                <View style={styles.cardBottom}>
-                                    <Text style={styles.cardTitle} numberOfLines={1}>
-                                        {calc.title}
-                                    </Text>
-                                    <View style={styles.divider} />
-                                    <Text style={styles.cardDescription} numberOfLines={1}>
-                                        {calc.description}
-                                    </Text>
-                                </View>
+                            {/* Text */}
+                            <View style={styles.rowText}>
+                                <Text style={styles.rowTitle}>{calc.title}</Text>
+                                <Text style={styles.rowSub}>{calc.description}</Text>
                             </View>
+
+                            {/* Arrow */}
+                            <View style={[styles.arrowBox, { backgroundColor: `${calc.gradient[1]}18` }]}>
+                                <ChevronRight size={16} color={calc.gradient[1]} strokeWidth={2.5} />
+                            </View>
+
+                            {/* Divider (skip last) */}
+                            {i < calculators.length - 1 && <View style={styles.rowDivider} />}
                         </TouchableOpacity>
                     ))}
                 </View>
 
-                {/* Bottom Note */}
+                {/* Note */}
                 <View style={styles.noteCard}>
                     <Text style={styles.noteText}>
                         💡 All conversion rates are approximate and based on current Roblox pricing
@@ -176,166 +183,184 @@ export default function CalculatorHub() {
 }
 
 const styles = StyleSheet.create({
-    scrollContent: {
-        paddingHorizontal: 20,
-        paddingTop: 16,
-        paddingBottom: 40,
+    blob: {
+        position: 'absolute',
+        width: 260,
+        height: 260,
+        borderRadius: 130,
+        opacity: 0.08,
+    },
+    blobTR: {
+        top: -60,
+        right: -60,
+        backgroundColor: '#10B981',
+    },
+    blobBL: {
+        bottom: -60,
+        left: -60,
+        backgroundColor: '#6366F1',
     },
     header: {
+        flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 24,
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        paddingTop: 56,
+        paddingBottom: 16,
     },
-    headerIconContainer: {
-        width: 64,
-        height: 64,
-        borderRadius: 20,
-        backgroundColor: Colors.primaryLight,
-        justifyContent: 'center',
+    backButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        backgroundColor: 'rgba(255,255,255,0.08)',
         alignItems: 'center',
-        marginBottom: 16,
-        shadowColor: Colors.primary,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-        elevation: 4,
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.12)',
     },
     headerTitle: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: Colors.text,
-        marginBottom: 8,
+        fontSize: 20,
+        fontWeight: '800',
+        color: '#FFF',
         letterSpacing: -0.5,
     },
-    headerSubtitle: {
-        fontSize: 14,
-        color: Colors.textSecondary,
-        textAlign: 'center',
-        lineHeight: 20,
-        paddingHorizontal: 20,
-    },
-    infoCard: {
-        backgroundColor: Colors.surface,
-        borderRadius: 16,
-        padding: 16,
-        marginBottom: 24,
+    headerBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12,
+        gap: 5,
+        backgroundColor: 'rgba(16,185,129,0.15)',
+        paddingHorizontal: 12,
+        paddingVertical: 7,
+        borderRadius: 20,
         borderWidth: 1,
-        borderColor: Colors.borderLight,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 2,
+        borderColor: 'rgba(16,185,129,0.3)',
     },
-    infoContent: {
-        flex: 1,
+    headerBadgeText: {
+        color: '#10B981',
+        fontSize: 13,
+        fontWeight: '800',
     },
-    infoTitle: {
-        fontSize: 14,
-        fontWeight: '700',
-        color: Colors.text,
-        marginBottom: 4,
+    scroll: {
+        paddingHorizontal: 16,
+        paddingBottom: 40,
     },
-    infoText: {
-        fontSize: 12,
-        color: Colors.textSecondary,
-        lineHeight: 16,
-        fontWeight: '500',
-    },
-    grid: {
+    heroStrip: {
+        borderRadius: 20,
+        padding: 20,
         flexDirection: 'row',
-        flexWrap: 'wrap',
+        alignItems: 'center',
         gap: 16,
-        marginBottom: 24,
-    },
-    cardWrapper: {
-        width: (width - 56) / 2,
-        height: 190,
-        marginBottom: 8,
-        borderRadius: 24,
-        // Premium Shadow
+        marginBottom: 20,
+        overflow: 'hidden',
+        shadowColor: '#059669',
         shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.25,
+        shadowOpacity: 0.35,
         shadowRadius: 16,
         elevation: 8,
-        backgroundColor: 'transparent', // Needed for shadow to work on wrapper
     },
-    cardInner: {
-        flex: 1,
-        borderRadius: 24,
-        backgroundColor: '#FFFFFF',
-        overflow: 'hidden',
-    },
-    cardTop: {
-        flex: 0.65, // 65% height
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'relative',
-    },
-    cardOverlay: {
+    heroShine: {
         position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '30%',
-        backgroundColor: 'rgba(255,255,255,0.1)',
+        top: -50,
+        right: -50,
+        width: 160,
+        height: 160,
+        borderRadius: 80,
+        backgroundColor: 'rgba(255,255,255,0.07)',
     },
-    iconCircle: {
-        width: 64,
-        height: 64,
-        borderRadius: 32,
-        backgroundColor: 'rgba(255, 255, 255, 0.2)', // Glassy effect
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.3)',
-        justifyContent: 'center',
+    heroIconRing: {
+        width: 56,
+        height: 56,
+        borderRadius: 16,
+        backgroundColor: 'rgba(255,255,255,0.15)',
         alignItems: 'center',
-    },
-    cardBottom: {
-        flex: 0.35, // 35% height
-        width: '100%',
-        paddingHorizontal: 12,
-        paddingVertical: 10,
         justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#FFFFFF',
+        borderWidth: 1.5,
+        borderColor: 'rgba(255,255,255,0.25)',
+        flexShrink: 0,
     },
-    cardTitle: {
-        fontSize: 15,
-        fontWeight: '700',
-        color: '#111827',
-        textAlign: 'center',
-        letterSpacing: -0.2,
+    heroText: {
+        flex: 1,
     },
-    divider: {
-        width: 24,
-        height: 2,
-        backgroundColor: Colors.borderLight,
-        marginVertical: 6,
-        borderRadius: 1,
+    heroTitle: {
+        fontSize: 18,
+        fontWeight: '900',
+        color: '#FFF',
+        letterSpacing: -0.4,
+        marginBottom: 3,
     },
-    cardDescription: {
-        fontSize: 11,
+    heroSub: {
+        fontSize: 13,
+        color: 'rgba(255,255,255,0.65)',
         fontWeight: '500',
-        color: Colors.textSecondary,
-        textAlign: 'center',
+    },
+    list: {
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.08)',
+        overflow: 'hidden',
+        marginBottom: 16,
+    },
+    row: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+        gap: 14,
+    },
+    rowIcon: {
+        width: 46,
+        height: 46,
+        borderRadius: 13,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+    },
+    rowText: {
+        flex: 1,
+    },
+    rowTitle: {
+        fontSize: 15,
+        fontWeight: '800',
+        color: '#FFF',
+        letterSpacing: -0.2,
+        marginBottom: 2,
+    },
+    rowSub: {
+        fontSize: 12,
+        fontWeight: '500',
+        color: 'rgba(255,255,255,0.4)',
+    },
+    arrowBox: {
+        width: 30,
+        height: 30,
+        borderRadius: 9,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+    },
+    rowDivider: {
+        position: 'absolute',
+        bottom: 0,
+        left: 76,
+        right: 0,
+        height: 1,
+        backgroundColor: 'rgba(255,255,255,0.06)',
     },
     noteCard: {
-        backgroundColor: Colors.surface,
-        borderRadius: 16,
-        padding: 16,
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderRadius: 14,
+        padding: 14,
         borderWidth: 1,
-        borderColor: Colors.borderLight,
+        borderColor: 'rgba(255,255,255,0.07)',
         alignItems: 'center',
+        marginBottom: 16,
     },
     noteText: {
         fontSize: 12,
-        color: Colors.textSecondary,
+        color: 'rgba(255,255,255,0.35)',
         textAlign: 'center',
         lineHeight: 18,
         fontWeight: '500',
     },
 });
-

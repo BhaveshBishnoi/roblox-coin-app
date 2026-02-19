@@ -1,35 +1,46 @@
 import React from 'react';
 import { View, StyleSheet, SafeAreaView, Platform, StatusBar as RNStatusBar } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Colors } from '../constants/Colors';
 import { StatusBar } from 'expo-status-bar';
 
-export function Container({ children, style, safeArea = true }: { children: React.ReactNode, style?: any, safeArea?: boolean }) {
+export function Container({
+    children,
+    style,
+    safeArea = true,
+}: {
+    children: React.ReactNode;
+    style?: any;
+    safeArea?: boolean;
+}) {
     return (
-        <View style={{ flex: 1 }}>
-            <StatusBar style="dark" backgroundColor="transparent" translucent />
-            <LinearGradient
-                colors={[Colors.backgroundHighlight, Colors.background]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 0, y: 1 }}
-                style={styles.background}
-            >
-                {safeArea ? (
-                    <SafeAreaView style={{ flex: 1, paddingTop: Platform.OS === 'android' ? RNStatusBar.currentHeight : 0 }}>
-                        <View style={[{ flex: 1 }, style]}>
-                            {children}
-                        </View>
-                    </SafeAreaView>
-                ) : (
-                    <View style={[{ flex: 1 }, style]}>{children}</View>
-                )}
-            </LinearGradient>
+        <View style={styles.root}>
+            {/* Light status bar icons for dark backgrounds */}
+            <StatusBar style="light" backgroundColor="transparent" translucent />
+
+            {safeArea ? (
+                <SafeAreaView
+                    style={[
+                        styles.safeArea,
+                        { paddingTop: Platform.OS === 'android' ? RNStatusBar.currentHeight : 0 },
+                    ]}
+                >
+                    <View style={[styles.inner, style]}>{children}</View>
+                </SafeAreaView>
+            ) : (
+                <View style={[styles.inner, style]}>{children}</View>
+            )}
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    background: {
+    root: {
+        flex: 1,
+        backgroundColor: '#0A0A1A', // dark fallback so no flash on load
+    },
+    safeArea: {
+        flex: 1,
+    },
+    inner: {
         flex: 1,
     },
 });
