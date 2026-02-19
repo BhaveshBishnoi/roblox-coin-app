@@ -1,6 +1,5 @@
 import React from 'react';
 import { Text, StyleSheet } from 'react-native';
-import { Colors } from '../constants/Colors';
 
 export function Title({ children }: { children: string }) {
     return <Text style={styles.text}>{children}</Text>;
@@ -8,13 +7,14 @@ export function Title({ children }: { children: string }) {
 
 const styles = StyleSheet.create({
     text: {
-        fontSize: 28,
+        fontSize: 26,
         fontWeight: '900',
-        color: Colors.text,
+        color: '#FFF',
         textAlign: 'center',
-        marginVertical: 20,
-        textShadowColor: Colors.primary,
+        marginVertical: 16,
+        letterSpacing: -0.5,
+        textShadowColor: '#10B981',
         textShadowOffset: { width: 0, height: 0 },
-        textShadowRadius: 15,
-    }
+        textShadowRadius: 12,
+    },
 });

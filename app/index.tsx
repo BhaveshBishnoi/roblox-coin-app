@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
     calculatorButton: {
         width: '100%',
         marginVertical: 0,
-        minHeight: 44,           // reduced from 48
+        minHeight: 48,           // reduced from 48
         shadowColor: 'rgba(0,0,0,0.2)',
         shadowOpacity: 0.2,
         shadowRadius: 8,
@@ -450,9 +450,9 @@ const styles = StyleSheet.create({
         padding: 14,             // reduced from 20
     },
     cardIconHighlight: {
-        width: 60,               // reduced from 70
-        height: 60,
-        borderRadius: 16,        // reduced from 20
+        width: 70,               // reduced from 70
+        height: 70,
+        borderRadius: 20,        // reduced from 20
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
         alignItems: 'center',
         justifyContent: 'center',
@@ -465,16 +465,16 @@ const styles = StyleSheet.create({
         marginTop: 6,
     },
     cardIcon: {
-        width: 36,               // reduced from 42
-        height: 36,
+        width: 42,               // reduced from 42
+        height: 42,
     } as ImageStyle,
     cardText: {
-        fontSize: 14,            // reduced from 16
+        fontSize: 16,            // reduced from 16
         fontWeight: '800',
         color: '#fff',
         textAlign: 'center',
         letterSpacing: -0.3,
-        marginBottom: 6,         // reduced from 8
+        marginBottom: 8,         // reduced from 8
         textShadowColor: 'rgba(0,0,0,0.15)',
         textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 4,

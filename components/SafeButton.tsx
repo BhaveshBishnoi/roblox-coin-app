@@ -1,7 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle, StyleProp } from 'react-native';
 import { useAdAction } from '../hooks/useAdAction';
-import { Colors } from '../constants/Colors';
 import { LinearGradient } from 'expo-linear-gradient';
 
 interface Props {
@@ -34,7 +33,7 @@ export function SafeButton({ onPress, title, style, textStyle, gradientColors, v
             case 'danger': return ['#F87171', '#DC2626']; // Soft Red to Bold Red
             case 'accent': return ['#FACC15', '#EAB308']; // Bright Yellow/Gold
             case 'purple': return ['#C084FC', '#9333EA']; // Vivid Purple
-            case 'surface': return ['#F9FAFB', '#F3F4F6']; // Subtle White/Gray
+            case 'surface': return ['rgba(255,255,255,0.10)', 'rgba(255,255,255,0.06)'] as const; // Dark glass
             default: return ['#4ADE80', '#16A34A']; // Vibrant Green
         }
     };
@@ -45,7 +44,7 @@ export function SafeButton({ onPress, title, style, textStyle, gradientColors, v
 
         switch (variant) {
             case 'surface':
-                return { color: Colors.text };
+                return { color: 'rgba(255,255,255,0.75)' };
             default:
                 return { color: '#FFFFFF' }; // White text for all colored cards for better contrast
         }

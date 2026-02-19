@@ -107,7 +107,6 @@ export default function Daily() {
                             end={{ x: 1, y: 0 }}
                             style={styles.rewardBox}
                         >
-                            <Text style={styles.rewardAmount}>100</Text>
                             <Text style={styles.rewardLabel}>COINS</Text>
                         </LinearGradient>
                     </View>
@@ -137,7 +136,7 @@ export default function Daily() {
 
                 {/* Claim Button */}
                 <SafeButton
-                    title={available ? 'CLAIM 100 COINS' : 'CLAIMED'}
+                    title={available ? 'CLAIM WINNER COINS' : 'CLAIMED'}
                     onPress={handleClaim}
                     variant={available ? 'primary' : 'secondary'}
                     disabled={!available}
@@ -154,7 +153,6 @@ export default function Daily() {
                     <View style={styles.infoDivider} />
                     <View style={styles.infoItem}>
                         <Text style={styles.infoEmoji}>🪙</Text>
-                        <Text style={styles.infoLabel}>100 Coins</Text>
                     </View>
                     <View style={styles.infoDivider} />
                     <View style={styles.infoItem}>
