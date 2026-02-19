@@ -51,7 +51,12 @@ export function useAppOpenAd() {
     useEffect(() => {
         const handleAppStateChange = (nextAppState: AppStateStatus) => {
             if (nextAppState === 'active' && isLoaded && !isShowing) {
-                appOpenAd.show();
+                try {
+                    appOpenAd.show();
+                } catch (e) {
+                    console.error("Failed to show App Open Ad:", e);
+                    // Standard fallback: reload or ignore
+                }
             }
         };
 

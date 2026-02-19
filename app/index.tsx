@@ -6,8 +6,6 @@ import { Container } from '../components/Container';
 import { SafeButton } from '../components/SafeButton';
 import { AppHeader } from '../components/AppHeader';
 import { useCoins } from '../context/CoinContext';
-import { Colors } from '../constants/Colors';
-import { TrendingUp, Users, Award, Sparkles } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AdBanner } from '../components/AdBanner';
 
@@ -149,6 +147,14 @@ export default function Home() {
 
     return (
         <Container safeArea={false}>
+            {/* Dark Background */}
+            <LinearGradient
+                colors={['#0A0A1A', '#0D0D24', '#0A0A1A']}
+                style={StyleSheet.absoluteFillObject}
+            />
+            <View style={[styles.bgBlob, styles.bgBlobTR]} />
+            <View style={[styles.bgBlob, styles.bgBlobBL]} />
+
             <AppHeader title="RBX Calc & Rewards" />
 
             <ScrollView
@@ -247,38 +253,55 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
+    bgBlob: {
+        position: 'absolute',
+        width: 280,
+        height: 280,
+        borderRadius: 140,
+        opacity: 0.08,
+    },
+    bgBlobTR: {
+        top: -60,
+        right: -60,
+        backgroundColor: '#6366F1',
+    },
+    bgBlobBL: {
+        bottom: -60,
+        left: -60,
+        backgroundColor: '#10B981',
+    },
     scrollView: {
         flex: 1,
     },
     scrollContent: {
-        paddingHorizontal: 14,   // reduced from 20
-        paddingTop: 80,          // reduced from 90
-        paddingBottom: 24,       // reduced from 40
+        paddingHorizontal: 14,
+        paddingTop: 80,
+        paddingBottom: 24,
     },
     welcomeSection: {
-        marginBottom: 12,        // reduced from 20
+        marginBottom: 12,
     },
     welcomeText: {
-        fontSize: 22,            // reduced from 24
+        fontSize: 22,
         fontWeight: '800',
-        color: Colors.text,
+        color: '#FFF',
         letterSpacing: -0.5,
         marginBottom: 2,
     },
     welcomeSub: {
-        fontSize: 14,            // reduced from 15
+        fontSize: 14,
         fontWeight: '500',
-        color: Colors.textSecondary,
+        color: 'rgba(255,255,255,0.5)',
     },
     hero: {
-        minHeight: 190,          // reduced from 220
-        borderRadius: 20,        // reduced from 24
-        padding: 18,             // reduced from 24
-        marginBottom: 12,        // reduced from 32
+        minHeight: 190,
+        borderRadius: 20,
+        padding: 18,
+        marginBottom: 12,
         justifyContent: 'center',
-        shadowColor: '#000',
+        shadowColor: '#6366F1',
         shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.18,
+        shadowOpacity: 0.3,
         shadowRadius: 16,
         elevation: 8,
         overflow: 'hidden',
@@ -298,19 +321,19 @@ const styles = StyleSheet.create({
     },
     heroTitle: {
         color: '#fff',
-        fontSize: 30,            // reduced from 34
+        fontSize: 30,
         fontWeight: '900',
-        lineHeight: 36,          // reduced from 40
+        lineHeight: 36,
         letterSpacing: -1,
-        marginBottom: 6,         // reduced from 8
+        marginBottom: 6,
     },
     heroSub: {
-        color: 'rgba(255,255,255,0.8)',
+        color: 'rgba(255,255,255,0.75)',
         marginTop: 2,
-        fontSize: 12,            // reduced from 14
+        fontSize: 12,
         fontWeight: '500',
         letterSpacing: -0.2,
-        marginBottom: 14,        // reduced from 20
+        marginBottom: 14,
     },
     calculatorButton: {
         width: '100%',
@@ -333,16 +356,11 @@ const styles = StyleSheet.create({
         height: 95,
         opacity: 1,
     } as ImageStyle,
-    statsContainer: {
-        flexDirection: 'row',
-        gap: 8,                  // reduced from 12
-        marginBottom: 12,        // reduced from 32
-    },
     statCard: {
         flex: 1,
-        backgroundColor: Colors.surface,
-        borderRadius: 16,        // reduced from 20
-        padding: 12,             // reduced from 16
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        borderRadius: 16,
+        padding: 12,
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
@@ -350,43 +368,43 @@ const styles = StyleSheet.create({
         shadowRadius: 10,
         elevation: 2,
         borderWidth: 1,
-        borderColor: 'rgba(0,0,0,0.04)',
+        borderColor: 'rgba(255,255,255,0.08)',
     },
     statIconContainer: {
-        width: 36,               // reduced from 40
+        width: 36,
         height: 36,
         borderRadius: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 8,         // reduced from 10
+        marginBottom: 8,
     },
     statValue: {
-        fontSize: 16,            // reduced from 18
+        fontSize: 16,
         fontWeight: '800',
-        color: Colors.text,
+        color: '#FFF',
         letterSpacing: -0.5,
         marginBottom: 2,
     },
     statLabel: {
-        fontSize: 10,            // reduced from 11
+        fontSize: 10,
         fontWeight: '600',
-        color: Colors.textSecondary,
+        color: 'rgba(255,255,255,0.45)',
         textAlign: 'center',
     },
     sectionHeader: {
-        marginBottom: 12,        // reduced from 16
+        marginBottom: 12,
         paddingHorizontal: 2,
     },
     sectionTitle: {
-        fontSize: 20,            // reduced from 22
+        fontSize: 20,
         fontWeight: '800',
-        color: Colors.text,
+        color: '#FFF',
         letterSpacing: -0.5,
     },
     sectionSubtitle: {
-        fontSize: 13,            // reduced from 14
+        fontSize: 13,
         fontWeight: '500',
-        color: Colors.textSecondary,
+        color: 'rgba(255,255,255,0.45)',
         marginTop: 2,
     },
     grid: {
