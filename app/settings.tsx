@@ -15,9 +15,9 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 
 const APP_VERSION = '1.0.0';
-const TELEGRAM_URL = 'https://t.me/your_channel'; // Replace with your Telegram channel
-const PRIVACY_URL = 'https://games.biographydata.org/privacy';
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.bhaveshbishnoi.roblox';
+const TELEGRAM_URL = 'https://t.me/hindicreator'; // Replace with your Telegram channel
+const PRIVACY_URL = 'https://rbx.dhakshsolutions.com/privacy-policy';
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.kappytech.rbxcalc';
 
 export default function Settings() {
     const handleShare = async () => {

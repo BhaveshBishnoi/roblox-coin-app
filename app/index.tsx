@@ -145,11 +145,7 @@ export default function Home() {
         { id: 'settings', title: 'Settings', icon: ICONS.settings, route: '/settings', variant: 'purple', gradient: ['#6366F1', '#4F46E5'] as const },
     ];
 
-    const stats = [
-        { label: 'Active Users', value: '50K+', icon: Users, color: '#10B981' },
-        { label: 'Coins Earned', value: '10M+', icon: TrendingUp, color: '#F59E0B' },
-        { label: 'Daily Rewards', value: '1000+', icon: Award, color: '#8B5CF6' },
-    ];
+
 
     return (
         <Container safeArea={false}>
@@ -175,9 +171,7 @@ export default function Home() {
                         end={{ x: 1, y: 1 }}
                         style={styles.hero}
                     >
-
                         <View style={styles.heroGlow} />
-
 
                         <View style={styles.heroContent}>
                             <Text style={styles.heroTitle}>Get Free{'\n'}Robux</Text>
@@ -199,18 +193,8 @@ export default function Home() {
                     </LinearGradient>
                 </Animated.View>
 
-                {/* Stats Section */}
-                <View style={styles.statsContainer}>
-                    {stats.map((stat, index) => (
-                        <View key={index} style={styles.statCard}>
-                            <View style={[styles.statIconContainer, { backgroundColor: `${stat.color}15` }]}>
-                                <stat.icon size={20} color={stat.color} strokeWidth={2.5} />
-                            </View>
-                            <Text style={styles.statValue}>{stat.value}</Text>
-                            <Text style={styles.statLabel}>{stat.label}</Text>
-                        </View>
-                    ))}
-                </View>
+                {/* Ad Banner 1 — After Hero */}
+                <AdBanner />
 
                 {/* Section Title */}
                 <View style={styles.sectionHeader}>
@@ -255,6 +239,7 @@ export default function Home() {
                     ))}
                 </View>
 
+                {/* Ad Banner 2 — Bottom */}
                 <AdBanner />
             </ScrollView>
         </Container>
@@ -266,101 +251,71 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     scrollContent: {
-        paddingHorizontal: 20,
-        paddingTop: 90,
-        paddingBottom: 40,
+        paddingHorizontal: 14,   // reduced from 20
+        paddingTop: 80,          // reduced from 90
+        paddingBottom: 24,       // reduced from 40
     },
     welcomeSection: {
-        marginBottom: 20,
+        marginBottom: 12,        // reduced from 20
     },
     welcomeText: {
-        fontSize: 24,
+        fontSize: 22,            // reduced from 24
         fontWeight: '800',
         color: Colors.text,
         letterSpacing: -0.5,
-        marginBottom: 4,
+        marginBottom: 2,
     },
     welcomeSub: {
-        fontSize: 15,
+        fontSize: 14,            // reduced from 15
         fontWeight: '500',
         color: Colors.textSecondary,
     },
     hero: {
-        minHeight: 220,
-        borderRadius: 24,
-        padding: 24,
-        marginBottom: 32,
+        minHeight: 190,          // reduced from 220
+        borderRadius: 20,        // reduced from 24
+        padding: 18,             // reduced from 24
+        marginBottom: 12,        // reduced from 32
         justifyContent: 'center',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.2,
-        shadowRadius: 20,
-        elevation: 10,
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.18,
+        shadowRadius: 16,
+        elevation: 8,
         overflow: 'hidden',
     },
     heroGlow: {
         position: 'absolute',
         top: -60,
         right: -60,
-        width: 240,
-        height: 240,
-        borderRadius: 120,
+        width: 220,
+        height: 220,
+        borderRadius: 110,
         backgroundColor: 'rgba(16, 185, 129, 0.15)',
-    },
-    heroGradientOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-    },
-    sparkle: {
-        position: 'absolute',
-        zIndex: 2,
     },
     heroContent: {
         zIndex: 1,
         width: '65%',
     },
-    heroBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-        backgroundColor: 'rgba(16, 185, 129, 0.18)',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 100,
-        alignSelf: 'flex-start',
-        marginBottom: 12,
-        borderWidth: 1,
-        borderColor: 'rgba(16, 185, 129, 0.25)',
-    },
-    heroBadgeText: {
-        color: '#10B981',
-        fontSize: 11,
-        fontWeight: '800',
-        letterSpacing: 0.5,
-    },
     heroTitle: {
         color: '#fff',
-        fontSize: 34,
+        fontSize: 30,            // reduced from 34
         fontWeight: '900',
-        lineHeight: 40,
+        lineHeight: 36,          // reduced from 40
         letterSpacing: -1,
-        marginBottom: 8,
+        marginBottom: 6,         // reduced from 8
     },
     heroSub: {
         color: 'rgba(255,255,255,0.8)',
-        marginTop: 4,
-        fontSize: 14,
+        marginTop: 2,
+        fontSize: 12,            // reduced from 14
         fontWeight: '500',
         letterSpacing: -0.2,
-        marginBottom: 20,
+        marginBottom: 14,        // reduced from 20
     },
     calculatorButton: {
         width: '100%',
         marginVertical: 0,
-        minHeight: 48,
+        minHeight: 44,           // reduced from 48
         shadowColor: 'rgba(0,0,0,0.2)',
         shadowOpacity: 0.2,
         shadowRadius: 8,
@@ -368,107 +323,104 @@ const styles = StyleSheet.create({
     },
     heroCoinContainer: {
         position: 'absolute',
-        right: 10,
-        bottom: 20,
-        top: 20,
+        right: 8,
+        bottom: 16,
+        top: 16,
         justifyContent: 'center',
     },
     heroCoinImage: {
-        width: 110,
-        height: 110,
+        width: 95,               // reduced from 110
+        height: 95,
         opacity: 1,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.3,
-        shadowRadius: 10,
     } as ImageStyle,
     statsContainer: {
         flexDirection: 'row',
-        gap: 12,
-        marginBottom: 32,
+        gap: 8,                  // reduced from 12
+        marginBottom: 12,        // reduced from 32
     },
     statCard: {
         flex: 1,
         backgroundColor: Colors.surface,
-        borderRadius: 20,
-        padding: 16,
+        borderRadius: 16,        // reduced from 20
+        padding: 12,             // reduced from 16
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.04,
-        shadowRadius: 12,
+        shadowRadius: 10,
         elevation: 2,
         borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.04)',
     },
     statIconContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: 12,
+        width: 36,               // reduced from 40
+        height: 36,
+        borderRadius: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 10,
+        marginBottom: 8,         // reduced from 10
     },
     statValue: {
-        fontSize: 18,
+        fontSize: 16,            // reduced from 18
         fontWeight: '800',
         color: Colors.text,
         letterSpacing: -0.5,
         marginBottom: 2,
     },
     statLabel: {
-        fontSize: 11,
+        fontSize: 10,            // reduced from 11
         fontWeight: '600',
         color: Colors.textSecondary,
         textAlign: 'center',
     },
     sectionHeader: {
-        marginBottom: 16,
-        paddingHorizontal: 4,
+        marginBottom: 12,        // reduced from 16
+        paddingHorizontal: 2,
     },
     sectionTitle: {
-        fontSize: 22,
+        fontSize: 20,            // reduced from 22
         fontWeight: '800',
         color: Colors.text,
         letterSpacing: -0.5,
     },
     sectionSubtitle: {
-        fontSize: 14,
+        fontSize: 13,            // reduced from 14
         fontWeight: '500',
         color: Colors.textSecondary,
-        marginTop: 4,
+        marginTop: 2,
     },
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 16,
+        gap: 12,                 // reduced from 16
+        marginBottom: 12,
     },
     gridItem: {
-        width: (width - 56) / 2,
-        aspectRatio: 0.85,
+        width: (width - 40) / 2, // adjusted for new horizontal padding (14*2 + 12 gap)
+        aspectRatio: 0.9,        // slightly taller ratio
     },
     cardContainer: {
         flex: 1,
-        borderRadius: 24,
+        borderRadius: 20,        // reduced from 24
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.15,
-        shadowRadius: 16,
-        elevation: 6,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.12,
+        shadowRadius: 12,
+        elevation: 5,
     },
     cardGradient: {
         flex: 1,
-        borderRadius: 24,
-        padding: 2, // Border effect
+        borderRadius: 20,
+        padding: 2,
         overflow: 'hidden',
     },
     cardShine: {
         position: 'absolute',
         top: -50,
         left: -50,
-        width: 150,
-        height: 150,
-        borderRadius: 75,
+        width: 140,
+        height: 140,
+        borderRadius: 70,
         backgroundColor: 'rgba(255, 255, 255, 0.12)',
         transform: [{ scaleX: 1.5 }],
     },
@@ -477,12 +429,12 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 20,
+        padding: 14,             // reduced from 20
     },
     cardIconHighlight: {
-        width: 70,
-        height: 70,
-        borderRadius: 20,
+        width: 60,               // reduced from 70
+        height: 60,
+        borderRadius: 16,        // reduced from 20
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
         alignItems: 'center',
         justifyContent: 'center',
@@ -492,19 +444,19 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 1,
         shadowRadius: 8,
-        marginTop: 10,
+        marginTop: 6,
     },
     cardIcon: {
-        width: 42,
-        height: 42,
+        width: 36,               // reduced from 42
+        height: 36,
     } as ImageStyle,
     cardText: {
-        fontSize: 16,
+        fontSize: 14,            // reduced from 16
         fontWeight: '800',
         color: '#fff',
         textAlign: 'center',
         letterSpacing: -0.3,
-        marginBottom: 8,
+        marginBottom: 6,         // reduced from 8
         textShadowColor: 'rgba(0,0,0,0.15)',
         textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 4,
