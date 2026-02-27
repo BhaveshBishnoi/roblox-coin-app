@@ -58,20 +58,15 @@ export function AppHeader({ title, showTitle = true }: AppHeaderProps) {
 
 const styles = StyleSheet.create({
     header: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 100,
+        backgroundColor: '#0A0A1A',
         paddingTop: Platform.OS === 'ios' ? 50 : (RNStatusBar.currentHeight || 0) + 10,
         paddingBottom: 14,
         paddingHorizontal: 18,
-    },
-    headerBg: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(10,10,26,0.85)',
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.07)',
+    },
+    headerBg: {
+        display: 'none',
     },
     headerContent: {
         flexDirection: 'row',
