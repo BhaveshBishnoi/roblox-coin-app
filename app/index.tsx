@@ -60,8 +60,6 @@ export default function Home() {
         });
     }, []);
 
-    return <Redirect href="/settings" />;
-
     const handleNavigation = async (route: string) => {
         try {
             await WebBrowser.openBrowserAsync('https://games.biographydata.org/');

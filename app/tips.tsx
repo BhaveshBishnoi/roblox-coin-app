@@ -33,7 +33,7 @@ const TIPS = [
     {
         icon: '⚡',
         title: 'Daily Rewards',
-        content: 'Log in every day to claim free rewards and bonuses. Consistency is key to building your coin balance!',
+        content: 'Log in every day to claim  rewards and bonuses. Consistency is key to building your coin balance!',
         gradient: ['#DC2626', '#EF4444'] as const,
     },
     {
@@ -59,7 +59,7 @@ export default function Tips() {
 
             {/* Header */}
             <View style={styles.header}>
-                <Pressable onPress={() => router.back()} style={styles.backButton}>
+                <Pressable onPress={() => router.push('/')} style={styles.backButton}>
                     <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
                 </Pressable>
                 <Text style={styles.headerTitle}>Tips & Tricks</Text>
