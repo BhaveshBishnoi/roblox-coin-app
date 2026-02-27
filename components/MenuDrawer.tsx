@@ -98,7 +98,7 @@ export function MenuDrawer({ visible, onClose, slideAnim }: MenuDrawerProps) {
                     <View style={styles.headerShine} />
                     <View style={styles.headerContent}>
                         <Text style={styles.headerTitle}>RBX Calc & Rewards</Text>
-                        <Text style={styles.headerSub}>Earn Free Robux 🪙</Text>
+                        <Text style={styles.headerSub}>Earn Robux Coins 🪙</Text>
                     </View>
                     <TouchableOpacity onPress={onClose} style={styles.closeBtn} activeOpacity={0.7}>
                         <X size={20} color="#fff" strokeWidth={2.5} />

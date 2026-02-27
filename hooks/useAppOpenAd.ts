@@ -8,6 +8,8 @@ const appOpenAd = AppOpenAd.createForAdRequest(adUnitId, {
     requestNonPersonalizedAdsOnly: true,
 });
 
+let appOpenAdShownThisSession = false;
+
 export function useAppOpenAd() {
     const [isLoaded, setIsLoaded] = useState(false);
     const [isShowing, setIsShowing] = useState(false);
@@ -49,14 +51,27 @@ export function useAppOpenAd() {
 
     // Handle app state changes to show ad on resume
     useEffect(() => {
-        const handleAppStateChange = (nextAppState: AppStateStatus) => {
-            if (nextAppState === 'active' && isLoaded && !isShowing) {
+        const tryShowAd = () => {
+            if (isLoaded && !isShowing && !appOpenAdShownThisSession) {
                 try {
+                    appOpenAdShownThisSession = true;
                     appOpenAd.show();
                 } catch (e) {
+                    appOpenAdShownThisSession = false;
                     console.error("Failed to show App Open Ad:", e);
                     // Standard fallback: reload or ignore
                 }
+            }
+        };
+
+        // Try showing ad immediately if app is active
+        if (AppState.currentState === 'active') {
+            tryShowAd();
+        }
+
+        const handleAppStateChange = (nextAppState: AppStateStatus) => {
+            if (nextAppState === 'active') {
+                tryShowAd();
             }
         };
 

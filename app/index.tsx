@@ -245,8 +245,7 @@ export default function Home() {
                     ))}
                 </View>
 
-                {/* Ad Banner 2 — Bottom */}
-                <AdBanner />
+
             </ScrollView>
         </Container>
     );
