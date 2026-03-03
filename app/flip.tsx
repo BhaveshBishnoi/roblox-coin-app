@@ -16,7 +16,7 @@ import { Container } from '../components/Container';
 import { Colors } from '../constants/Colors';
 import { useAdAction } from '../hooks/useAdAction';
 import { useCoins } from '../context/CoinContext';
-import { Clock, Zap, Star, Trophy, ChevronLeft } from 'lucide-react-native';
+import { Clock, Zap, Star, Trophy, ChevronLeft, Play } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 
@@ -25,7 +25,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 64;
 const CARD_HEIGHT = CARD_WIDTH * 1.35;
 
-const generateCoinValue = () => Math.floor(Math.random() * 10) + 1;
+const generateCoinValue = () => Math.floor(Math.random() * 6) + 5; // 5–10 coins
 
 // Floating particle component
 const Particle = ({ delay, x, emoji }: { delay: number; x: number; emoji: string }) => {
@@ -79,6 +79,7 @@ export default function Flip() {
     const [isFlipped, setIsFlipped] = useState(false);
     const [hasFlipped, setHasFlipped] = useState(false);
     const [showParticles, setShowParticles] = useState(false);
+    const [adSkipUsed, setAdSkipUsed] = useState(false);
 
     const flipRotation = useSharedValue(0);
     const scale = useSharedValue(1);
@@ -126,6 +127,7 @@ export default function Flip() {
                 setTimeLeft(getRemainingTime('flip', 1));
             } else {
                 setTimeLeft(null);
+                setAdSkipUsed(false);
                 if (hasFlipped) {
                     setIsFlipped(false);
                     setHasFlipped(false);
@@ -233,7 +235,7 @@ export default function Flip() {
                 </View>
                 <View style={styles.coinBadge}>
                     <Star size={14} color="#F59E0B" fill="#F59E0B" />
-                    <Text style={styles.coinBadgeText}>1-10</Text>
+                    <Text style={styles.coinBadgeText}>5-10</Text>
                 </View>
             </View>
 
@@ -258,9 +260,35 @@ export default function Flip() {
                         <Text style={styles.statusReadyText}>Ready to flip!</Text>
                     </View>
                 ) : !available ? (
-                    <View style={styles.cooldownPill}>
-                        <Clock size={15} color="#F87171" />
-                        <Text style={styles.cooldownText}>Next flip in {timeLeft}</Text>
+                    <View style={styles.cooldownColumn}>
+                        <View style={styles.cooldownPill}>
+                            <Clock size={15} color="#F87171" />
+                            <Text style={styles.cooldownText}>Next flip in {timeLeft}</Text>
+                        </View>
+                        {!adSkipUsed ? (
+                            <Pressable
+                                onPress={() => triggerAd(() => {
+                                    setAdSkipUsed(true);
+                                    setCoinValue(generateCoinValue());
+                                    setAvailable(true);
+                                })}
+                                style={styles.skipAdBtn}
+                            >
+                                <LinearGradient
+                                    colors={['#7C3AED', '#9333EA']}
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    style={styles.skipAdGradient}
+                                >
+                                    <Play size={14} color="#FFF" fill="#FFF" />
+                                    <Text style={styles.skipAdText}>Watch Ad to Skip Wait</Text>
+                                </LinearGradient>
+                            </Pressable>
+                        ) : (
+                            <View style={styles.skipUsedBadge}>
+                                <Text style={styles.skipUsedText}>✅ Ad skip used this cycle</Text>
+                            </View>
+                        )}
                     </View>
                 ) : null}
 
@@ -390,7 +418,7 @@ export default function Flip() {
                     <View style={styles.infoDivider} />
                     <View style={styles.infoItem}>
                         <Text style={styles.infoEmoji}>🪙</Text>
-                        <Text style={styles.infoLabel}>1-10 Coins</Text>
+                        <Text style={styles.infoLabel}>5-10 Coins</Text>
                     </View>
                     <View style={styles.infoDivider} />
                     <View style={styles.infoItem}>
@@ -508,6 +536,12 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '700',
     },
+    cooldownColumn: {
+        gap: 10,
+        marginBottom: 10,
+        width: '100%',
+        alignItems: 'center',
+    },
     cooldownPill: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -518,7 +552,36 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         borderWidth: 1,
         borderColor: 'rgba(239, 68, 68, 0.2)',
-        marginBottom: 10,
+    },
+    skipAdBtn: {
+        borderRadius: 16,
+        overflow: 'hidden',
+        width: '100%',
+    },
+    skipAdGradient: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        paddingVertical: 13,
+        paddingHorizontal: 20,
+    },
+    skipAdText: {
+        color: '#FFF',
+        fontSize: 14,
+        fontWeight: '800',
+    },
+    skipUsedBadge: {
+        alignItems: 'center',
+        paddingVertical: 10,
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderRadius: 12,
+        width: '100%',
+    },
+    skipUsedText: {
+        color: 'rgba(255,255,255,0.4)',
+        fontSize: 12,
+        fontWeight: '600',
     },
     cooldownText: {
         color: '#F87171',

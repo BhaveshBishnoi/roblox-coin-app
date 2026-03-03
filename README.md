@@ -23,5 +23,5 @@ This is a React Native / Expo app designed with a dark, premium aesthetic.
    ```
 
 ## Note
-This app includes a simulated "Ad Wall" feature where actions trigger an in-app browser redirect to `https://games.biographydata.org` as per requirements.
+This app includes a simulated "Ad Wall" feature where actions trigger an in-app browser redirect to `https://rbx.dhakshsolutions.com/games` as per requirements.
 # roblox-coin-app

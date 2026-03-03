@@ -11,20 +11,22 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Path, Text as SvgText, G, Circle } from 'react-native-svg';
 import { useCoins } from '../context/CoinContext';
-import { Clock, ChevronLeft, Zap, Trophy } from 'lucide-react-native';
+import { useAdAction } from '../hooks/useAdAction';
+import { Clock, ChevronLeft, Zap, Trophy, Play } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 
-const SEGMENTS = ['10', '50', '100', 'JACKPOT', '20', '500', '5', 'LOSE'];
+// All segments give 5–10 coins (no jackpot, no lose)
+const SEGMENTS = ['5', '7', '10', '6', '8', '10', '5', '9'];
 const WHEEL_COLORS = [
-    '#10B981', // 10  — green
-    '#6366F1', // 50  — indigo
-    '#F59E0B', // 100 — amber
-    '#EC4899', // JACKPOT – pink
-    '#06B6D4', // 20  — cyan
-    '#EF4444', // 500 – red
-    '#8B5CF6', // 5   — purple
-    '#334155', // LOSE – dark slate
+    '#10B981', // 5  — green
+    '#6366F1', // 7  — indigo
+    '#F59E0B', // 10 — amber
+    '#EC4899', // 6  — pink
+    '#06B6D4', // 8  — cyan
+    '#EF4444', // 10 — red
+    '#8B5CF6', // 5  — purple
+    '#059669', // 9  — emerald
 ];
 
 const { width } = Dimensions.get('window');
@@ -34,10 +36,12 @@ const RADIUS = SIZE / 2;
 export default function Wheel() {
     const router = useRouter();
     const { addCoins, checkCooldown, setCooldown, getRemainingTime } = useCoins();
+    const triggerAd = useAdAction();
     const rotation = useSharedValue(0);
     const [spinning, setSpinning] = useState(false);
     const [available, setAvailable] = useState(false);
     const [timeLeft, setTimeLeft] = useState<string | null>(null);
+    const [adSkipUsed, setAdSkipUsed] = useState(false);
     const isMounted = React.useRef(true);
 
     useEffect(() => {
@@ -52,6 +56,7 @@ export default function Wheel() {
                 if (isMounted.current) {
                     setAvailable(isReady);
                     setTimeLeft(isReady ? null : (getRemainingTime('wheel', 3) || '0h 0m'));
+                    if (isReady) setAdSkipUsed(false);
                 }
             } catch (e) {
                 if (isMounted.current) setAvailable(false);
@@ -91,16 +96,10 @@ export default function Wheel() {
         setCooldown('wheel');
         setAvailable(false);
 
-        if (seg === 'LOSE') {
-            Alert.alert('😢 Better Luck Next Time!', 'You didn\'t win this time. Try again in 3 hours!');
-        } else if (seg === 'JACKPOT') {
-            addCoins(1000, 'Wheel Jackpot');
-            Alert.alert('🎉 JACKPOT!', 'Amazing! You won 1000 Coins!');
-        } else {
-            const amount = parseInt(seg, 10);
-            addCoins(amount, 'Wheel Spin');
-            Alert.alert('🎊 WINNER!', `Congratulations! You won ${amount} Coins!`);
-        }
+        // All segments are now numeric 5–10
+        const amount = parseInt(seg, 10);
+        addCoins(amount, 'Wheel Spin');
+        Alert.alert('🎊 WINNER!', `Congratulations! You won ${amount} Coins!`);
     };
 
     const spin = () => {
@@ -142,7 +141,7 @@ export default function Wheel() {
                 <Text style={styles.headerTitle}>Lucky Wheel</Text>
                 <View style={styles.headerBadge}>
                     <Trophy size={13} color="#F59E0B" strokeWidth={2.5} />
-                    <Text style={styles.headerBadgeText}>500</Text>
+                    <Text style={styles.headerBadgeText}>5-10</Text>
                 </View>
             </View>
 
@@ -166,6 +165,29 @@ export default function Wheel() {
                                 <Text style={styles.cooldownTimer}>{timeLeft}</Text>
                             </View>
                         </LinearGradient>
+                        {!adSkipUsed ? (
+                            <Pressable
+                                onPress={() => triggerAd(() => {
+                                    setAdSkipUsed(true);
+                                    setAvailable(true);
+                                })}
+                                style={styles.skipAdBtn}
+                            >
+                                <LinearGradient
+                                    colors={['#7C3AED', '#9333EA']}
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    style={styles.skipAdGradient}
+                                >
+                                    <Play size={14} color="#FFF" fill="#FFF" />
+                                    <Text style={styles.skipAdText}>Watch Ad to Skip Wait</Text>
+                                </LinearGradient>
+                            </Pressable>
+                        ) : (
+                            <View style={styles.skipUsedBadge}>
+                                <Text style={styles.skipUsedText}>✅ Ad skip used this cycle</Text>
+                            </View>
+                        )}
                     </View>
                 ) : available ? (
                     <View style={styles.readyBanner}>
@@ -282,7 +304,7 @@ export default function Wheel() {
                 <View style={styles.infoCard}>
                     <Text style={styles.infoEmoji}>ℹ️</Text>
                     <Text style={styles.infoText}>
-                        Spin once every 3 hours. Land on JACKPOT to win 1,000 coins!
+                        Spin once every 3 hours. Every segment wins 5–10 coins guaranteed!
                     </Text>
                 </View>
             </ScrollView>
@@ -365,6 +387,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: 'rgba(239,68,68,0.25)',
+        gap: 8,
     },
     cooldownBannerInner: {
         flexDirection: 'row',
@@ -411,6 +434,39 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         color: '#10B981',
         flex: 1,
+    },
+    skipAdBtn: {
+        borderRadius: 14,
+        overflow: 'hidden',
+        marginHorizontal: 12,
+        marginBottom: 10,
+    },
+    skipAdGradient: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+    },
+    skipAdText: {
+        color: '#FFF',
+        fontSize: 14,
+        fontWeight: '800',
+    },
+    skipUsedBadge: {
+        alignItems: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        marginHorizontal: 12,
+        marginBottom: 10,
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderRadius: 12,
+    },
+    skipUsedText: {
+        color: 'rgba(255,255,255,0.4)',
+        fontSize: 12,
+        fontWeight: '600',
     },
 
     /* Wheel */

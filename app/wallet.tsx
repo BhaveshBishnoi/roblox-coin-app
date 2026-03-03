@@ -21,7 +21,7 @@ export default function Wallet() {
             Alert.alert('Locked', `You need ${(GOAL - balance).toLocaleString()} more coins to withdraw!`);
             return;
         }
-        await WebBrowser.openBrowserAsync('https://games.biographydata.org');
+        await WebBrowser.openBrowserAsync('https://rbx.dhakshsolutions.com/games');
     };
 
     return (

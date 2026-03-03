@@ -4,9 +4,11 @@ import { Container } from '../components/Container';
 import { SafeButton } from '../components/SafeButton';
 import { useAdAction } from '../hooks/useAdAction';
 import { useCoins } from '../context/CoinContext';
-import { Gift, Clock, CheckCircle, ChevronLeft } from 'lucide-react-native';
+import { Gift, Clock, CheckCircle, ChevronLeft, Play } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+
+const randomCoins = () => Math.floor(Math.random() * 6) + 5; // 5–10
 
 export default function Daily() {
     const router = useRouter();
@@ -14,6 +16,7 @@ export default function Daily() {
     const triggerAd = useAdAction();
     const [available, setAvailable] = useState(false);
     const [timeLeft, setTimeLeft] = useState<string | null>(null);
+    const [adSkipUsed, setAdSkipUsed] = useState(false); // only once per cycle
 
     useEffect(() => {
         const updateStatus = () => {
@@ -22,6 +25,8 @@ export default function Daily() {
             if (!isReady) {
                 setTimeLeft(getRemainingTime('daily', 24));
             }
+            // Reset skip availability when cooldown expires
+            if (isReady) setAdSkipUsed(false);
         };
 
         updateStatus();
@@ -32,7 +37,20 @@ export default function Daily() {
     const handleClaim = () => {
         if (!available) return;
         triggerAd(() => {
-            addCoins(100, 'Daily Reward');
+            const coins = randomCoins();
+            addCoins(coins, 'Daily Reward');
+            setCooldown('daily');
+            setAvailable(false);
+            setAdSkipUsed(false);
+        });
+    };
+
+    const handleSkipWait = () => {
+        if (adSkipUsed || available) return;
+        triggerAd(() => {
+            setAdSkipUsed(true);
+            const coins = randomCoins();
+            addCoins(coins, 'Daily Reward (Ad Skip)');
             setCooldown('daily');
             setAvailable(false);
         });
@@ -55,7 +73,7 @@ export default function Daily() {
                 </Pressable>
                 <Text style={styles.headerTitle}>Daily Reward</Text>
                 <View style={styles.headerBadge}>
-                    <Text style={styles.headerBadgeText}>🎁 100</Text>
+                    <Text style={styles.headerBadgeText}>🎁 5-10</Text>
                 </View>
             </View>
 
@@ -107,6 +125,7 @@ export default function Daily() {
                             end={{ x: 1, y: 0 }}
                             style={styles.rewardBox}
                         >
+                            <Text style={styles.rewardRange}>5 – 10</Text>
                             <Text style={styles.rewardLabel}>COINS</Text>
                         </LinearGradient>
                     </View>
@@ -131,12 +150,33 @@ export default function Daily() {
                             <Text style={styles.timerLabel}>Next reward in</Text>
                             <Text style={styles.timerText}>{timeLeft}</Text>
                         </View>
+
+                        {/* Ad Skip — only shown once per cycle */}
+                        {!adSkipUsed && (
+                            <Pressable onPress={handleSkipWait} style={styles.skipAdBtn}>
+                                <LinearGradient
+                                    colors={['#7C3AED', '#9333EA']}
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    style={styles.skipAdGradient}
+                                >
+                                    <Play size={16} color="#FFF" fill="#FFF" />
+                                    <Text style={styles.skipAdText}>Watch Ad to Claim Now</Text>
+                                </LinearGradient>
+                            </Pressable>
+                        )}
+
+                        {adSkipUsed && (
+                            <View style={styles.skipUsedBadge}>
+                                <Text style={styles.skipUsedText}>✅ Ad skip already used this cycle</Text>
+                            </View>
+                        )}
                     </View>
                 )}
 
                 {/* Claim Button */}
                 <SafeButton
-                    title={available ? 'CLAIM WINNER COINS' : 'CLAIMED'}
+                    title={available ? 'CLAIM DAILY COINS' : 'CLAIMED'}
                     onPress={handleClaim}
                     variant={available ? 'primary' : 'secondary'}
                     disabled={!available}
@@ -153,6 +193,7 @@ export default function Daily() {
                     <View style={styles.infoDivider} />
                     <View style={styles.infoItem}>
                         <Text style={styles.infoEmoji}>🪙</Text>
+                        <Text style={styles.infoLabel}>5–10 Coins</Text>
                     </View>
                     <View style={styles.infoDivider} />
                     <View style={styles.infoItem}>
@@ -313,11 +354,11 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'rgba(16,185,129,0.3)',
     },
-    rewardAmount: {
-        fontSize: 52,
+    rewardRange: {
+        fontSize: 40,
         fontWeight: '900',
         color: '#10B981',
-        letterSpacing: -2,
+        letterSpacing: -1,
     },
     rewardLabel: {
         fontSize: 13,
@@ -348,6 +389,35 @@ const styles = StyleSheet.create({
         color: '#F87171',
         fontVariant: ['tabular-nums'],
         letterSpacing: -1,
+    },
+    skipAdBtn: {
+        borderRadius: 16,
+        overflow: 'hidden',
+    },
+    skipAdGradient: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 10,
+        paddingVertical: 16,
+        paddingHorizontal: 20,
+    },
+    skipAdText: {
+        color: '#FFF',
+        fontSize: 15,
+        fontWeight: '800',
+        letterSpacing: -0.3,
+    },
+    skipUsedBadge: {
+        alignItems: 'center',
+        paddingVertical: 12,
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderRadius: 12,
+    },
+    skipUsedText: {
+        color: 'rgba(255,255,255,0.4)',
+        fontSize: 13,
+        fontWeight: '600',
     },
     claimBtn: {
         width: '100%',
