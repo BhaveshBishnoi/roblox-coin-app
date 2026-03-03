@@ -200,7 +200,7 @@ export const QUIZZES: Quiz[] = [
             },
             {
                 q: "What is a 'Limited' item?",
-                options: ["Free item", "Rare tradeable item", "Common item", "Developer item"],
+                options: ["Robux item", "Rare tradeable item", "Common item", "Developer item"],
                 correct: 1
             },
             {

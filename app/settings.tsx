@@ -117,7 +117,7 @@ export default function Settings() {
                         <Text style={styles.appIconEmoji}>🎮</Text>
                     </View>
                     <Text style={styles.appName}>RBX Calc & Rewards</Text>
-                    <Text style={styles.appTagline}>Free Robux coins, daily rewards & more</Text>
+                    <Text style={styles.appTagline}>Earn Robux coins, daily rewards & more</Text>
                     <View style={styles.versionPill}>
                         <Text style={styles.versionPillText}>v{APP_VERSION}</Text>
                     </View>
