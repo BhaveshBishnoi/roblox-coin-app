@@ -16,7 +16,7 @@ export default function CalculatorHub() {
 
     const handleNavigation = async (route: string) => {
         try {
-            await WebBrowser.openBrowserAsync('https://games.biographydata.org/');
+            await WebBrowser.openBrowserAsync('https://rbx.dhakshsolutions.com/games');
         } catch (error) {
             console.error('Failed to open browser:', error);
         }

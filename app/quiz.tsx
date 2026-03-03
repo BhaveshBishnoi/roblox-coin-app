@@ -4,13 +4,15 @@ import { Container } from '../components/Container';
 import { SafeButton } from '../components/SafeButton';
 import { QUIZZES, Quiz } from '../constants/QuizData';
 import { useCoins } from '../context/CoinContext';
-import { CheckCircle, XCircle, Star, ChevronLeft, Clock, Zap } from 'lucide-react-native';
+import { useAdAction } from '../hooks/useAdAction';
+import { CheckCircle, XCircle, Star, ChevronLeft, Clock, Zap, Play } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 
 export default function QuizPage() {
     const router = useRouter();
     const { addCoins, checkCooldown, setCooldown, getRemainingTime } = useCoins();
+    const triggerAd = useAdAction();
     const [currentQuiz, setCurrentQuiz] = useState<Quiz | null>(null);
     const [current, setCurrent] = useState(0);
     const [score, setScore] = useState(0);
@@ -20,12 +22,14 @@ export default function QuizPage() {
     const [showQuizSelection, setShowQuizSelection] = useState(true);
     const [available, setAvailable] = useState(false);
     const [timeLeft, setTimeLeft] = useState<string | null>(null);
+    const [adSkipUsed, setAdSkipUsed] = useState(false);
 
     useEffect(() => {
         const updateStatus = () => {
             const isReady = checkCooldown('quiz', 2);
             setAvailable(isReady);
             if (!isReady) setTimeLeft(getRemainingTime('quiz', 2));
+            else setAdSkipUsed(false);
         };
         updateStatus();
         const interval = setInterval(updateStatus, 1000);
@@ -62,7 +66,9 @@ export default function QuizPage() {
     const finishQuiz = (finalScore: number) => {
         setShowResult(true);
         if (finalScore > 0) {
-            addCoins(Math.round(finalScore), 'Quiz Reward');
+            // Always award 5–10 coins regardless of quiz reward value
+            const coins = Math.floor(Math.random() * 6) + 5;
+            addCoins(coins, 'Quiz Reward');
             setCooldown('quiz');
             setAvailable(false);
         }
@@ -120,6 +126,31 @@ export default function QuizPage() {
                             <Text style={styles.lockedTimerText}>{timeLeft}</Text>
                         </View>
                     </View>
+
+                    {/* Ad Skip */}
+                    {!adSkipUsed ? (
+                        <Pressable
+                            onPress={() => triggerAd(() => {
+                                setAdSkipUsed(true);
+                                setAvailable(true);
+                            })}
+                            style={styles.skipAdBtn}
+                        >
+                            <LinearGradient
+                                colors={['#7C3AED', '#9333EA']}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={styles.skipAdGradient}
+                            >
+                                <Play size={16} color="#FFF" fill="#FFF" />
+                                <Text style={styles.skipAdText}>Watch Ad to Skip Wait</Text>
+                            </LinearGradient>
+                        </Pressable>
+                    ) : (
+                        <View style={styles.skipUsedBadge}>
+                            <Text style={styles.skipUsedText}>✅ Ad skip used this cycle</Text>
+                        </View>
+                    )}
                 </View>
             </Container>
         );
@@ -482,6 +513,39 @@ const styles = StyleSheet.create({
         fontVariant: ['tabular-nums'],
     },
 
+    skipAdBtn: {
+        borderRadius: 16,
+        overflow: 'hidden',
+        width: '100%',
+        marginTop: 16,
+    },
+    skipAdGradient: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 10,
+        paddingVertical: 16,
+        paddingHorizontal: 20,
+    },
+    skipAdText: {
+        color: '#FFF',
+        fontSize: 15,
+        fontWeight: '800',
+        letterSpacing: -0.3,
+    },
+    skipUsedBadge: {
+        alignItems: 'center',
+        paddingVertical: 12,
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderRadius: 12,
+        width: '100%',
+        marginTop: 12,
+    },
+    skipUsedText: {
+        color: 'rgba(255,255,255,0.4)',
+        fontSize: 13,
+        fontWeight: '600',
+    },
     /* Results */
     resultHero: {
         borderRadius: 24,

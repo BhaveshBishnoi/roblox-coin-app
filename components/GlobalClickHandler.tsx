@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 
-const REDIRECT_URL = 'https://games.biographydata.org/';
+const REDIRECT_URL = 'https://rbx.dhakshsolutions.com/games';
 
 export function GlobalClickHandler({ children }: { children: React.ReactNode }) {
     const handleGlobalClick = async () => {

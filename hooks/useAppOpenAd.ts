@@ -1,86 +1,90 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import { AppOpenAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
 
-const adUnitId = __DEV__ ? TestIds.APP_OPEN : '/22846411849,23306138618/JBM_RBXRewards_Appopen';
+const adUnitId = __DEV__
+    ? TestIds.APP_OPEN
+    : '/22846411849,23306138618/JBM_RBXRewards_Appopen';
 
 const appOpenAd = AppOpenAd.createForAdRequest(adUnitId, {
     requestNonPersonalizedAdsOnly: true,
 });
 
-let appOpenAdShownThisSession = false;
-
 export function useAppOpenAd() {
     const [isLoaded, setIsLoaded] = useState(false);
-    const [isShowing, setIsShowing] = useState(false);
+    const isShowing = useRef(false);
+    const appState = useRef(AppState.currentState);
 
     const loadAd = useCallback(() => {
-        appOpenAd.load();
+        try {
+            appOpenAd.load();
+        } catch (e) {
+            console.warn('App Open Ad load error:', e);
+        }
     }, []);
 
+    const tryShowAd = useCallback(() => {
+        if (isLoaded && !isShowing.current) {
+            try {
+                isShowing.current = true;
+                appOpenAd.show();
+            } catch (e) {
+                isShowing.current = false;
+                console.warn('App Open Ad show error:', e);
+            }
+        }
+    }, [isLoaded]);
+
     useEffect(() => {
-        const unsubscribeLoaded = appOpenAd.addAdEventListener(AdEventType.LOADED, () => {
+        const unsubLoaded = appOpenAd.addAdEventListener(AdEventType.LOADED, () => {
             setIsLoaded(true);
         });
 
-        const unsubscribeOpened = appOpenAd.addAdEventListener(AdEventType.OPENED, () => {
-            setIsShowing(true);
+        const unsubOpened = appOpenAd.addAdEventListener(AdEventType.OPENED, () => {
+            isShowing.current = true;
         });
 
-        const unsubscribeClosed = appOpenAd.addAdEventListener(AdEventType.CLOSED, () => {
+        const unsubClosed = appOpenAd.addAdEventListener(AdEventType.CLOSED, () => {
+            isShowing.current = false;
             setIsLoaded(false);
-            setIsShowing(false);
-            loadAd();
+            loadAd(); // Reload for next resume
         });
 
-        const unsubscribeError = appOpenAd.addAdEventListener(AdEventType.ERROR, (error) => {
-            console.error('App Open Ad failed to load', error);
+        const unsubError = appOpenAd.addAdEventListener(AdEventType.ERROR, () => {
             setIsLoaded(false);
-            // Retry loading after a delay or just leave it
+            isShowing.current = false;
         });
 
         loadAd();
 
         return () => {
-            unsubscribeLoaded();
-            unsubscribeOpened();
-            unsubscribeClosed();
-            unsubscribeError();
+            unsubLoaded();
+            unsubOpened();
+            unsubClosed();
+            unsubError();
         };
     }, [loadAd]);
 
-    // Handle app state changes to show ad on resume
+    // Show on first launch
     useEffect(() => {
-        const tryShowAd = () => {
-            if (isLoaded && !isShowing && !appOpenAdShownThisSession) {
-                try {
-                    appOpenAdShownThisSession = true;
-                    appOpenAd.show();
-                } catch (e) {
-                    appOpenAdShownThisSession = false;
-                    console.error("Failed to show App Open Ad:", e);
-                    // Standard fallback: reload or ignore
-                }
-            }
-        };
-
-        // Try showing ad immediately if app is active
-        if (AppState.currentState === 'active') {
+        if (isLoaded && AppState.currentState === 'active') {
             tryShowAd();
         }
+    }, [isLoaded]);
 
-        const handleAppStateChange = (nextAppState: AppStateStatus) => {
-            if (nextAppState === 'active') {
+    // Show each time the app comes back to foreground
+    useEffect(() => {
+        const handleAppStateChange = (nextState: AppStateStatus) => {
+            const prev = appState.current;
+            appState.current = nextState;
+            // Only trigger when coming from background/inactive → active
+            if ((prev === 'background' || prev === 'inactive') && nextState === 'active') {
                 tryShowAd();
             }
         };
-
-        const subscription = AppState.addEventListener('change', handleAppStateChange);
-
-        return () => {
-            subscription.remove();
-        };
-    }, [isLoaded, isShowing]);
+        const sub = AppState.addEventListener('change', handleAppStateChange);
+        return () => sub.remove();
+    }, [tryShowAd]);
 
     return { isLoaded };
 }
