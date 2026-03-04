@@ -29,48 +29,7 @@ const CARD_HEIGHT = CARD_WIDTH * 1.35;
 
 
 
-// Floating particle component
-const Particle = ({ delay, x, emoji }: { delay: number; x: number; emoji: string }) => {
-    const translateY = useSharedValue(0);
-    const opacity = useSharedValue(0);
-
-    useEffect(() => {
-        translateY.value = withDelay(
-            delay,
-            withRepeat(
-                withTiming(-120, { duration: 2000, easing: Easing.out(Easing.ease) }),
-                -1,
-                false
-            )
-        );
-        opacity.value = withDelay(
-            delay,
-            withRepeat(
-                withSequence(
-                    withTiming(1, { duration: 400 }),
-                    withTiming(1, { duration: 1200 }),
-                    withTiming(0, { duration: 400 })
-                ),
-                -1,
-                false
-            )
-        );
-    }, []);
-
-    const style = useAnimatedStyle(() => ({
-        transform: [{ translateY: translateY.value }],
-        opacity: opacity.value,
-        position: 'absolute',
-        left: x,
-        bottom: 0,
-    }));
-
-    return (
-        <Animated.View style={style}>
-            <Text style={{ fontSize: 20 }}>{emoji}</Text>
-        </Animated.View>
-    );
-};
+// No floating particles (per user request)
 
 export default function Flip() {
     const router = useRouter();
@@ -158,7 +117,6 @@ export default function Flip() {
     const cardWrapperStyle = useAnimatedStyle(() => ({
         transform: [
             { scale: scale.value },
-            { translateY: isFlipped ? 0 : cardFloat.value },
         ],
     }));
 
@@ -183,14 +141,6 @@ export default function Flip() {
         opacity: pulseOpacity.value,
     }));
 
-    const particles = [
-        { x: CARD_WIDTH * 0.1, emoji: '✨', delay: 0 },
-        { x: CARD_WIDTH * 0.25, emoji: '🪙', delay: 200 },
-        { x: CARD_WIDTH * 0.45, emoji: '⭐', delay: 400 },
-        { x: CARD_WIDTH * 0.65, emoji: '🎊', delay: 150 },
-        { x: CARD_WIDTH * 0.82, emoji: '✨', delay: 300 },
-    ];
-
     return (
         <Container safeArea={false}>
             {/* Background */}
@@ -205,7 +155,11 @@ export default function Flip() {
 
             {/* Header */}
             <View style={styles.header}>
-                <Pressable onPress={() => router.back()} style={styles.backButton}>
+                <Pressable
+                    onPress={() => router.back()}
+                    style={styles.backButton}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
                     <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
                 </Pressable>
                 <View style={styles.headerCenter}>
@@ -253,7 +207,11 @@ export default function Flip() {
 
                 {/* Ad Skip Option (Once per cycle) */}
                 {canUseAdSkip && (
-                    <Pressable onPress={() => triggerAd(handleAdSkip)} style={styles.skipAdBtn}>
+                    <Pressable
+                        onPress={() => triggerAd(handleAdSkip)}
+                        style={styles.skipAdBtn}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
                         <LinearGradient
                             colors={['#7C3AED', '#9333EA']}
                             start={{ x: 0, y: 0 }}
@@ -372,15 +330,6 @@ export default function Flip() {
                             </Animated.View>
                         </Pressable>
                     </Animated.View>
-
-                    {/* Particles after win */}
-                    {showParticles && (
-                        <View style={styles.particleContainer}>
-                            {particles.map((p, i) => (
-                                <Particle key={i} x={p.x} emoji={p.emoji} delay={p.delay} />
-                            ))}
-                        </View>
-                    )}
                 </View>
 
                 {/* Bottom info strip */}
