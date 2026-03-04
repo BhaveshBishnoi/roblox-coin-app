@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { AppState, AppStateStatus } from 'react-native';
+import { AppState } from 'react-native';
 import { AppOpenAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
 
 const adUnitId = __DEV__
@@ -13,7 +13,7 @@ const appOpenAd = AppOpenAd.createForAdRequest(adUnitId, {
 export function useAppOpenAd() {
     const [isLoaded, setIsLoaded] = useState(false);
     const isShowing = useRef(false);
-    const appState = useRef(AppState.currentState);
+    const hasShownOnLaunch = useRef(false); // ensures we only ever show once per cold start
 
     const loadAd = useCallback(() => {
         try {
@@ -24,12 +24,14 @@ export function useAppOpenAd() {
     }, []);
 
     const tryShowAd = useCallback(() => {
-        if (isLoaded && !isShowing.current) {
+        if (isLoaded && !isShowing.current && !hasShownOnLaunch.current) {
             try {
+                hasShownOnLaunch.current = true;
                 isShowing.current = true;
                 appOpenAd.show();
             } catch (e) {
                 isShowing.current = false;
+                hasShownOnLaunch.current = false;
                 console.warn('App Open Ad show error:', e);
             }
         }
@@ -47,7 +49,7 @@ export function useAppOpenAd() {
         const unsubClosed = appOpenAd.addAdEventListener(AdEventType.CLOSED, () => {
             isShowing.current = false;
             setIsLoaded(false);
-            loadAd(); // Reload for next resume
+            // Do NOT reload — we never want to show again this session
         });
 
         const unsubError = appOpenAd.addAdEventListener(AdEventType.ERROR, () => {
@@ -65,26 +67,14 @@ export function useAppOpenAd() {
         };
     }, [loadAd]);
 
-    // Show on first launch
+    // Show once when the ad first loads on launch (cold start only)
     useEffect(() => {
         if (isLoaded && AppState.currentState === 'active') {
             tryShowAd();
         }
-    }, [isLoaded]);
+    }, [isLoaded, tryShowAd]);
 
-    // Show each time the app comes back to foreground
-    useEffect(() => {
-        const handleAppStateChange = (nextState: AppStateStatus) => {
-            const prev = appState.current;
-            appState.current = nextState;
-            // Only trigger when coming from background/inactive → active
-            if ((prev === 'background' || prev === 'inactive') && nextState === 'active') {
-                tryShowAd();
-            }
-        };
-        const sub = AppState.addEventListener('change', handleAppStateChange);
-        return () => sub.remove();
-    }, [tryShowAd]);
+    // NOTE: No AppState change listener — we intentionally do NOT show on background→foreground
 
     return { isLoaded };
 }
