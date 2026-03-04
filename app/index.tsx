@@ -122,7 +122,7 @@ export default function Home() {
                                 onPress={() => navigate('/calculator')}
                                 variant="surface"
                                 style={styles.calcBtn}
-                                textStyle={{ fontSize: 13, color: '#fff', backgroundColor: '#079364ff' }}
+                                textStyle={{ fontSize: 13, color: '#fff' }}
                             />
                         </View>
                         <Animated.View style={[styles.heroCoinWrap, { transform: [{ scale: coinScale }] }]}>
