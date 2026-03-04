@@ -11,6 +11,7 @@ import { AppHeader } from '../components/AppHeader';
 import { useCoins } from '../context/CoinContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AdBanner } from '../components/AdBanner';
+import { useOpenGames } from '../hooks/useOpenGames';
 
 const ICONS = {
     daily: require('../assets/icons/calender.png'),
@@ -41,6 +42,7 @@ export default function Home() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
     const { balance } = useCoins();
+    const openGames = useOpenGames();
 
     const coinScale = useRef(new Animated.Value(1)).current;
     const heroFloat = useRef(new Animated.Value(0)).current;
@@ -78,7 +80,11 @@ export default function Home() {
         });
     }, []);
 
-    const navigate = (route: string) => router.push(route as any);
+    // Opens games URL in browser, then navigates to the feature route after closing
+    const navigate = async (route: string) => {
+        await openGames();
+        router.push(route as any);
+    };
 
     return (
         <Container safeArea={false}>
@@ -116,7 +122,7 @@ export default function Home() {
                                 onPress={() => navigate('/calculator')}
                                 variant="surface"
                                 style={styles.calcBtn}
-                                textStyle={{ fontSize: 13, color: '#0F172A' }}
+                                textStyle={{ fontSize: 13, color: '#fff', backgroundColor: '#079364ff' }}
                             />
                         </View>
                         <Animated.View style={[styles.heroCoinWrap, { transform: [{ scale: coinScale }] }]}>
@@ -231,8 +237,8 @@ const styles = StyleSheet.create({
     },
     calcBtn: {
         marginVertical: 0,
-        minHeight: 36,
-        paddingHorizontal: 10,
+        minHeight: 30,
+        paddingHorizontal: 8,
         alignSelf: 'flex-start',
     },
     heroCoinWrap: {

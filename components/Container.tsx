@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, StyleSheet, SafeAreaView, Platform, StatusBar as RNStatusBar } from 'react-native';
+import { View, StyleSheet, Platform, StatusBar as RNStatusBar } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export function Container({
     children,
@@ -11,23 +12,27 @@ export function Container({
     style?: any;
     safeArea?: boolean;
 }) {
+    const insets = useSafeAreaInsets();
+
+    const topPad = Platform.OS === 'android'
+        ? (RNStatusBar.currentHeight ?? 0)
+        : insets.top;
+
     return (
         <View style={styles.root}>
-            {/* Light status bar icons for dark backgrounds */}
             <StatusBar style="light" backgroundColor="transparent" translucent />
-
-            {safeArea ? (
-                <SafeAreaView
-                    style={[
-                        styles.safeArea,
-                        { paddingTop: Platform.OS === 'android' ? RNStatusBar.currentHeight : 0 },
-                    ]}
-                >
-                    <View style={[styles.inner, style]}>{children}</View>
-                </SafeAreaView>
-            ) : (
-                <View style={[styles.inner, style]}>{children}</View>
-            )}
+            <View
+                style={[
+                    styles.inner,
+                    safeArea && {
+                        paddingTop: topPad,
+                        paddingBottom: insets.bottom,
+                    },
+                    style,
+                ]}
+            >
+                {children}
+            </View>
         </View>
     );
 }
@@ -35,10 +40,7 @@ export function Container({
 const styles = StyleSheet.create({
     root: {
         flex: 1,
-        backgroundColor: '#0A0A1A', // dark fallback so no flash on load
-    },
-    safeArea: {
-        flex: 1,
+        backgroundColor: '#0A0A1A',
     },
     inner: {
         flex: 1,
