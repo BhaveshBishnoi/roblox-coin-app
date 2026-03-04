@@ -91,32 +91,10 @@ export default function Scratch() {
     const revealScale = useSharedValue(0);
 
     useEffect(() => {
-        cardFloat.value = withRepeat(
-            withSequence(
-                withTiming(-8, { duration: 2200, easing: Easing.inOut(Easing.ease) }),
-                withTiming(0, { duration: 2200, easing: Easing.inOut(Easing.ease) })
-            ),
-            -1,
-            false
-        );
-
-        glowScale.value = withRepeat(
-            withSequence(
-                withTiming(1.1, { duration: 1800, easing: Easing.inOut(Easing.ease) }),
-                withTiming(1, { duration: 1800, easing: Easing.inOut(Easing.ease) })
-            ),
-            -1,
-            false
-        );
-
-        pulseOpacity.value = withRepeat(
-            withSequence(
-                withTiming(0.8, { duration: 1500 }),
-                withTiming(0.3, { duration: 1500 })
-            ),
-            -1,
-            false
-        );
+        // Reset values on mount to ensure static layout
+        glowScale.value = 1;
+        pulseOpacity.value = 0;
+        cardFloat.value = 0;
     }, []);
 
     // Reset view state when cooldown completes or ad skip used
@@ -126,14 +104,7 @@ export default function Scratch() {
             setHasScratched(false);
             setShowParticles(false);
             revealScale.value = 0;
-            cardFloat.value = withRepeat(
-                withSequence(
-                    withTiming(-8, { duration: 2200, easing: Easing.inOut(Easing.ease) }),
-                    withTiming(0, { duration: 2200, easing: Easing.inOut(Easing.ease) })
-                ),
-                -1,
-                false
-            );
+            cardFloat.value = 0;
         }
     }, [isAvailable, hasScratched]);
 
