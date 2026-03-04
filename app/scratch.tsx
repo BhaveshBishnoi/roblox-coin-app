@@ -26,44 +26,7 @@ const CARD_HEIGHT = CARD_WIDTH * 1.2;
 
 
 
-// Floating particle
-const Particle = ({ delay, x, emoji }: { delay: number; x: number; emoji: string }) => {
-    const translateY = useSharedValue(0);
-    const opacity = useSharedValue(0);
-
-    useEffect(() => {
-        translateY.value = withDelay(
-            delay,
-            withRepeat(withTiming(-130, { duration: 2200, easing: Easing.out(Easing.ease) }), -1, false)
-        );
-        opacity.value = withDelay(
-            delay,
-            withRepeat(
-                withSequence(
-                    withTiming(1, { duration: 400 }),
-                    withTiming(1, { duration: 1400 }),
-                    withTiming(0, { duration: 400 })
-                ),
-                -1,
-                false
-            )
-        );
-    }, []);
-
-    const style = useAnimatedStyle(() => ({
-        transform: [{ translateY: translateY.value }],
-        opacity: opacity.value,
-        position: 'absolute',
-        left: x,
-        bottom: 0,
-    }));
-
-    return (
-        <Animated.View style={style}>
-            <Text style={{ fontSize: 22 }}>{emoji}</Text>
-        </Animated.View>
-    );
-};
+// No floating particles (per user request)
 
 export default function Scratch() {
     const router = useRouter();
@@ -154,7 +117,6 @@ export default function Scratch() {
     const cardWrapperStyle = useAnimatedStyle(() => ({
         transform: [
             { scale: scale.value },
-            { translateY: isScratched ? 0 : cardFloat.value },
         ],
     }));
 
@@ -167,14 +129,6 @@ export default function Scratch() {
         transform: [{ scale: revealScale.value }],
         opacity: revealScale.value,
     }));
-
-    const particles = [
-        { x: CARD_WIDTH * 0.08, emoji: '✨', delay: 0 },
-        { x: CARD_WIDTH * 0.22, emoji: '🪙', delay: 150 },
-        { x: CARD_WIDTH * 0.42, emoji: '⭐', delay: 300 },
-        { x: CARD_WIDTH * 0.62, emoji: '🎊', delay: 100 },
-        { x: CARD_WIDTH * 0.80, emoji: '✨', delay: 250 },
-    ];
 
     return (
         <Container safeArea={false}>
@@ -190,7 +144,11 @@ export default function Scratch() {
 
             {/* Header */}
             <View style={styles.header}>
-                <Pressable onPress={() => router.back()} style={styles.backButton}>
+                <Pressable
+                    onPress={() => router.back()}
+                    style={styles.backButton}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
                     <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
                 </Pressable>
                 <View style={styles.headerCenter}>
@@ -238,7 +196,11 @@ export default function Scratch() {
 
                 {/* Ad Skip Option (Once per cycle) */}
                 {canUseAdSkip && (
-                    <Pressable onPress={() => triggerAd(handleAdSkip)} style={styles.skipAdBtn}>
+                    <Pressable
+                        onPress={() => triggerAd(handleAdSkip)}
+                        style={styles.skipAdBtn}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
                         <LinearGradient
                             colors={['#7C3AED', '#9333EA']}
                             start={{ x: 0, y: 0 }}
@@ -352,15 +314,6 @@ export default function Scratch() {
                             )}
                         </Pressable>
                     </Animated.View>
-
-                    {/* Particles */}
-                    {showParticles && (
-                        <View style={styles.particleContainer}>
-                            {particles.map((p, i) => (
-                                <Particle key={i} x={p.x} emoji={p.emoji} delay={p.delay} />
-                            ))}
-                        </View>
-                    )}
                 </View>
 
                 {/* Info strip */}
