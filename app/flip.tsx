@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Pressable, Text, Alert, Dimensions, Image } from 'react-native';
 import Animated, {
     useSharedValue,
@@ -16,6 +16,8 @@ import { Container } from '../components/Container';
 import { Colors } from '../constants/Colors';
 import { useAdAction } from '../hooks/useAdAction';
 import { useCoins } from '../context/CoinContext';
+import { useGameCooldown } from '../hooks/useGameCooldown';
+import { generateCoinReward } from '../utils/rewards';
 import { Clock, Zap, Star, Trophy, ChevronLeft, Play } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -25,7 +27,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 64;
 const CARD_HEIGHT = CARD_WIDTH * 1.35;
 
-const generateCoinValue = () => Math.floor(Math.random() * 6) + 5; // 5–10 coins
+
 
 // Floating particle component
 const Particle = ({ delay, x, emoji }: { delay: number; x: number; emoji: string }) => {
@@ -71,15 +73,22 @@ const Particle = ({ delay, x, emoji }: { delay: number; x: number; emoji: string
 };
 
 export default function Flip() {
-    const { addCoins, checkCooldown, setCooldown, getRemainingTime } = useCoins();
     const router = useRouter();
-    const [available, setAvailable] = useState(false);
-    const [timeLeft, setTimeLeft] = useState<string | null>(null);
+    const { addCoins } = useCoins();
+
+    const {
+        isAvailable,
+        timeLeft,
+        adSkipUsed,
+        canUseAdSkip,
+        handleUseFeature,
+        handleAdSkip
+    } = useGameCooldown('flip', 1);
+
     const [coinValue, setCoinValue] = useState<number>(0);
     const [isFlipped, setIsFlipped] = useState(false);
     const [hasFlipped, setHasFlipped] = useState(false);
     const [showParticles, setShowParticles] = useState(false);
-    const [adSkipUsed, setAdSkipUsed] = useState(false);
 
     const flipRotation = useSharedValue(0);
     const scale = useSharedValue(1);
@@ -118,36 +127,22 @@ export default function Flip() {
         );
     }, []);
 
+    // Reset local view state when cooldown completes or ad skip used
     useEffect(() => {
-        const updateStatus = () => {
-            const isReady = checkCooldown('flip', 1);
-            setAvailable(isReady);
-
-            if (!isReady) {
-                setTimeLeft(getRemainingTime('flip', 1));
-            } else {
-                setTimeLeft(null);
-                setAdSkipUsed(false);
-                if (hasFlipped) {
-                    setIsFlipped(false);
-                    setHasFlipped(false);
-                    flipRotation.value = 0;
-                    setCoinValue(generateCoinValue());
-                    setShowParticles(false);
-                }
-            }
-        };
-
-        setCoinValue(generateCoinValue());
-        updateStatus();
-        const interval = setInterval(updateStatus, 1000);
-        return () => clearInterval(interval);
-    }, [hasFlipped, checkCooldown, getRemainingTime]);
+        if (isAvailable && hasFlipped) {
+            setIsFlipped(false);
+            setHasFlipped(false);
+            flipRotation.value = 0;
+            setShowParticles(false);
+        }
+    }, [isAvailable, hasFlipped]);
 
     const handleFlip = () => {
-        if (!available || isFlipped) return;
+        if (!isAvailable || isFlipped) return;
 
-        triggerAd(() => {
+        const executeFlip = async () => {
+            const generatedValue = generateCoinReward();
+            setCoinValue(generatedValue);
             setIsFlipped(true);
             setHasFlipped(true);
 
@@ -162,19 +157,24 @@ export default function Flip() {
                 easing: Easing.bezier(0.25, 0.1, 0.25, 1)
             });
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 setShowParticles(true);
-                addCoins(coinValue, 'Flip Card');
-                setCooldown('flip');
-                setAvailable(false);
+                addCoins(generatedValue, adSkipUsed ? 'Flip Card (Ad Skip)' : 'Flip Card');
+                await handleUseFeature();
 
                 Alert.alert(
                     "🎉 You Won!",
-                    `${coinValue} Coins added to your wallet!\nCome back in 1 hour for another flip.`,
+                    `${generatedValue} Coins added to your wallet!\nCome back in 1 hour for another flip.`,
                     [{ text: '🔥 Awesome!' }]
                 );
             }, FLIP_DURATION + 150);
-        });
+        };
+
+        if (adSkipUsed) {
+            triggerAd(executeFlip);
+        } else {
+            executeFlip();
+        }
     };
 
     const cardWrapperStyle = useAnimatedStyle(() => ({
@@ -235,7 +235,7 @@ export default function Flip() {
                 </View>
                 <View style={styles.coinBadge}>
                     <Star size={14} color="#F59E0B" fill="#F59E0B" />
-                    <Text style={styles.coinBadgeText}>5-10</Text>
+                    <Text style={styles.coinBadgeText}>Coins!</Text>
                 </View>
             </View>
 
@@ -254,48 +254,44 @@ export default function Flip() {
                 </View>
 
                 {/* Status */}
-                {available && !isFlipped ? (
+                {isAvailable && !isFlipped ? (
                     <View style={styles.statusReady}>
                         <View style={styles.statusDot} />
                         <Text style={styles.statusReadyText}>Ready to flip!</Text>
                     </View>
-                ) : !available ? (
+                ) : !isAvailable && timeLeft ? (
                     <View style={styles.cooldownColumn}>
                         <View style={styles.cooldownPill}>
                             <Clock size={15} color="#F87171" />
                             <Text style={styles.cooldownText}>Next flip in {timeLeft}</Text>
                         </View>
-                        {!adSkipUsed ? (
-                            <Pressable
-                                onPress={() => triggerAd(() => {
-                                    setAdSkipUsed(true);
-                                    setCoinValue(generateCoinValue());
-                                    setAvailable(true);
-                                })}
-                                style={styles.skipAdBtn}
-                            >
-                                <LinearGradient
-                                    colors={['#7C3AED', '#9333EA']}
-                                    start={{ x: 0, y: 0 }}
-                                    end={{ x: 1, y: 0 }}
-                                    style={styles.skipAdGradient}
-                                >
-                                    <Play size={14} color="#FFF" fill="#FFF" />
-                                    <Text style={styles.skipAdText}>Watch Ad to Skip Wait</Text>
-                                </LinearGradient>
-                            </Pressable>
-                        ) : (
+                        {adSkipUsed ? (
                             <View style={styles.skipUsedBadge}>
                                 <Text style={styles.skipUsedText}>✅ Ad skip used this cycle</Text>
                             </View>
-                        )}
+                        ) : null}
                     </View>
                 ) : null}
+
+                {/* Ad Skip Option (Once per cycle) */}
+                {canUseAdSkip && (
+                    <Pressable onPress={() => triggerAd(handleAdSkip)} style={styles.skipAdBtn}>
+                        <LinearGradient
+                            colors={['#7C3AED', '#9333EA']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={styles.skipAdGradient}
+                        >
+                            <Play size={16} color="#FFF" fill="#FFF" />
+                            <Text style={styles.skipAdText}>Watch Ad to Play Now</Text>
+                        </LinearGradient>
+                    </Pressable>
+                )}
 
                 {/* Card */}
                 <View style={styles.cardArea}>
                     {/* Glow behind card */}
-                    {available && !isFlipped && (
+                    {isAvailable && !isFlipped && (
                         <Animated.View style={[styles.cardGlow, glowStyle]} />
                     )}
                     {isFlipped && (
@@ -306,11 +302,11 @@ export default function Flip() {
                         <Pressable
                             onPress={handleFlip}
                             style={styles.cardPressable}
-                            disabled={!available || isFlipped}
+                            disabled={!isAvailable || isFlipped}
                         >
                             {/* Front */}
                             <Animated.View style={[styles.card, frontStyle]}>
-                                {!available ? (
+                                {!isAvailable ? (
                                     <LinearGradient
                                         colors={['#1C1C2E', '#16213E', '#0F3460']}
                                         start={{ x: 0, y: 0 }}
@@ -353,14 +349,14 @@ export default function Flip() {
                                                 <Text style={styles.questionMark}>?</Text>
                                             </View>
 
-                                            <View style={styles.tapHint}>
-                                                <Zap size={16} color="#FFF" fill="#FFF" />
-                                                <Text style={styles.tapText}>TAP TO REVEAL</Text>
+                                            <View style={styles.readyBadge}>
+                                                <Zap size={14} color="#10B981" fill="#10B981" />
+                                                <Text style={styles.readyBadgeText}>READY TO PLAY</Text>
                                             </View>
 
                                             <View style={styles.hintBadge}>
                                                 <Star size={13} color="#FDE68A" fill="#FDE68A" />
-                                                <Text style={styles.hintText}>Win up to 10 coins</Text>
+                                                <Text style={styles.hintText}>Flip & Win Coins!</Text>
                                             </View>
                                         </View>
                                     </LinearGradient>
@@ -418,7 +414,7 @@ export default function Flip() {
                     <View style={styles.infoDivider} />
                     <View style={styles.infoItem}>
                         <Text style={styles.infoEmoji}>🪙</Text>
-                        <Text style={styles.infoLabel}>5-10 Coins</Text>
+                        <Text style={styles.infoLabel}>Win Coins!</Text>
                     </View>
                     <View style={styles.infoDivider} />
                     <View style={styles.infoItem}>
@@ -624,7 +620,28 @@ const styles = StyleSheet.create({
         height: CARD_HEIGHT,
     },
     cardPressable: {
-        flex: 1,
+        width: CARD_WIDTH,
+        height: CARD_HEIGHT,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    readyBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(16,185,129,0.15)',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(16,185,129,0.3)',
+        marginTop: 20,
+    },
+    readyBadgeText: {
+        color: '#10B981',
+        fontWeight: '800',
+        fontSize: 13,
+        marginLeft: 6,
+        letterSpacing: 1,
     },
     card: {
         ...StyleSheet.absoluteFillObject,

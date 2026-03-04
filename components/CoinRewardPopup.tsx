@@ -232,8 +232,8 @@ export function CoinRewardPopup({ visible, amount, source, onClose }: CoinReward
                             </Animated.View>
 
                             {/* Amount */}
-                            <Text style={styles.title}>You Got</Text>
-                            <Text style={styles.amount}>+{amount}</Text>
+                            <Text style={styles.title}>🎉 You Won!</Text>
+                            <Text style={styles.amount}>{amount}</Text>
                             <Text style={styles.coinsLabel}>COINS</Text>
 
                             {/* Source */}

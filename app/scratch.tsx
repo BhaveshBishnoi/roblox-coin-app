@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, Alert, Dimensions } from 'react-native';
 import { useAdAction } from '../hooks/useAdAction';
 import Animated, {
@@ -14,6 +14,8 @@ import Animated, {
 import { Container } from '../components/Container';
 import { Colors } from '../constants/Colors';
 import { useCoins } from '../context/CoinContext';
+import { useGameCooldown } from '../hooks/useGameCooldown';
+import { generateCoinReward } from '../utils/rewards';
 import { Clock, Zap, Star, Trophy, ChevronLeft, Gift, Play } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -22,7 +24,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 64;
 const CARD_HEIGHT = CARD_WIDTH * 1.2;
 
-const generateCoinValue = () => Math.floor(Math.random() * 6) + 5; // 5–10 coins
+
 
 // Floating particle
 const Particle = ({ delay, x, emoji }: { delay: number; x: number; emoji: string }) => {
@@ -64,17 +66,23 @@ const Particle = ({ delay, x, emoji }: { delay: number; x: number; emoji: string
 };
 
 export default function Scratch() {
-    const { addCoins, checkCooldown, setCooldown, getRemainingTime } = useCoins();
     const router = useRouter();
+    const { addCoins } = useCoins();
     const triggerAd = useAdAction();
 
-    const [available, setAvailable] = useState(false);
-    const [timeLeft, setTimeLeft] = useState<string | null>(null);
+    const {
+        isAvailable,
+        timeLeft,
+        adSkipUsed,
+        canUseAdSkip,
+        handleUseFeature,
+        handleAdSkip
+    } = useGameCooldown('scratch', 6);
+
     const [coinValue, setCoinValue] = useState(0);
     const [isScratched, setIsScratched] = useState(false);
     const [hasScratched, setHasScratched] = useState(false);
     const [showParticles, setShowParticles] = useState(false);
-    const [adSkipUsed, setAdSkipUsed] = useState(false);
 
     const scale = useSharedValue(1);
     const cardFloat = useSharedValue(0);
@@ -111,43 +119,30 @@ export default function Scratch() {
         );
     }, []);
 
+    // Reset view state when cooldown completes or ad skip used
     useEffect(() => {
-        const updateStatus = () => {
-            const isReady = checkCooldown('scratch', 6); // 6 hour cooldown
-            setAvailable(isReady);
-
-            if (!isReady) {
-                setTimeLeft(getRemainingTime('scratch', 6));
-            } else {
-                setTimeLeft(null);
-                setAdSkipUsed(false);
-                if (hasScratched) {
-                    setIsScratched(false);
-                    setHasScratched(false);
-                    setShowParticles(false);
-                    revealScale.value = 0;
-                    cardFloat.value = withRepeat(
-                        withSequence(
-                            withTiming(-8, { duration: 2200, easing: Easing.inOut(Easing.ease) }),
-                            withTiming(0, { duration: 2200, easing: Easing.inOut(Easing.ease) })
-                        ),
-                        -1,
-                        false
-                    );
-                }
-            }
-        };
-
-        setCoinValue(generateCoinValue());
-        updateStatus();
-        const interval = setInterval(updateStatus, 1000);
-        return () => clearInterval(interval);
-    }, [hasScratched, checkCooldown, getRemainingTime]);
+        if (isAvailable && hasScratched) {
+            setIsScratched(false);
+            setHasScratched(false);
+            setShowParticles(false);
+            revealScale.value = 0;
+            cardFloat.value = withRepeat(
+                withSequence(
+                    withTiming(-8, { duration: 2200, easing: Easing.inOut(Easing.ease) }),
+                    withTiming(0, { duration: 2200, easing: Easing.inOut(Easing.ease) })
+                ),
+                -1,
+                false
+            );
+        }
+    }, [isAvailable, hasScratched]);
 
     const handleScratch = () => {
-        if (!available || isScratched) return;
+        if (!isAvailable || isScratched) return;
 
-        triggerAd(() => {
+        const executeScratch = async () => {
+            const generatedValue = generateCoinReward();
+            setCoinValue(generatedValue);
             setIsScratched(true);
             setHasScratched(true);
 
@@ -165,19 +160,24 @@ export default function Scratch() {
                 withSpring(1, { damping: 10, stiffness: 120 })
             );
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 setShowParticles(true);
-                addCoins(coinValue, 'Scratch Card');
-                setCooldown('scratch');
-                setAvailable(false);
+                addCoins(generatedValue, adSkipUsed ? 'Scratch Card (Ad Skip)' : 'Scratch Card');
+                await handleUseFeature();
 
                 Alert.alert(
                     '🎉 You Won!',
-                    `${coinValue} Coins added to your wallet!\nCome back in 6 hours for another scratch.`,
+                    `${generatedValue} Coins added to your wallet!\nCome back in 6 hours for another scratch.`,
                     [{ text: '🔥 Awesome!' }]
                 );
             }, 600);
-        });
+        };
+
+        if (adSkipUsed) {
+            triggerAd(executeScratch);
+        } else {
+            executeScratch();
+        }
     };
 
     const cardWrapperStyle = useAnimatedStyle(() => ({
@@ -227,7 +227,7 @@ export default function Scratch() {
                 </View>
                 <View style={styles.coinBadge}>
                     <Star size={14} color="#F59E0B" fill="#F59E0B" />
-                    <Text style={styles.coinBadgeText}>5-10</Text>
+                    <Text style={styles.coinBadgeText}>Coins!</Text>
                 </View>
             </View>
 
@@ -246,49 +246,44 @@ export default function Scratch() {
                 </View>
 
                 {/* Status */}
-                {available && !isScratched ? (
+                {isAvailable && !isScratched ? (
                     <View style={styles.statusReady}>
                         <View style={styles.statusDot} />
                         <Text style={styles.statusReadyText}>Ready to scratch!</Text>
                     </View>
-                ) : !available ? (
+                ) : !isAvailable && timeLeft ? (
                     <View style={styles.cooldownColumn}>
                         <View style={styles.cooldownPill}>
                             <Clock size={15} color="#F87171" />
-                            <Text style={styles.cooldownText}>Next scratch in {timeLeft}</Text>
+                            <Text style={styles.cooldownText}>Next card in {timeLeft}</Text>
                         </View>
-                        {!adSkipUsed ? (
-                            <Pressable
-                                onPress={() => triggerAd(() => {
-                                    setAdSkipUsed(true);
-                                    const cv = generateCoinValue();
-                                    setCoinValue(cv);
-                                    setAvailable(true);
-                                })}
-                                style={styles.skipAdBtn}
-                            >
-                                <LinearGradient
-                                    colors={['#7C3AED', '#9333EA']}
-                                    start={{ x: 0, y: 0 }}
-                                    end={{ x: 1, y: 0 }}
-                                    style={styles.skipAdGradient}
-                                >
-                                    <Play size={14} color="#FFF" fill="#FFF" />
-                                    <Text style={styles.skipAdText}>Watch Ad to Skip Wait</Text>
-                                </LinearGradient>
-                            </Pressable>
-                        ) : (
+                        {adSkipUsed ? (
                             <View style={styles.skipUsedBadge}>
                                 <Text style={styles.skipUsedText}>✅ Ad skip used this cycle</Text>
                             </View>
-                        )}
+                        ) : null}
                     </View>
                 ) : null}
+
+                {/* Ad Skip Option (Once per cycle) */}
+                {canUseAdSkip && (
+                    <Pressable onPress={() => triggerAd(handleAdSkip)} style={styles.skipAdBtn}>
+                        <LinearGradient
+                            colors={['#7C3AED', '#9333EA']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={styles.skipAdGradient}
+                        >
+                            <Play size={16} color="#FFF" fill="#FFF" />
+                            <Text style={styles.skipAdText}>Watch Ad to Play Now</Text>
+                        </LinearGradient>
+                    </Pressable>
+                )}
 
                 {/* Card */}
                 <View style={styles.cardArea}>
                     {/* Glow */}
-                    {available && !isScratched && (
+                    {isAvailable && !isScratched && (
                         <Animated.View style={[styles.cardGlow, glowStyle]} />
                     )}
                     {isScratched && (
@@ -299,11 +294,11 @@ export default function Scratch() {
                         <Pressable
                             onPress={handleScratch}
                             style={styles.cardPressable}
-                            disabled={!available || isScratched}
+                            disabled={!isAvailable || isScratched}
                         >
                             {!isScratched ? (
                                 /* Unscratched card */
-                                available ? (
+                                isAvailable ? (
                                     <LinearGradient
                                         colors={['#92400E', '#D97706', '#F59E0B', '#FCD34D']}
                                         start={{ x: 0, y: 0 }}
@@ -327,7 +322,7 @@ export default function Scratch() {
                                             </View>
                                             <View style={styles.hintBadge}>
                                                 <Star size={13} color="#92400E" fill="#92400E" />
-                                                <Text style={styles.hintText}>Win up to 10 coins</Text>
+                                                <Text style={styles.hintText}>Scratch & Win Coins!</Text>
                                             </View>
                                             <View style={styles.cardPattern}>
                                                 {[...Array(5)].map((_, i) => (
@@ -406,7 +401,7 @@ export default function Scratch() {
                     <View style={styles.infoDivider} />
                     <View style={styles.infoItem}>
                         <Text style={styles.infoEmoji}>🪙</Text>
-                        <Text style={styles.infoLabel}>5-10 Coins</Text>
+                        <Text style={styles.infoLabel}>Win Coins!</Text>
                     </View>
                     <View style={styles.infoDivider} />
                     <View style={styles.infoItem}>
