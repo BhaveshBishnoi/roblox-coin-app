@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, Dimensions, Alert, ScrollView, Pressable } from 'react-native';
 import { Container } from '../components/Container';
 import { SafeButton } from '../components/SafeButton';
@@ -12,7 +12,9 @@ import Animated, {
 import Svg, { Path, Text as SvgText, G, Circle } from 'react-native-svg';
 import { useCoins } from '../context/CoinContext';
 import { useAdAction } from '../hooks/useAdAction';
-import { Clock, ChevronLeft, Zap, Trophy, Play } from 'lucide-react-native';
+import { useGameCooldown } from '../hooks/useGameCooldown';
+import { generateCoinReward } from '../utils/rewards';
+import { Trophy, Gift, ChevronLeft, Play, Info } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 
@@ -35,37 +37,26 @@ const RADIUS = SIZE / 2;
 
 export default function Wheel() {
     const router = useRouter();
-    const { addCoins, checkCooldown, setCooldown, getRemainingTime } = useCoins();
+    const { addCoins } = useCoins();
     const triggerAd = useAdAction();
-    const rotation = useSharedValue(0);
-    const [spinning, setSpinning] = useState(false);
-    const [available, setAvailable] = useState(false);
-    const [timeLeft, setTimeLeft] = useState<string | null>(null);
-    const [adSkipUsed, setAdSkipUsed] = useState(false);
-    const isMounted = React.useRef(true);
 
-    useEffect(() => {
+    const {
+        isAvailable,
+        timeLeft,
+        adSkipUsed,
+        canUseAdSkip,
+        handleUseFeature,
+        handleAdSkip
+    } = useGameCooldown('wheel', 3);
+
+    const [isSpinning, setIsSpinning] = useState(false);
+    const rotation = useSharedValue(0);
+    const isMounted = useRef(true); // Keep for runOnJS safety
+
+    React.useEffect(() => {
         isMounted.current = true;
         return () => { isMounted.current = false; };
     }, []);
-
-    useEffect(() => {
-        const updateStatus = () => {
-            try {
-                const isReady = checkCooldown('wheel', 3);
-                if (isMounted.current) {
-                    setAvailable(isReady);
-                    setTimeLeft(isReady ? null : (getRemainingTime('wheel', 3) || '0h 0m'));
-                    if (isReady) setAdSkipUsed(false);
-                }
-            } catch (e) {
-                if (isMounted.current) setAvailable(false);
-            }
-        };
-        updateStatus();
-        const interval = setInterval(updateStatus, 1000);
-        return () => clearInterval(interval);
-    }, [checkCooldown, getRemainingTime]);
 
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [{ rotate: `${rotation.value}deg` }],
@@ -89,23 +80,33 @@ export default function Wheel() {
         return SEGMENTS[Math.floor(adjustedRotation / segmentAngle) % SEGMENTS.length];
     };
 
-    const handleResult = (finalRotation: number) => {
+    const handleResult = (finalRotation: number, wasAdSkip: boolean) => {
         if (!isMounted.current) return;
-        const seg = calculateWinningSegment(finalRotation);
-        setSpinning(false);
-        setCooldown('wheel');
-        setAvailable(false);
+        // const seg = calculateWinningSegment(finalRotation); // Not needed for reward calculation anymore
+        runOnJS(setIsSpinning)(false);
+        runOnJS(handleUseFeature)();
 
-        // All segments are now numeric 5–10
-        const amount = parseInt(seg, 10);
-        addCoins(amount, 'Wheel Spin');
-        Alert.alert('🎊 WINNER!', `Congratulations! You won ${amount} Coins!`);
+        // Now calculate reward and show the popup
+        const reward = generateCoinReward();
+        runOnJS(addCoins)(reward, wasAdSkip ? 'Lucky Wheel (Ad Skip)' : 'Lucky Wheel');
+        Alert.alert('🎊 WINNER!', `Congratulations! You won ${reward} Coins!`);
     };
 
-    const spin = () => {
-        if (!available || spinning) return;
+    const handleSpinClick = () => {
+        if (!isAvailable || isSpinning) return;
+
+        // If they are spinning using the ad skip unlock
+        if (adSkipUsed) {
+            triggerAd(() => spinWheel(true));
+        } else {
+            // Normal spin
+            spinWheel(false);
+        }
+    };
+
+    const spinWheel = (wasAdSkip: boolean) => {
+        setIsSpinning(true);
         try {
-            setSpinning(true);
             const fullSpins = 5 + Math.floor(Math.random() * 3);
             const randomAngle = Math.random() * 360;
             const finalRotation = fullSpins * 360 + randomAngle;
@@ -113,10 +114,10 @@ export default function Wheel() {
                 duration: 4000,
                 easing: Easing.out(Easing.cubic),
             }, (finished) => {
-                if (finished && isMounted.current) runOnJS(handleResult)(finalRotation);
+                if (finished && isMounted.current) runOnJS(handleResult)(finalRotation, wasAdSkip);
             });
         } catch (e) {
-            if (isMounted.current) setSpinning(false);
+            if (isMounted.current) setIsSpinning(false);
             Alert.alert('Error', 'Failed to spin. Please try again.');
         }
     };
@@ -151,7 +152,7 @@ export default function Wheel() {
                 bounces
             >
                 {/* Cooldown / Ready Banner */}
-                {!available && timeLeft ? (
+                {!isAvailable && timeLeft ? (
                     <View style={styles.cooldownBanner}>
                         <LinearGradient
                             colors={['rgba(239,68,68,0.15)', 'rgba(220,38,38,0.08)']}
@@ -159,37 +160,33 @@ export default function Wheel() {
                             end={{ x: 1, y: 0 }}
                             style={styles.cooldownBannerInner}
                         >
-                            <Clock size={18} color="#F87171" strokeWidth={2} />
+                            <Info size={18} color="#F87171" strokeWidth={2} />
                             <View style={styles.cooldownTexts}>
                                 <Text style={styles.cooldownLabel}>Next spin in</Text>
                                 <Text style={styles.cooldownTimer}>{timeLeft}</Text>
                             </View>
                         </LinearGradient>
-                        {!adSkipUsed ? (
-                            <Pressable
-                                onPress={() => triggerAd(() => {
-                                    setAdSkipUsed(true);
-                                    setAvailable(true);
-                                })}
-                                style={styles.skipAdBtn}
-                            >
+                        {/* Ad Skip Option */}
+                        {canUseAdSkip && (
+                            <Pressable onPress={() => triggerAd(handleAdSkip)} style={styles.skipAdBtn}>
                                 <LinearGradient
                                     colors={['#7C3AED', '#9333EA']}
                                     start={{ x: 0, y: 0 }}
                                     end={{ x: 1, y: 0 }}
                                     style={styles.skipAdGradient}
                                 >
-                                    <Play size={14} color="#FFF" fill="#FFF" />
-                                    <Text style={styles.skipAdText}>Watch Ad to Skip Wait</Text>
+                                    <Play size={16} color="#FFF" fill="#FFF" />
+                                    <Text style={styles.skipAdText}>Watch Ad to Spin Now</Text>
                                 </LinearGradient>
                             </Pressable>
-                        ) : (
+                        )}
+                        {adSkipUsed && (
                             <View style={styles.skipUsedBadge}>
                                 <Text style={styles.skipUsedText}>✅ Ad skip used this cycle</Text>
                             </View>
                         )}
                     </View>
-                ) : available ? (
+                ) : isAvailable ? (
                     <View style={styles.readyBanner}>
                         <LinearGradient
                             colors={['rgba(16,185,129,0.15)', 'rgba(5,150,105,0.08)']}
@@ -197,7 +194,7 @@ export default function Wheel() {
                             end={{ x: 1, y: 0 }}
                             style={styles.readyBannerInner}
                         >
-                            <Zap size={18} color="#10B981" strokeWidth={2.5} fill="#10B981" />
+                            <Gift size={18} color="#10B981" strokeWidth={2.5} fill="#10B981" />
                             <Text style={styles.readyText}>Your spin is ready — give it a whirl!</Text>
                         </LinearGradient>
                     </View>
@@ -208,8 +205,8 @@ export default function Wheel() {
                     {/* Outer glow ring */}
                     <View style={[
                         styles.wheelGlowRing,
-                        spinning && styles.wheelGlowRingActive,
-                        !available && styles.wheelGlowRingLocked,
+                        isSpinning && styles.wheelGlowRingActive,
+                        !isAvailable && styles.wheelGlowRingLocked,
                     ]} />
 
                     {/* Arrow pointer */}
@@ -223,7 +220,7 @@ export default function Wheel() {
                         style={[
                             styles.wheel,
                             animatedStyle,
-                            !available && { opacity: 0.55 },
+                            !isAvailable && { opacity: 0.55 },
                         ]}
                     >
                         <Svg height={SIZE} width={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
@@ -276,10 +273,10 @@ export default function Wheel() {
 
                 {/* Spin Button */}
                 <SafeButton
-                    title={spinning ? '🌀  SPINNING...' : available ? '🎯  SPIN THE WHEEL' : '🔒  LOCKED'}
-                    onPress={spin}
-                    disabled={spinning || !available}
-                    variant={available ? 'accent' : 'secondary'}
+                    title={isSpinning ? '🌀  SPINNING...' : isAvailable ? '🎯  SPIN THE WHEEL' : '🔒  LOCKED'}
+                    onPress={handleSpinClick}
+                    disabled={isSpinning || !isAvailable}
+                    variant={isAvailable ? 'accent' : 'secondary'}
                     style={styles.spinBtn}
                 />
 

@@ -1,59 +1,52 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { Container } from '../components/Container';
 import { SafeButton } from '../components/SafeButton';
 import { useAdAction } from '../hooks/useAdAction';
 import { useCoins } from '../context/CoinContext';
+import { useGameCooldown } from '../hooks/useGameCooldown';
+import { generateCoinReward } from '../utils/rewards';
 import { Gift, Clock, CheckCircle, ChevronLeft, Play } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 
-const randomCoins = () => Math.floor(Math.random() * 10) + 1; // 1–10
+
 
 export default function Daily() {
     const router = useRouter();
-    const { addCoins, checkCooldown, setCooldown, getRemainingTime } = useCoins();
+    const { addCoins } = useCoins();
     const triggerAd = useAdAction();
-    const [available, setAvailable] = useState(false);
-    const [timeLeft, setTimeLeft] = useState<string | null>(null);
-    const [adSkipUsed, setAdSkipUsed] = useState(false); // only once per cycle
 
-    useEffect(() => {
-        const updateStatus = () => {
-            const isReady = checkCooldown('daily', 24);
-            setAvailable(isReady);
-            if (!isReady) {
-                setTimeLeft(getRemainingTime('daily', 24));
-            }
-            // Reset skip availability when cooldown expires
-            if (isReady) setAdSkipUsed(false);
-        };
-
-        updateStatus();
-        const interval = setInterval(updateStatus, 1000);
-        return () => clearInterval(interval);
-    }, []);
+    const {
+        isAvailable,
+        timeLeft,
+        adSkipUsed,
+        canUseAdSkip,
+        handleUseFeature,
+        handleAdSkip
+    } = useGameCooldown('daily', 24);
 
     const handleClaim = () => {
-        if (!available) return;
-        triggerAd(() => {
-            const coins = randomCoins();
+        if (!isAvailable) return;
+
+        // If they are claiming using the ad skip unlock
+        if (adSkipUsed) {
+            triggerAd(async () => {
+                const coins = generateCoinReward();
+                addCoins(coins, 'Daily Reward (Ad Skip)');
+                await handleUseFeature();
+            });
+        } else {
+            // Normal claim
+            const coins = generateCoinReward();
             addCoins(coins, 'Daily Reward');
-            setCooldown('daily');
-            setAvailable(false);
-            setAdSkipUsed(false);
-        });
+            handleUseFeature();
+        }
     };
 
     const handleSkipWait = () => {
-        if (adSkipUsed || available) return;
-        triggerAd(() => {
-            setAdSkipUsed(true);
-            const coins = randomCoins();
-            addCoins(coins, 'Daily Reward (Ad Skip)');
-            setCooldown('daily');
-            setAvailable(false);
-        });
+        if (!canUseAdSkip) return;
+        triggerAd(handleAdSkip);
     };
 
     return (
@@ -84,7 +77,7 @@ export default function Daily() {
             >
                 {/* Icon Hero */}
                 <LinearGradient
-                    colors={available ? ['#064E3B', '#065F46', '#059669'] : ['#1C1C2E', '#1E293B', '#334155']}
+                    colors={isAvailable ? ['#064E3B', '#065F46', '#059669'] : ['#1C1C2E', '#1E293B', '#334155']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.iconCard}
@@ -94,15 +87,15 @@ export default function Daily() {
                         <Gift size={52} color="#FFF" strokeWidth={1.5} />
                     </View>
                     <Text style={styles.iconCardTitle}>
-                        {available ? 'Claim Your Daily' : 'Come Back Soon'}
+                        {isAvailable ? 'Claim Your Daily' : 'Come Back Soon'}
                     </Text>
                     <Text style={styles.iconCardSub}>
-                        {available ? 'Your reward is ready to claim' : 'Daily reward refreshes every 24 hours'}
+                        {isAvailable ? 'Your reward is ready to claim' : 'Daily reward refreshes every 24 hours'}
                     </Text>
                 </LinearGradient>
 
                 {/* Status Card */}
-                {available ? (
+                {isAvailable ? (
                     <View style={styles.statusCard}>
                         <View style={styles.statusTop}>
                             <LinearGradient
@@ -152,7 +145,7 @@ export default function Daily() {
                         </View>
 
                         {/* Ad Skip — only shown once per cycle */}
-                        {!adSkipUsed && (
+                        {canUseAdSkip && (
                             <Pressable onPress={handleSkipWait} style={styles.skipAdBtn}>
                                 <LinearGradient
                                     colors={['#7C3AED', '#9333EA']}
@@ -176,12 +169,12 @@ export default function Daily() {
 
                 {/* Claim Button */}
                 <SafeButton
-                    title={available ? 'CLAIM DAILY COINS' : 'CLAIMED'}
+                    title={isAvailable ? 'CLAIM DAILY COINS' : 'CLAIMED'}
                     onPress={handleClaim}
-                    variant={available ? 'primary' : 'secondary'}
-                    disabled={!available}
+                    variant={isAvailable ? 'primary' : 'secondary'}
+                    disabled={!isAvailable}
                     style={styles.claimBtn}
-                    icon={available ? <Gift color="#fff" size={20} strokeWidth={2.5} /> : undefined}
+                    icon={isAvailable ? <Gift color="#fff" size={20} strokeWidth={2.5} /> : undefined}
                 />
 
                 {/* Info Strip */}
@@ -202,7 +195,7 @@ export default function Daily() {
                     </View>
                 </View>
             </ScrollView>
-        </Container>
+        </Container >
     );
 }
 

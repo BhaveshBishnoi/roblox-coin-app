@@ -4,6 +4,8 @@ import { Container } from '../components/Container';
 import { SafeButton } from '../components/SafeButton';
 import { QUIZZES, Quiz } from '../constants/QuizData';
 import { useCoins } from '../context/CoinContext';
+import { useGameCooldown } from '../hooks/useGameCooldown';
+import { generateCoinReward } from '../utils/rewards';
 import { useAdAction } from '../hooks/useAdAction';
 import { CheckCircle, XCircle, Star, ChevronLeft, Clock, Zap, Play } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -11,7 +13,7 @@ import { useRouter } from 'expo-router';
 
 export default function QuizPage() {
     const router = useRouter();
-    const { addCoins, checkCooldown, setCooldown, getRemainingTime } = useCoins();
+    const { addCoins } = useCoins();
     const triggerAd = useAdAction();
     const [currentQuiz, setCurrentQuiz] = useState<Quiz | null>(null);
     const [current, setCurrent] = useState(0);
@@ -20,21 +22,15 @@ export default function QuizPage() {
     const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [showQuizSelection, setShowQuizSelection] = useState(true);
-    const [available, setAvailable] = useState(false);
-    const [timeLeft, setTimeLeft] = useState<string | null>(null);
-    const [adSkipUsed, setAdSkipUsed] = useState(false);
 
-    useEffect(() => {
-        const updateStatus = () => {
-            const isReady = checkCooldown('quiz', 2);
-            setAvailable(isReady);
-            if (!isReady) setTimeLeft(getRemainingTime('quiz', 2));
-            else setAdSkipUsed(false);
-        };
-        updateStatus();
-        const interval = setInterval(updateStatus, 1000);
-        return () => clearInterval(interval);
-    }, []);
+    const {
+        isAvailable,
+        timeLeft,
+        adSkipUsed,
+        canUseAdSkip,
+        handleUseFeature,
+        handleAdSkip
+    } = useGameCooldown('quiz', 2);
 
     const startQuiz = (quiz: Quiz) => {
         setCurrentQuiz(quiz);
@@ -63,14 +59,13 @@ export default function QuizPage() {
         }, 1500);
     };
 
-    const finishQuiz = (finalScore: number) => {
+    const finishQuiz = async (finalScore: number) => {
         setShowResult(true);
         if (finalScore > 0) {
             // Award 1–10 coins
-            const coins = Math.floor(Math.random() * 10) + 1;
-            addCoins(coins, 'Quiz Reward');
-            setCooldown('quiz');
-            setAvailable(false);
+            const coins = generateCoinReward();
+            addCoins(coins, adSkipUsed ? 'Quiz Reward (Ad Skip)' : 'Quiz Reward');
+            await handleUseFeature();
         }
     };
 
@@ -91,7 +86,7 @@ export default function QuizPage() {
     };
 
     /* ─── Locked Screen ─── */
-    if (!available && !showResult && showQuizSelection) {
+    if (!isAvailable && !showResult && showQuizSelection) {
         return (
             <Container safeArea={false}>
                 <LinearGradient colors={['#0A0A1A', '#0D0D24', '#0A0A1A']} style={StyleSheet.absoluteFillObject} />
@@ -127,15 +122,9 @@ export default function QuizPage() {
                         </View>
                     </View>
 
-                    {/* Ad Skip */}
-                    {!adSkipUsed ? (
-                        <Pressable
-                            onPress={() => triggerAd(() => {
-                                setAdSkipUsed(true);
-                                setAvailable(true);
-                            })}
-                            style={styles.skipAdBtn}
-                        >
+                    {/* Ad Skip Option */}
+                    {canUseAdSkip && (
+                        <Pressable onPress={() => triggerAd(handleAdSkip)} style={styles.skipAdBtn}>
                             <LinearGradient
                                 colors={['#7C3AED', '#9333EA']}
                                 start={{ x: 0, y: 0 }}
@@ -146,7 +135,8 @@ export default function QuizPage() {
                                 <Text style={styles.skipAdText}>Watch Ad to Skip Wait</Text>
                             </LinearGradient>
                         </Pressable>
-                    ) : (
+                    )}
+                    {adSkipUsed && (
                         <View style={styles.skipUsedBadge}>
                             <Text style={styles.skipUsedText}>✅ Ad skip used this cycle</Text>
                         </View>
