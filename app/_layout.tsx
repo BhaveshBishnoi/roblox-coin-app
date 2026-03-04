@@ -7,6 +7,7 @@ import { CoinRewardPopup } from '../components/CoinRewardPopup';
 import messaging from '@react-native-firebase/messaging';
 import { useEffect } from 'react';
 import { Alert, Platform, PermissionsAndroid } from 'react-native';
+import mobileAds from 'react-native-google-mobile-ads';
 import { useAppOpenAd } from '../hooks/useAppOpenAd';
 
 // Register background handler
@@ -20,6 +21,14 @@ function AppContent() {
 
     useEffect(() => {
         const setupFirebase = async () => {
+            // Initialize mobile ads
+            try {
+                await mobileAds().initialize();
+                console.log('Mobile Ads SDK initialized');
+            } catch (error) {
+                console.error('Mobile Ads initialization failed:', error);
+            }
+
             // Request permission
             if (Platform.OS === 'android' && Platform.Version >= 33) {
                 const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);

@@ -23,7 +23,9 @@ export function useRewardedAd() {
     }, [rewardedAd]);
 
     useEffect(() => {
+        console.log('Registering Rewarded Ad listeners...');
         const unsubscribeLoaded = rewardedAd.addAdEventListener(RewardedAdEventType.LOADED, () => {
+            console.log('Rewarded Ad loaded successfully');
             setIsLoaded(true);
         });
 
@@ -33,22 +35,30 @@ export function useRewardedAd() {
         });
 
         const unsubscribeClosed = rewardedAd.addAdEventListener(AdEventType.CLOSED, () => {
+            console.log('Rewarded Ad closed');
             isShowingRef.current = false;
             setIsLoaded(false);
             setIsClosed(true);   // signals useAdAction to fire callback
-            rewardedAd.load();   // preload next
+
+            // Wait a bit before reloading to ensure state is clear
+            setTimeout(() => {
+                console.log('Preloading next Rewarded Ad...');
+                rewardedAd.load();
+            }, 1000);
         });
 
         const unsubscribeError = rewardedAd.addAdEventListener(AdEventType.ERROR, (err) => {
-            console.error('Rewarded Ad failed to load', err);
+            console.error('Rewarded Ad failed to load/show', err);
             setError(err);
             setIsLoaded(false);
             isShowingRef.current = false;
         });
 
+        console.log('Initial Rewarded Ad load attempt');
         loadAd();
 
         return () => {
+            console.log('Cleaning up Rewarded Ad listeners');
             unsubscribeLoaded();
             unsubscribeEarned();
             unsubscribeClosed();
@@ -57,9 +67,10 @@ export function useRewardedAd() {
     }, [rewardedAd, loadAd]);
 
     const show = useCallback(() => {
+        console.log('Attempting to show Rewarded Ad. isLoaded:', isLoaded, 'isShowing:', isShowingRef.current);
         if (isLoaded && !isShowingRef.current) {
             try {
-                // CRITICAL: reset isClosed so useAdAction detects the new false→true transition
+                // CRITICAL: reset flags so useAdAction detects the new false→true transition
                 setIsClosed(false);
                 setIsEarned(false);
                 isShowingRef.current = true;
@@ -70,7 +81,7 @@ export function useRewardedAd() {
                 loadAd();
             }
         } else if (!isLoaded) {
-            console.warn('Rewarded ad not loaded yet, preloading...');
+            console.warn('Rewarded ad not loaded yet, forcing load...');
             loadAd();
         }
     }, [isLoaded, rewardedAd, loadAd]);
