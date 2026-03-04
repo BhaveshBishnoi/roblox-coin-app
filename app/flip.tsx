@@ -5,11 +5,11 @@ import Animated, {
     useAnimatedStyle,
     withTiming,
     withSpring,
+    withSequence,
+    withDelay,
+    withRepeat,
     interpolate,
     Easing,
-    withSequence,
-    withRepeat,
-    withDelay,
     runOnJS,
 } from 'react-native-reanimated';
 import { Container } from '../components/Container';
@@ -97,34 +97,12 @@ export default function Flip() {
     const cardFloat = useSharedValue(0);
     const triggerAd = useAdAction();
 
-    // Floating animation for idle card
+    // No floating idle animation for card (per user request)
     useEffect(() => {
-        cardFloat.value = withRepeat(
-            withSequence(
-                withTiming(-8, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-                withTiming(0, { duration: 2000, easing: Easing.inOut(Easing.ease) })
-            ),
-            -1,
-            false
-        );
-
-        pulseOpacity.value = withRepeat(
-            withSequence(
-                withTiming(0.8, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
-                withTiming(0.3, { duration: 1500, easing: Easing.inOut(Easing.ease) })
-            ),
-            -1,
-            false
-        );
-
-        glowScale.value = withRepeat(
-            withSequence(
-                withTiming(1.08, { duration: 1800, easing: Easing.inOut(Easing.ease) }),
-                withTiming(1, { duration: 1800, easing: Easing.inOut(Easing.ease) })
-            ),
-            -1,
-            false
-        );
+        // Reset values on mount to ensure static layout
+        glowScale.value = 1;
+        pulseOpacity.value = 0;
+        cardFloat.value = 0;
     }, []);
 
     // Reset local view state when cooldown completes or ad skip used
