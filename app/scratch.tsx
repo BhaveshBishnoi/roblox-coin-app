@@ -22,7 +22,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 64;
 const CARD_HEIGHT = CARD_WIDTH * 1.2;
 
-const generateCoinValue = () => Math.floor(Math.random() * 6) + 5; // 5–10 coins
+const generateCoinValue = () => Math.floor(Math.random() * 10) + 1; // 1–10 coins
 
 // Floating particle
 const Particle = ({ delay, x, emoji }: { delay: number; x: number; emoji: string }) => {
@@ -227,7 +227,7 @@ export default function Scratch() {
                 </View>
                 <View style={styles.coinBadge}>
                     <Star size={14} color="#F59E0B" fill="#F59E0B" />
-                    <Text style={styles.coinBadgeText}>5-10</Text>
+                    <Text style={styles.coinBadgeText}>Coins!</Text>
                 </View>
             </View>
 
@@ -327,7 +327,7 @@ export default function Scratch() {
                                             </View>
                                             <View style={styles.hintBadge}>
                                                 <Star size={13} color="#92400E" fill="#92400E" />
-                                                <Text style={styles.hintText}>Win up to 10 coins</Text>
+                                                <Text style={styles.hintText}>Scratch & Win Coins!</Text>
                                             </View>
                                             <View style={styles.cardPattern}>
                                                 {[...Array(5)].map((_, i) => (
@@ -406,7 +406,7 @@ export default function Scratch() {
                     <View style={styles.infoDivider} />
                     <View style={styles.infoItem}>
                         <Text style={styles.infoEmoji}>🪙</Text>
-                        <Text style={styles.infoLabel}>5-10 Coins</Text>
+                        <Text style={styles.infoLabel}>Win Coins!</Text>
                     </View>
                     <View style={styles.infoDivider} />
                     <View style={styles.infoItem}>

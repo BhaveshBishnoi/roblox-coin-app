@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { RewardedAd, RewardedAdEventType, TestIds, AdEventType } from 'react-native-google-mobile-ads';
 
 const adUnitId = __DEV__ ? TestIds.REWARDED : '/22846411849,23306138618/JBM_RBXRewards_Rewarded';
@@ -8,8 +8,8 @@ export function useRewardedAd() {
     const [isEarned, setIsEarned] = useState(false);
     const [isClosed, setIsClosed] = useState(false);
     const [error, setError] = useState<Error | null>(null);
+    const isShowingRef = useRef(false);
 
-    // Create a new instance for each use of the hook to avoid global state conflicts
     const rewardedAd = useMemo(() => {
         return RewardedAd.createForAdRequest(adUnitId, {
             requestNonPersonalizedAdsOnly: true,
@@ -17,8 +17,9 @@ export function useRewardedAd() {
     }, []);
 
     const loadAd = useCallback(() => {
-        // Only load if not already loaded (though createsForAdRequest makes a new one, so it starts unloaded)
-        rewardedAd.load();
+        if (!isShowingRef.current) {
+            try { rewardedAd.load(); } catch (_) { }
+        }
     }, [rewardedAd]);
 
     useEffect(() => {
@@ -27,23 +28,22 @@ export function useRewardedAd() {
         });
 
         const unsubscribeEarned = rewardedAd.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
-            console.log('User earned reward of ', reward);
+            console.log('User earned reward:', reward);
             setIsEarned(true);
         });
 
         const unsubscribeClosed = rewardedAd.addAdEventListener(AdEventType.CLOSED, () => {
-            setIsClosed(true);
+            isShowingRef.current = false;
             setIsLoaded(false);
-            // We don't auto-reload here because this instance is likely tied to the component's lifecycle
-            // If the user wants to show another ad, they might re-mount or we can expose a reload function
-            // But for now, let's auto-reload to keep the existing behavior if they keep the component open
-            rewardedAd.load();
+            setIsClosed(true);   // signals useAdAction to fire callback
+            rewardedAd.load();   // preload next
         });
 
-        const unsubscribeError = rewardedAd.addAdEventListener(AdEventType.ERROR, (error) => {
-            console.error('Rewarded Ad failed to load', error);
-            setError(error);
+        const unsubscribeError = rewardedAd.addAdEventListener(AdEventType.ERROR, (err) => {
+            console.error('Rewarded Ad failed to load', err);
+            setError(err);
             setIsLoaded(false);
+            isShowingRef.current = false;
         });
 
         loadAd();
@@ -57,21 +57,23 @@ export function useRewardedAd() {
     }, [rewardedAd, loadAd]);
 
     const show = useCallback(() => {
-        if (isLoaded) {
+        if (isLoaded && !isShowingRef.current) {
             try {
-                rewardedAd.show();
-                setIsEarned(false); // Reset for new showing
+                // CRITICAL: reset isClosed so useAdAction detects the new false→true transition
                 setIsClosed(false);
+                setIsEarned(false);
+                isShowingRef.current = true;
+                rewardedAd.show();
             } catch (e) {
-                console.error("Failed to show ad:", e);
-                // Fallback: try to load again if show failed
+                console.error('Failed to show ad:', e);
+                isShowingRef.current = false;
                 loadAd();
             }
-        } else {
-            console.warn('Ad not loaded yet');
-            loadAd(); // Try loading again if not loaded
+        } else if (!isLoaded) {
+            console.warn('Rewarded ad not loaded yet, preloading...');
+            loadAd();
         }
-    }, [isLoaded, loadAd, rewardedAd]);
+    }, [isLoaded, rewardedAd, loadAd]);
 
-    return { isLoaded, isEarned, isClosed, error, show };
+    return { isLoaded, isEarned, isClosed, error, show, loadAd };
 }

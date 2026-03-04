@@ -16,8 +16,8 @@ import { Clock, ChevronLeft, Zap, Trophy, Play } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 
-// All segments give 5–10 coins (no jackpot, no lose)
-const SEGMENTS = ['5', '7', '10', '6', '8', '10', '5', '9'];
+// Wheel segments — varied 1–10 coins each spin
+const SEGMENTS = ['3', '7', '10', '1', '8', '5', '2', '9'];
 const WHEEL_COLORS = [
     '#10B981', // 5  — green
     '#6366F1', // 7  — indigo
@@ -141,7 +141,7 @@ export default function Wheel() {
                 <Text style={styles.headerTitle}>Lucky Wheel</Text>
                 <View style={styles.headerBadge}>
                     <Trophy size={13} color="#F59E0B" strokeWidth={2.5} />
-                    <Text style={styles.headerBadgeText}>5-10</Text>
+                    <Text style={styles.headerBadgeText}>Coins!</Text>
                 </View>
             </View>
 
@@ -304,7 +304,7 @@ export default function Wheel() {
                 <View style={styles.infoCard}>
                     <Text style={styles.infoEmoji}>ℹ️</Text>
                     <Text style={styles.infoText}>
-                        Spin once every 3 hours. Every segment wins 5–10 coins guaranteed!
+                        Spin once every 3 hours. Every segment wins coins guaranteed!
                     </Text>
                 </View>
             </ScrollView>

@@ -8,7 +8,7 @@ import { Gift, Clock, CheckCircle, ChevronLeft, Play } from 'lucide-react-native
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 
-const randomCoins = () => Math.floor(Math.random() * 6) + 5; // 5–10
+const randomCoins = () => Math.floor(Math.random() * 10) + 1; // 1–10
 
 export default function Daily() {
     const router = useRouter();
@@ -73,7 +73,7 @@ export default function Daily() {
                 </Pressable>
                 <Text style={styles.headerTitle}>Daily Reward</Text>
                 <View style={styles.headerBadge}>
-                    <Text style={styles.headerBadgeText}>🎁 5-10</Text>
+                    <Text style={styles.headerBadgeText}>🎁 Coins</Text>
                 </View>
             </View>
 
@@ -125,8 +125,8 @@ export default function Daily() {
                             end={{ x: 1, y: 0 }}
                             style={styles.rewardBox}
                         >
-                            <Text style={styles.rewardRange}>5 – 10</Text>
-                            <Text style={styles.rewardLabel}>COINS</Text>
+                            <Text style={styles.rewardRange}>🎁</Text>
+                            <Text style={styles.rewardLabel}>READY!</Text>
                         </LinearGradient>
                     </View>
                 ) : (

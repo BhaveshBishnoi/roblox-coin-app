@@ -1,35 +1,35 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useRewardedAd } from './useRewardedAd';
 
-// Fallback or additional behavior if needed, but primarily we use the Rewarded Ad now
-
 export function useAdAction() {
-    const { isLoaded, isClosed, show, isEarned } = useRewardedAd();
-    const [pendingCallback, setPendingCallback] = useState<(() => void) | null>(null);
+    const { isLoaded, isClosed, isEarned, show, loadAd } = useRewardedAd();
 
-    // Watch for ad close to trigger the callback
+    // Use refs to avoid stale-closure issues
+    const pendingCallbackRef = useRef<(() => void) | null>(null);
+    const isActiveSessionRef = useRef(false); // true only between show() and close
+
+    // When ad closes during an active session → fire callback
     useEffect(() => {
-        if (isClosed && pendingCallback) {
-            // User closed the ad. We can check isEarned here if we want to enforce reward.
-            // For now, we execute the callback regardless of reward status (as is common for "interstitial-like" behavior)
-            // or we could validte isEarned.
-            pendingCallback();
-            setPendingCallback(null);
+        if (isClosed && isActiveSessionRef.current) {
+            isActiveSessionRef.current = false;
+            const cb = pendingCallbackRef.current;
+            pendingCallbackRef.current = null;
+            cb?.();
         }
-    }, [isClosed, pendingCallback]);
+    }, [isClosed]);
 
     const execute = useCallback((callback?: () => void) => {
         if (isLoaded) {
-            if (callback) setPendingCallback(() => callback);
+            pendingCallbackRef.current = callback ?? null;
+            isActiveSessionRef.current = true;
             show();
         } else {
-            console.log('Ad not loaded, executing action directly');
-            if (callback) {
-                callback();
-            }
+            // Ad not loaded — execute the callback directly and preload for next time
+            console.log('Ad not loaded, executing action directly and preloading');
+            loadAd();
+            callback?.();
         }
-    }, [isLoaded, show]);
+    }, [isLoaded, show, loadAd]);
 
     return execute;
 }
-

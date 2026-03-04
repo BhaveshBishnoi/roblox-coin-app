@@ -25,7 +25,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 64;
 const CARD_HEIGHT = CARD_WIDTH * 1.35;
 
-const generateCoinValue = () => Math.floor(Math.random() * 6) + 5; // 5–10 coins
+const generateCoinValue = () => Math.floor(Math.random() * 10) + 1; // 1–10 coins
 
 // Floating particle component
 const Particle = ({ delay, x, emoji }: { delay: number; x: number; emoji: string }) => {
@@ -235,7 +235,7 @@ export default function Flip() {
                 </View>
                 <View style={styles.coinBadge}>
                     <Star size={14} color="#F59E0B" fill="#F59E0B" />
-                    <Text style={styles.coinBadgeText}>5-10</Text>
+                    <Text style={styles.coinBadgeText}>Coins!</Text>
                 </View>
             </View>
 
@@ -360,7 +360,7 @@ export default function Flip() {
 
                                             <View style={styles.hintBadge}>
                                                 <Star size={13} color="#FDE68A" fill="#FDE68A" />
-                                                <Text style={styles.hintText}>Win up to 10 coins</Text>
+                                                <Text style={styles.hintText}>Flip & Win Coins!</Text>
                                             </View>
                                         </View>
                                     </LinearGradient>
@@ -418,7 +418,7 @@ export default function Flip() {
                     <View style={styles.infoDivider} />
                     <View style={styles.infoItem}>
                         <Text style={styles.infoEmoji}>🪙</Text>
-                        <Text style={styles.infoLabel}>5-10 Coins</Text>
+                        <Text style={styles.infoLabel}>Win Coins!</Text>
                     </View>
                     <View style={styles.infoDivider} />
                     <View style={styles.infoItem}>

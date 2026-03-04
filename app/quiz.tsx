@@ -66,8 +66,8 @@ export default function QuizPage() {
     const finishQuiz = (finalScore: number) => {
         setShowResult(true);
         if (finalScore > 0) {
-            // Always award 5–10 coins regardless of quiz reward value
-            const coins = Math.floor(Math.random() * 6) + 5;
+            // Award 1–10 coins
+            const coins = Math.floor(Math.random() * 10) + 1;
             addCoins(coins, 'Quiz Reward');
             setCooldown('quiz');
             setAvailable(false);
