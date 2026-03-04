@@ -240,6 +240,7 @@ const styles = StyleSheet.create({
         minHeight: 30,
         paddingHorizontal: 8,
         alignSelf: 'flex-start',
+        backgroundColor: '#079364ff',
     },
     heroCoinWrap: {
         justifyContent: 'center',
