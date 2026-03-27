@@ -10,6 +10,8 @@ import { Alert, Platform, PermissionsAndroid } from 'react-native';
 import mobileAds from 'react-native-google-mobile-ads';
 import { useAppOpenAd } from '../hooks/useAppOpenAd';
 
+import * as WebBrowser from 'expo-web-browser';
+
 // Register background handler
 messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log('Message handled in the background!', remoteMessage);
@@ -18,6 +20,22 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
 function AppContent() {
     useAppOpenAd();
     const { rewardPopup, hideRewardPopup } = useCoins();
+
+    const handleNotificationUrl = async (remoteMessage: any) => {
+        if (!remoteMessage) return;
+        
+        const url = remoteMessage.data?.url;
+        if (url) {
+            console.log('Opening notification URL:', url);
+            try {
+                await WebBrowser.openBrowserAsync(url, {
+                    presentationStyle: WebBrowser.WebBrowserPresentationStyle.FULL_SCREEN,
+                });
+            } catch (error) {
+                console.error('Failed to open notification URL:', error);
+            }
+        }
+    };
 
     useEffect(() => {
         const setupFirebase = async () => {
@@ -28,6 +46,15 @@ function AppContent() {
             } catch (error) {
                 console.error('Mobile Ads initialization failed:', error);
             }
+
+            // Check for initial notification (cold start)
+            const initialMessage = await messaging().getInitialNotification();
+            if (initialMessage) {
+                handleNotificationUrl(initialMessage);
+            }
+
+            // Listen for notification tap from background
+            const onOpenedAppUnsubscribe = messaging().onNotificationOpenedApp(handleNotificationUrl);
 
             // Request permission
             if (Platform.OS === 'android' && Platform.Version >= 33) {
@@ -60,10 +87,16 @@ function AppContent() {
                 console.log('Foreground Message:', remoteMessage);
             });
 
-            return unsubscribe;
+            return () => {
+                unsubscribe();
+                onOpenedAppUnsubscribe();
+            };
         };
 
-        setupFirebase();
+        const cleanupPromise = setupFirebase();
+        return () => {
+            cleanupPromise.then(cleanup => cleanup());
+        };
     }, []);
 
     return (
