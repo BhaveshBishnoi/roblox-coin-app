@@ -19,7 +19,7 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
 
 function AppContent() {
     useAppOpenAd();
-    const { rewardPopup, hideRewardPopup } = useCoins();
+    const { rewardPopup, hideRewardPopup, isStartupBrowserClosed } = useCoins();
 
     const handleNotificationUrl = async (remoteMessage: any) => {
         if (!remoteMessage) return;
@@ -37,9 +37,9 @@ function AppContent() {
         }
     };
 
+    // Immediate initialization (Ads, Listeners)
     useEffect(() => {
-        const setupFirebase = async () => {
-            // Initialize mobile ads
+        const initBase = async () => {
             try {
                 await mobileAds().initialize();
                 console.log('Mobile Ads SDK initialized');
@@ -47,16 +47,37 @@ function AppContent() {
                 console.error('Mobile Ads initialization failed:', error);
             }
 
-            // Check for initial notification (cold start)
             const initialMessage = await messaging().getInitialNotification();
             if (initialMessage) {
                 handleNotificationUrl(initialMessage);
             }
 
-            // Listen for notification tap from background
             const onOpenedAppUnsubscribe = messaging().onNotificationOpenedApp(handleNotificationUrl);
 
-            // Request permission
+            const unsubscribe = messaging().onMessage(async remoteMessage => {
+                Alert.alert('New Notification', remoteMessage.notification?.body || 'You have a new message!');
+                console.log('Foreground Message:', remoteMessage);
+            });
+
+            return () => {
+                unsubscribe();
+                onOpenedAppUnsubscribe();
+            };
+        };
+
+        const cleanupPromise = initBase();
+        return () => {
+            cleanupPromise.then(cleanup => cleanup && cleanup());
+        };
+    }, []);
+
+    // Delayed initialization (Permissions, Token) - Runs after browser closes
+    useEffect(() => {
+        if (!isStartupBrowserClosed) return;
+
+        const requestSetup = async () => {
+            console.log('Requesting notification permissions after browser closure...');
+            
             if (Platform.OS === 'android' && Platform.Version >= 33) {
                 const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
                 if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
@@ -73,31 +94,16 @@ function AppContent() {
                 }
             }
 
-            // Get FCM Token
             try {
                 const token = await messaging().getToken();
                 console.log('FCM Token:', token);
             } catch (error) {
                 console.log('Failed to get FCM token:', error);
             }
-
-            // Foreground message handler
-            const unsubscribe = messaging().onMessage(async remoteMessage => {
-                Alert.alert('New Notification', remoteMessage.notification?.body || 'You have a new message!');
-                console.log('Foreground Message:', remoteMessage);
-            });
-
-            return () => {
-                unsubscribe();
-                onOpenedAppUnsubscribe();
-            };
         };
 
-        const cleanupPromise = setupFirebase();
-        return () => {
-            cleanupPromise.then(cleanup => cleanup());
-        };
-    }, []);
+        requestSetup();
+    }, [isStartupBrowserClosed]);
 
     return (
         <>

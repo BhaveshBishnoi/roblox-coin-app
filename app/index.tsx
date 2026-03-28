@@ -41,7 +41,7 @@ const FEATURES = [
 export default function Home() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
-    const { balance } = useCoins();
+    const { balance, setStartupBrowserClosed } = useCoins();
     const openGames = useOpenGames();
 
     const coinScale = useRef(new Animated.Value(1)).current;
@@ -79,8 +79,12 @@ export default function Home() {
             ]).start();
         });
 
-        // Open games browser on fresh launch
-        openGames();
+        // Open games browser on fresh launch and then signal closure
+        const initBrowser = async () => {
+            await openGames();
+            setStartupBrowserClosed(true);
+        };
+        initBrowser();
     }, []);
 
     // Opens games URL in browser, then navigates to the feature route after closing
