@@ -17,6 +17,7 @@ import { generateCoinReward } from '../utils/rewards';
 import { Trophy, Gift, ChevronLeft, Play, Info } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { AdBanner } from '../components/AdBanner';
 
 // Wheel segments — varied 1–10 coins each spin
 const SEGMENTS = ['3', '7', '10', '1', '8', '5', '2', '9'];
@@ -145,6 +146,7 @@ export default function Wheel() {
                     <Text style={styles.headerBadgeText}>Coins!</Text>
                 </View>
             </View>
+            <AdBanner />
 
             <ScrollView
                 contentContainerStyle={styles.scroll}

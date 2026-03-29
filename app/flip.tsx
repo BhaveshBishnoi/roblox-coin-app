@@ -21,6 +21,7 @@ import { generateCoinReward } from '../utils/rewards';
 import { Clock, Zap, Star, Trophy, ChevronLeft, Play } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { AdBanner } from '../components/AdBanner';
 
 const FLIP_DURATION = 700;
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -170,6 +171,7 @@ export default function Flip() {
                     <Text style={styles.coinBadgeText}>Coins!</Text>
                 </View>
             </View>
+            <AdBanner />
 
             <View style={styles.content}>
                 {/* Prize text */}

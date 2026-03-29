@@ -10,6 +10,7 @@ import { useAdAction } from '../hooks/useAdAction';
 import { CheckCircle, XCircle, Star, ChevronLeft, Clock, Zap, Play } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { AdBanner } from '../components/AdBanner';
 
 export default function QuizPage() {
     const router = useRouter();
@@ -100,6 +101,7 @@ export default function QuizPage() {
                     <Text style={styles.headerTitle}>Roblox Quiz</Text>
                     <View style={{ width: 40 }} />
                 </View>
+                <AdBanner />
 
                 <View style={styles.lockedCenter}>
                     <LinearGradient
@@ -163,6 +165,7 @@ export default function QuizPage() {
                     <Text style={styles.headerTitle}>Results</Text>
                     <View style={{ width: 40 }} />
                 </View>
+                <AdBanner />
 
                 <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
                     {/* Result Hero */}
@@ -220,6 +223,7 @@ export default function QuizPage() {
                         <Text style={styles.headerBadgeText}>🧠 {QUIZZES.length}</Text>
                     </View>
                 </View>
+                <AdBanner />
 
                 <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
                     {/* Hero Strip */}

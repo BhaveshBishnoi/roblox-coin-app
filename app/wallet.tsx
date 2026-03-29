@@ -7,6 +7,7 @@ import { useCoins } from '../context/CoinContext';
 import { Wallet as WalletIcon, CheckCircle, Lock, TrendingUp, ChevronLeft, ArrowUpRight } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { AdBanner } from '../components/AdBanner';
 
 const GOAL = 10000;
 
@@ -44,6 +45,7 @@ export default function Wallet() {
                     <Text style={styles.headerBadgeText}>🪙 {balance.toLocaleString()}</Text>
                 </View>
             </View>
+            <AdBanner />
 
             <ScrollView
                 contentContainerStyle={styles.scroll}

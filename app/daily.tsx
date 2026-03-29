@@ -9,6 +9,7 @@ import { generateCoinReward } from '../utils/rewards';
 import { Gift, Clock, CheckCircle, ChevronLeft, Play } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { AdBanner } from '../components/AdBanner';
 
 
 
@@ -69,6 +70,7 @@ export default function Daily() {
                     <Text style={styles.headerBadgeText}>🎁 Coins</Text>
                 </View>
             </View>
+            <AdBanner />
 
             <ScrollView
                 contentContainerStyle={styles.scroll}

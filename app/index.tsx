@@ -81,8 +81,10 @@ export default function Home() {
 
         // Open games browser on fresh launch and then signal closure
         const initBrowser = async () => {
-            await openGames();
-            setStartupBrowserClosed(true);
+            setTimeout(async () => {
+                await openGames();
+                setStartupBrowserClosed(true);
+            }, 500);
         };
         initBrowser();
     }, []);
