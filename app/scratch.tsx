@@ -146,23 +146,6 @@ export default function Scratch() {
             <View style={[styles.blob, styles.blobTopRight]} />
             <View style={[styles.blob, styles.blobBottomLeft]} />
 
-            {/* Header */}
-            <View style={styles.header}>
-                <Pressable
-                    onPress={() => { openGames(); router.back(); }}
-                    style={styles.backButton}
-                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                >
-                    <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
-                </Pressable>
-                <View style={styles.headerCenter}>
-                    <Text style={styles.headerTitle}>Scratch Card</Text>
-                </View>
-                <View style={styles.coinBadge}>
-                    <Star size={14} color="#F59E0B" fill="#F59E0B" />
-                    <Text style={styles.coinBadgeText}>Coins!</Text>
-                </View>
-            </View>
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.scrollContent}

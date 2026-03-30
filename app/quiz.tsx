@@ -96,13 +96,6 @@ export default function QuizPage() {
                 <View style={[styles.blob, { top: -60, right: -60, backgroundColor: '#8B5CF6' }]} />
                 <View style={[styles.blob, { bottom: -60, left: -60, backgroundColor: '#10B981' }]} />
 
-                <View style={styles.header}>
-                    <Pressable onPress={() => { openGames(); router.back(); }} style={styles.backButton}>
-                        <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
-                    </Pressable>
-                    <Text style={styles.headerTitle}>Roblox Quiz</Text>
-                    <View style={{ width: 40 }} />
-                </View>
                 <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
                     <AdBanner />
                     <View style={styles.lockedCenter}>
@@ -158,19 +151,8 @@ export default function QuizPage() {
 
         return (
             <Container safeArea={false}>
-                <LinearGradient colors={['#0A0A1A', '#0D0D24', '#0A0A1A']} style={StyleSheet.absoluteFillObject} />
-                <View style={[styles.blob, { top: -60, right: -60, backgroundColor: '#8B5CF6' }]} />
-
-                <View style={styles.header}>
-                    <Pressable onPress={() => { openGames(); reset(); }} style={styles.backButton}>
-                        <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
-                    </Pressable>
-                    <Text style={styles.headerTitle}>Results</Text>
-                    <View style={{ width: 40 }} />
-                </View>
-                <AdBanner />
-
                 <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+                    <AdBanner />
                     {/* Result Hero */}
                     <LinearGradient
                         colors={score > 0 ? ['#064E3B', '#065F46', '#059669'] : ['#1C1C2E', '#16213E', '#1E293B']}
@@ -215,20 +197,8 @@ export default function QuizPage() {
             <Container safeArea={false}>
                 <LinearGradient colors={['#0A0A1A', '#0D0D24', '#0A0A1A']} style={StyleSheet.absoluteFillObject} />
                 <View style={[styles.blob, { top: -60, right: -60, backgroundColor: '#8B5CF6' }]} />
-                <View style={[styles.blob, { bottom: -60, left: -60, backgroundColor: '#10B981' }]} />
-
-                <View style={styles.header}>
-                    <Pressable onPress={() => { openGames(); router.back(); }} style={styles.backButton}>
-                        <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
-                    </Pressable>
-                    <Text style={styles.headerTitle}>Roblox Quiz</Text>
-                    <View style={styles.headerBadge}>
-                        <Text style={styles.headerBadgeText}>🧠 {QUIZZES.length}</Text>
-                    </View>
-                </View>
-                <AdBanner />
-
                 <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+                    <AdBanner />
                     {/* Hero Strip */}
                     <LinearGradient
                         colors={['#1E1B4B', '#312E81', '#4338CA']}
@@ -302,16 +272,6 @@ export default function QuizPage() {
             <LinearGradient colors={['#0A0A1A', '#0D0D24', '#0A0A1A']} style={StyleSheet.absoluteFillObject} />
             <View style={[styles.blob, { top: -60, right: -60, backgroundColor: '#8B5CF6' }]} />
 
-            <View style={styles.header}>
-                <Pressable onPress={() => { openGames(); reset(); }} style={styles.backButton}>
-                    <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
-                </Pressable>
-                <Text style={styles.headerTitle} numberOfLines={1}>{currentQuiz.title}</Text>
-                <View style={styles.scoreChip}>
-                    <Star size={13} color="#F59E0B" fill="#F59E0B" />
-                    <Text style={styles.scoreChipText}>{Math.round(score)}</Text>
-                </View>
-            </View>
 
             <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
                 <AdBanner />

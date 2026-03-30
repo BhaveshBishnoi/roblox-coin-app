@@ -37,16 +37,6 @@ export default function Wallet() {
             <View style={[styles.blob, styles.blobTR]} />
             <View style={[styles.blob, styles.blobBL]} />
 
-            {/* Header */}
-            <View style={styles.header}>
-                <Pressable onPress={() => { openGames(); router.back(); }} style={styles.backButton}>
-                    <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
-                </Pressable>
-                <Text style={styles.headerTitle}>My Wallet</Text>
-                <View style={styles.headerBadge}>
-                    <Text style={styles.headerBadgeText}>🪙 {balance.toLocaleString()}</Text>
-                </View>
-            </View>
             <ScrollView
                 contentContainerStyle={styles.scroll}
                 showsVerticalScrollIndicator={false}

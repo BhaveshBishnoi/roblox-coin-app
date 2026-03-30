@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Container } from './Container';
-import { ChevronLeft } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AdBanner } from './AdBanner';
 import { useOpenGames } from '../hooks/useOpenGames';
@@ -27,18 +26,8 @@ export function CalcShell({ title, accentColor, children }: CalcShellProps) {
                 colors={['#0A0A1A', '#0D0D24', '#0A0A1A']}
                 style={StyleSheet.absoluteFillObject}
             />
-            {/* Ambient blobs */}
             <View style={[styles.blob, { top: -70, right: -70, backgroundColor: accentColor }]} />
             <View style={[styles.blob, { bottom: -70, left: -70, backgroundColor: '#6366F1' }]} />
-
-            {/* Header */}
-            <View style={styles.header}>
-                <Pressable onPress={() => { openGames(); router.back(); }} style={styles.back}>
-                    <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
-                </Pressable>
-                <Text style={styles.headerTitle} numberOfLines={1}>{title}</Text>
-                <View style={{ width: 40 }} />
-            </View>
 
             <ScrollView
                 contentContainerStyle={styles.scroll}
@@ -47,7 +36,6 @@ export function CalcShell({ title, accentColor, children }: CalcShellProps) {
             >
                 <AdBanner />
                 {children}
-                <AdBanner />
             </ScrollView>
         </Container>
     );

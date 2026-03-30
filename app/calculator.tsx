@@ -102,17 +102,6 @@ export default function CalculatorHub() {
             <View style={[styles.blob, styles.blobTR]} />
             <View style={[styles.blob, styles.blobBL]} />
 
-            {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => { openGames(); router.back(); }} style={styles.backButton} activeOpacity={0.7}>
-                    <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Calculators</Text>
-                <View style={styles.headerBadge}>
-                    <Calculator size={14} color="#10B981" strokeWidth={2.5} />
-                    <Text style={styles.headerBadgeText}>{calculators.length}</Text>
-                </View>
-            </View>
 
             <ScrollView
                 contentContainerStyle={styles.scroll}
@@ -179,7 +168,6 @@ export default function CalculatorHub() {
                     </Text>
                 </View>
 
-                <AdBanner />
             </ScrollView>
         </Container>
     );
