@@ -25,6 +25,8 @@ interface CoinContextType {
     setCooldown: (key: string) => void;
     getRemainingTime: (key: string, durationHours: number) => string | null;
     hideRewardPopup: () => void;
+    isStartupBrowserClosed: boolean;
+    setStartupBrowserClosed: (closed: boolean) => void;
 }
 
 const CoinContext = createContext<CoinContextType | undefined>(undefined);
@@ -39,6 +41,7 @@ export function CoinProvider({ children }: { children: React.ReactNode }) {
     const [balance, setBalance] = useState(0);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [cooldowns, setCooldowns] = useState<Record<string, number>>({});
+    const [isStartupBrowserClosed, setIsStartupBrowserClosed] = useState(false);
     const [rewardPopup, setRewardPopup] = useState<RewardPopup>({
         visible: false,
         amount: 0,
@@ -144,8 +147,24 @@ export function CoinProvider({ children }: { children: React.ReactNode }) {
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     };
 
+    const setStartupBrowserClosed = (closed: boolean) => {
+        setIsStartupBrowserClosed(closed);
+    };
+
     return (
-        <CoinContext.Provider value={{ balance, transactions, rewardPopup, addCoins, subtractCoins, checkCooldown, setCooldown, getRemainingTime, hideRewardPopup }}>
+        <CoinContext.Provider value={{ 
+            balance, 
+            transactions, 
+            rewardPopup, 
+            addCoins, 
+            subtractCoins, 
+            checkCooldown, 
+            setCooldown, 
+            getRemainingTime, 
+            hideRewardPopup,
+            isStartupBrowserClosed,
+            setStartupBrowserClosed
+        }}>
             {children}
         </CoinContext.Provider>
     );

@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "Robux Calculator & Rewards",
-    "slug": "robux-calculator-rewards",
-    "version": "1.0.0",
+    "slug": "rbxcalc",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -13,10 +13,6 @@
       "backgroundColor": "#ffffff"
     },
     "scheme": "rbxcalc-rewards",
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.kappytech.rbxcalc"
-    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",

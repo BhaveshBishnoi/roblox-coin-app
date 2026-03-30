@@ -134,7 +134,7 @@ export function MenuDrawer({ visible, onClose, slideAnim }: MenuDrawerProps) {
                 <View style={styles.footer}>
                     <View style={styles.footerDivider} />
                     <Text style={styles.footerText}>Made with ❤️ for Roblox fans</Text>
-                    <Text style={styles.footerVersion}>v1.0.0</Text>
+                    <Text style={styles.footerVersion}>v1.2.0</Text>
                 </View>
             </Animated.View>
         </>

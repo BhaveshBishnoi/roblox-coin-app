@@ -94,7 +94,7 @@ export function CalculatorComponent({
                             value={inputValue}
                             onChangeText={handleChange}
                             placeholder="0"
-                            placeholderTextColor="rgba(255,255,255,0.2)"
+                            placeholderTextColor="rgba(255,255,255,0.15)"
                             keyboardType="decimal-pad"
                             onFocus={() => setFocused(true)}
                             onBlur={() => setFocused(false)}
@@ -126,20 +126,20 @@ export function CalculatorComponent({
                 <View style={styles.fieldWrap}>
                     <Text style={styles.fieldLabel}>{toLabel}</Text>
                     <LinearGradient
-                        colors={hasResult
-                            ? [`${gradient[0]}22`, `${gradient[1]}11`]
-                            : ['rgba(255,255,255,0.04)', 'rgba(255,255,255,0.02)']}
+                        colors={hasResult 
+                            ? ['rgba(16, 185, 129, 0.15)', 'rgba(5, 150, 105, 0.08)'] 
+                            : ['rgba(255, 255, 255, 0.04)', 'rgba(255, 255, 255, 0.02)']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
-                        style={[styles.resultRow, hasResult && { borderColor: `${gradient[0]}55` }]}
+                        style={[styles.resultRow, hasResult && { borderColor: 'rgba(16, 185, 129, 0.3)' }]}
                     >
                         {toSymbol ? (
-                            <Text style={[styles.symbolText, hasResult && { color: gradient[0] }]}>
+                            <Text style={[styles.symbolText, hasResult && { color: '#10B981' }]}>
                                 {toSymbol}
                             </Text>
                         ) : null}
                         <Text
-                            style={[styles.resultText, hasResult && { color: gradient[0] }]}
+                            style={[styles.resultText, hasResult && { color: '#10B981' }]}
                             numberOfLines={1}
                             adjustsFontSizeToFit
                         >
@@ -276,8 +276,8 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     inputRowFocused: {
-        borderColor: 'rgba(99,102,241,0.6)',
-        backgroundColor: 'rgba(99,102,241,0.07)',
+        borderColor: 'rgba(16, 185, 129, 0.5)',
+        backgroundColor: 'rgba(16, 185, 129, 0.08)',
     },
     symbolText: {
         fontSize: 22,

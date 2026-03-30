@@ -7,12 +7,14 @@ import { useAdAction } from '../hooks/useAdAction';
 import { Calculator, DollarSign, IndianRupee, Bitcoin, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AdBanner } from '../components/AdBanner';
+import { useOpenGames } from '../hooks/useOpenGames';
 
 const { width } = Dimensions.get('window');
 
 export default function CalculatorHub() {
     const router = useRouter();
     const triggerAd = useAdAction();
+    const openGames = useOpenGames();
 
     const handleNavigation = async (route: string) => {
         try {
@@ -102,7 +104,7 @@ export default function CalculatorHub() {
 
             {/* Header */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton} activeOpacity={0.7}>
+                <TouchableOpacity onPress={() => { openGames(); router.back(); }} style={styles.backButton} activeOpacity={0.7}>
                     <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Calculators</Text>
@@ -116,6 +118,7 @@ export default function CalculatorHub() {
                 contentContainerStyle={styles.scroll}
                 showsVerticalScrollIndicator={false}
             >
+                <AdBanner />
                 {/* Hero strip */}
                 <LinearGradient
                     colors={['#064E3B', '#065F46', '#059669']}
@@ -221,7 +224,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 20,
         fontWeight: '800',
-        color: '#FFF',
+        color: '#10B981', // Themed Title
         letterSpacing: -0.5,
     },
     headerBadge: {

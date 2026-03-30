@@ -19,6 +19,9 @@ import { generateCoinReward } from '../utils/rewards';
 import { Clock, Zap, Star, Trophy, ChevronLeft, Gift, Play } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { AdBanner } from '../components/AdBanner';
+import { ScrollView } from 'react-native';
+import { useOpenGames } from '../hooks/useOpenGames';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 64;
@@ -32,6 +35,7 @@ export default function Scratch() {
     const router = useRouter();
     const { addCoins } = useCoins();
     const triggerAd = useAdAction();
+    const openGames = useOpenGames();
 
     const {
         isAvailable,
@@ -145,7 +149,7 @@ export default function Scratch() {
             {/* Header */}
             <View style={styles.header}>
                 <Pressable
-                    onPress={() => router.back()}
+                    onPress={() => { openGames(); router.back(); }}
                     style={styles.backButton}
                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
@@ -159,8 +163,13 @@ export default function Scratch() {
                     <Text style={styles.coinBadgeText}>Coins!</Text>
                 </View>
             </View>
-
-            <View style={styles.content}>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.scrollContent}
+                bounces
+            >
+                <AdBanner />
+                <View style={styles.content}>
                 {/* Prize badge */}
                 <View style={styles.prizeRow}>
                     <LinearGradient
@@ -333,7 +342,8 @@ export default function Scratch() {
                         <Text style={styles.infoLabel}>Always Win</Text>
                     </View>
                 </View>
-            </View>
+                </View>
+            </ScrollView>
         </Container>
     );
 }
@@ -399,8 +409,12 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: '800',
     },
+    scrollContent: {
+        paddingBottom: 40,
+        alignItems: 'center',
+    },
     content: {
-        flex: 1,
+        width: '100%',
         paddingHorizontal: 20,
         paddingBottom: 24,
         alignItems: 'center',

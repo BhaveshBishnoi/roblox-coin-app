@@ -41,7 +41,7 @@ const FEATURES = [
 export default function Home() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
-    const { balance } = useCoins();
+    const { balance, setStartupBrowserClosed } = useCoins();
     const openGames = useOpenGames();
 
     const coinScale = useRef(new Animated.Value(1)).current;

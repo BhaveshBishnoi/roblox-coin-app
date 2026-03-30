@@ -17,6 +17,8 @@ import { generateCoinReward } from '../utils/rewards';
 import { Trophy, Gift, ChevronLeft, Play, Info } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { AdBanner } from '../components/AdBanner';
+import { useOpenGames } from '../hooks/useOpenGames';
 
 // Wheel segments — varied 1–10 coins each spin
 const SEGMENTS = ['3', '7', '10', '1', '8', '5', '2', '9'];
@@ -39,6 +41,7 @@ export default function Wheel() {
     const router = useRouter();
     const { addCoins } = useCoins();
     const triggerAd = useAdAction();
+    const openGames = useOpenGames();
 
     const {
         isAvailable,
@@ -136,7 +139,7 @@ export default function Wheel() {
 
             {/* Header */}
             <View style={styles.header}>
-                <Pressable onPress={() => router.back()} style={styles.backButton}>
+                <Pressable onPress={() => { openGames(); router.back(); }} style={styles.backButton}>
                     <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
                 </Pressable>
                 <Text style={styles.headerTitle}>Lucky Wheel</Text>
@@ -145,12 +148,12 @@ export default function Wheel() {
                     <Text style={styles.headerBadgeText}>Coins!</Text>
                 </View>
             </View>
-
             <ScrollView
                 contentContainerStyle={styles.scroll}
                 showsVerticalScrollIndicator={false}
                 bounces
             >
+                <AdBanner />
                 {/* Cooldown / Ready Banner */}
                 {!isAvailable && timeLeft ? (
                     <View style={styles.cooldownBanner}>

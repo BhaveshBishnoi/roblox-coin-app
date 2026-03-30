@@ -4,6 +4,8 @@ import { Container } from '../components/Container';
 import { Shield, Zap, ChevronLeft } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { AdBanner } from '../components/AdBanner';
+import { useOpenGames } from '../hooks/useOpenGames';
 
 const TIPS = [
     {
@@ -46,6 +48,7 @@ const TIPS = [
 
 export default function Tips() {
     const router = useRouter();
+    const openGames = useOpenGames();
 
     return (
         <Container safeArea={false}>
@@ -59,7 +62,7 @@ export default function Tips() {
 
             {/* Header */}
             <View style={styles.header}>
-                <Pressable onPress={() => router.push('/')} style={styles.backButton}>
+                <Pressable onPress={() => { openGames(); router.push('/'); }} style={styles.backButton}>
                     <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
                 </Pressable>
                 <Text style={styles.headerTitle}>Tips & Tricks</Text>
@@ -73,6 +76,7 @@ export default function Tips() {
                 showsVerticalScrollIndicator={false}
                 bounces
             >
+                <AdBanner />
                 {/* Hero strip */}
                 <LinearGradient
                     colors={['#1E1B4B', '#312E81', '#4338CA']}
