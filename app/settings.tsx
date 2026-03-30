@@ -15,7 +15,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.2.0';
 const TELEGRAM_URL = 'https://t.me/+YeKVAqx3DNhjZWY1';
 const PRIVACY_URL = 'https://rbx.dhakshsolutions.com/privacy-policy';
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.kappytech.rbxcalc';
@@ -92,14 +92,6 @@ export default function Settings() {
             <View style={[styles.blob, styles.blobTR]} />
             <View style={[styles.blob, styles.blobBL]} />
 
-            {/* Header */}
-            <View style={styles.header}>
-                <Pressable onPress={() => router.back()} style={styles.backButton}>
-                    <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
-                </Pressable>
-                <Text style={styles.headerTitle}>Settings</Text>
-                <View style={{ width: 40 }} />
-            </View>
 
             <ScrollView
                 contentContainerStyle={styles.scroll}
