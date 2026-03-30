@@ -4,6 +4,8 @@ import { useRouter } from 'expo-router';
 import { Container } from './Container';
 import { ChevronLeft } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { AdBanner } from './AdBanner';
+import { useOpenGames } from '../hooks/useOpenGames';
 
 interface CalcShellProps {
     title: string;
@@ -17,6 +19,7 @@ interface CalcShellProps {
  */
 export function CalcShell({ title, accentColor, children }: CalcShellProps) {
     const router = useRouter();
+    const openGames = useOpenGames();
 
     return (
         <Container safeArea={false}>
@@ -30,7 +33,7 @@ export function CalcShell({ title, accentColor, children }: CalcShellProps) {
 
             {/* Header */}
             <View style={styles.header}>
-                <Pressable onPress={() => router.back()} style={styles.back}>
+                <Pressable onPress={() => { openGames(); router.back(); }} style={styles.back}>
                     <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
                 </Pressable>
                 <Text style={styles.headerTitle} numberOfLines={1}>{title}</Text>
@@ -42,7 +45,9 @@ export function CalcShell({ title, accentColor, children }: CalcShellProps) {
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
             >
+                <AdBanner />
                 {children}
+                <AdBanner />
             </ScrollView>
         </Container>
     );
@@ -77,7 +82,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#FFF',
+        color: '#10B981', // Themed primary color (Green)
         letterSpacing: -0.4,
         flex: 1,
         textAlign: 'center',

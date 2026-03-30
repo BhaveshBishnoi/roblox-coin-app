@@ -5,12 +5,11 @@ import { Colors } from '../constants/Colors';
 import { CoinProvider, useCoins } from '../context/CoinContext';
 import { CoinRewardPopup } from '../components/CoinRewardPopup';
 import messaging from '@react-native-firebase/messaging';
-import { useEffect } from 'react';
-import { Alert, Platform, PermissionsAndroid } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { Alert, Platform, PermissionsAndroid, BackHandler, TouchableOpacity } from 'react-native';
 import mobileAds from 'react-native-google-mobile-ads';
 import { useAppOpenAd } from '../hooks/useAppOpenAd';
 import { useOpenGames } from '../hooks/useOpenGames';
-import { BackHandler, TouchableOpacity } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native';
 
 import * as WebBrowser from 'expo-web-browser';
@@ -24,7 +23,8 @@ function AppContent() {
     useAppOpenAd();
     const router = useRouter();
     const openGames = useOpenGames();
-    const { rewardPopup, hideRewardPopup, isStartupBrowserClosed } = useCoins();
+    const { rewardPopup, hideRewardPopup, isStartupBrowserClosed, setStartupBrowserClosed } = useCoins();
+    const isBrowserOpening = useRef(false);
 
     const handleNotificationUrl = async (remoteMessage: any) => {
         if (!remoteMessage) return;
@@ -42,37 +42,45 @@ function AppContent() {
         }
     };
 
-    // Immediate initialization (Ads, Listeners)
+    // Global initialization and Startup Browser Logic
     useEffect(() => {
-        const initBase = async () => {
+        const initApp = async () => {
             try {
+                // Initialize Ads
                 await mobileAds().initialize();
                 console.log('Mobile Ads SDK initialized');
+
+                // Initialize Messaging
+                const initialMessage = await messaging().getInitialNotification();
+                if (initialMessage) {
+                    handleNotificationUrl(initialMessage);
+                }
+
+                // Force open in-app browser on startup (every time app starts from cold)
+                if (!isBrowserOpening.current) {
+                    isBrowserOpening.current = true;
+                    // Small delay to ensure UI is ready
+                    setTimeout(async () => {
+                        await openGames();
+                        setStartupBrowserClosed(true);
+                        isBrowserOpening.current = false;
+                    }, 500);
+                }
             } catch (error) {
-                console.error('Mobile Ads initialization failed:', error);
+                console.error('App initialization failed:', error);
             }
-
-            const initialMessage = await messaging().getInitialNotification();
-            if (initialMessage) {
-                handleNotificationUrl(initialMessage);
-            }
-
-            const onOpenedAppUnsubscribe = messaging().onNotificationOpenedApp(handleNotificationUrl);
-
-            const unsubscribe = messaging().onMessage(async remoteMessage => {
-                Alert.alert('New Notification', remoteMessage.notification?.body || 'You have a new message!');
-                console.log('Foreground Message:', remoteMessage);
-            });
-
-            return () => {
-                unsubscribe();
-                onOpenedAppUnsubscribe();
-            };
         };
 
-        const cleanupPromise = initBase();
+        initApp();
+
+        const onOpenedAppUnsubscribe = messaging().onNotificationOpenedApp(handleNotificationUrl);
+        const unsubscribe = messaging().onMessage(async remoteMessage => {
+            Alert.alert('New Notification', remoteMessage.notification?.body || 'You have a new message!');
+        });
+
         return () => {
-            cleanupPromise.then(cleanup => cleanup && cleanup());
+            unsubscribe();
+            onOpenedAppUnsubscribe();
         };
     }, []);
 
@@ -147,11 +155,10 @@ function AppContent() {
                         canGoBack ? (
                             <TouchableOpacity 
                                 onPress={() => {
-                                    openGames().finally(() => {
-                                        if (router.canGoBack()) {
-                                            router.back();
-                                        }
-                                    });
+                                    openGames(); // Trigger browser on back
+                                    if (router.canGoBack()) {
+                                        router.back();
+                                    }
                                 }}
                                 style={{
                                     width: 40,

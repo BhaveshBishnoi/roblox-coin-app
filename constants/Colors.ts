@@ -1,9 +1,9 @@
 export const Colors = {
   // Backgrounds - Softer, more premium feel
-  background: '#FAFBFC', // Ultra-light gray-blue
-  backgroundHighlight: '#F5F7FA', // Subtle gradient
-  surface: '#FFFFFF', // Pure white cards
-  surfaceHighlight: '#F8F9FB', // Hover state
+  background: '#0A0A1A', // Rich Dark Blue/Black
+  backgroundHighlight: '#0D0D24', // Subtle highlights
+  surface: '#1A1A2E', // Dark cards
+  surfaceHighlight: '#16213E', // Card hover/focus
 
   // Primary colors - More vibrant and modern
   primary: '#10B981', // Emerald-500 (softer green)
@@ -19,13 +19,13 @@ export const Colors = {
 
 
   // Text - Better hierarchy
-  text: '#0F172A', // Slate-900 (deeper, richer black)
-  textSecondary: '#64748B', // Slate-500 (softer gray)
-  textTertiary: '#94A3B8', // Slate-400 (lighter gray)
+  text: '#FFFFFF', // Pure white text
+  textSecondary: '#94A3B8', // Slate-400 (softer gray)
+  textTertiary: '#64748B', // Slate-500 (lighter gray)
 
   // Borders & dividers
-  border: '#E2E8F0', // Slate-200
-  borderLight: '#F1F5F9', // Slate-100
+  border: 'rgba(255,255,255,0.08)', // Subtle borders
+  borderLight: 'rgba(255,255,255,0.04)', // Very subtle borders
 
   // Status colors
   success: '#10B981',

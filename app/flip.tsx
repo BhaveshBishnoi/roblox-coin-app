@@ -22,6 +22,8 @@ import { Clock, Zap, Star, Trophy, ChevronLeft, Play } from 'lucide-react-native
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { AdBanner } from '../components/AdBanner';
+import { ScrollView } from 'react-native';
+import { useOpenGames } from '../hooks/useOpenGames';
 
 const FLIP_DURATION = 700;
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -56,6 +58,7 @@ export default function Flip() {
     const pulseOpacity = useSharedValue(0.4);
     const cardFloat = useSharedValue(0);
     const triggerAd = useAdAction();
+    const openGames = useOpenGames();
 
     // No floating idle animation for card (per user request)
     useEffect(() => {
@@ -157,7 +160,7 @@ export default function Flip() {
             {/* Header */}
             <View style={styles.header}>
                 <Pressable
-                    onPress={() => router.back()}
+                    onPress={() => { openGames(); router.back(); }}
                     style={styles.backButton}
                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
@@ -171,9 +174,13 @@ export default function Flip() {
                     <Text style={styles.coinBadgeText}>Coins!</Text>
                 </View>
             </View>
-            <AdBanner />
-
-            <View style={styles.content}>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.scrollContent}
+                bounces
+            >
+                <AdBanner />
+                <View style={styles.content}>
                 {/* Prize text */}
                 <View style={styles.prizeRow}>
                     <LinearGradient
@@ -351,7 +358,8 @@ export default function Flip() {
                         <Text style={styles.infoLabel}>Guaranteed</Text>
                     </View>
                 </View>
-            </View>
+                </View>
+            </ScrollView>
         </Container>
     );
 }
@@ -417,8 +425,12 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: '800',
     },
+    scrollContent: {
+        paddingBottom: 40,
+        alignItems: 'center',
+    },
     content: {
-        flex: 1,
+        width: '100%',
         paddingHorizontal: 20,
         paddingBottom: 24,
         alignItems: 'center',

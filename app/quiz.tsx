@@ -11,11 +11,13 @@ import { CheckCircle, XCircle, Star, ChevronLeft, Clock, Zap, Play } from 'lucid
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { AdBanner } from '../components/AdBanner';
+import { useOpenGames } from '../hooks/useOpenGames';
 
 export default function QuizPage() {
     const router = useRouter();
     const { addCoins } = useCoins();
     const triggerAd = useAdAction();
+    const openGames = useOpenGames();
     const [currentQuiz, setCurrentQuiz] = useState<Quiz | null>(null);
     const [current, setCurrent] = useState(0);
     const [score, setScore] = useState(0);
@@ -95,15 +97,15 @@ export default function QuizPage() {
                 <View style={[styles.blob, { bottom: -60, left: -60, backgroundColor: '#10B981' }]} />
 
                 <View style={styles.header}>
-                    <Pressable onPress={() => router.back()} style={styles.backButton}>
+                    <Pressable onPress={() => { openGames(); router.back(); }} style={styles.backButton}>
                         <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
                     </Pressable>
                     <Text style={styles.headerTitle}>Roblox Quiz</Text>
                     <View style={{ width: 40 }} />
                 </View>
-                <AdBanner />
-
-                <View style={styles.lockedCenter}>
+                <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+                    <AdBanner />
+                    <View style={styles.lockedCenter}>
                     <LinearGradient
                         colors={['#4C1D95', '#5B21B6', '#7C3AED']}
                         start={{ x: 0, y: 0 }}
@@ -143,7 +145,8 @@ export default function QuizPage() {
                             <Text style={styles.skipUsedText}>✅ Ad skip used this cycle</Text>
                         </View>
                     )}
-                </View>
+                    </View>
+                </ScrollView>
             </Container>
         );
     }
@@ -159,7 +162,7 @@ export default function QuizPage() {
                 <View style={[styles.blob, { top: -60, right: -60, backgroundColor: '#8B5CF6' }]} />
 
                 <View style={styles.header}>
-                    <Pressable onPress={reset} style={styles.backButton}>
+                    <Pressable onPress={() => { openGames(); reset(); }} style={styles.backButton}>
                         <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
                     </Pressable>
                     <Text style={styles.headerTitle}>Results</Text>
@@ -215,7 +218,7 @@ export default function QuizPage() {
                 <View style={[styles.blob, { bottom: -60, left: -60, backgroundColor: '#10B981' }]} />
 
                 <View style={styles.header}>
-                    <Pressable onPress={() => router.back()} style={styles.backButton}>
+                    <Pressable onPress={() => { openGames(); router.back(); }} style={styles.backButton}>
                         <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
                     </Pressable>
                     <Text style={styles.headerTitle}>Roblox Quiz</Text>
@@ -300,7 +303,7 @@ export default function QuizPage() {
             <View style={[styles.blob, { top: -60, right: -60, backgroundColor: '#8B5CF6' }]} />
 
             <View style={styles.header}>
-                <Pressable onPress={reset} style={styles.backButton}>
+                <Pressable onPress={() => { openGames(); reset(); }} style={styles.backButton}>
                     <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
                 </Pressable>
                 <Text style={styles.headerTitle} numberOfLines={1}>{currentQuiz.title}</Text>
@@ -311,6 +314,7 @@ export default function QuizPage() {
             </View>
 
             <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+                <AdBanner />
                 {/* Progress */}
                 <View style={styles.progressWrap}>
                     <Text style={styles.progressLabel}>
@@ -434,10 +438,10 @@ const styles = StyleSheet.create({
 
     /* Locked */
     lockedCenter: {
-        flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: 24,
+        paddingTop: 40,
     },
     lockedIconCard: {
         width: 110,

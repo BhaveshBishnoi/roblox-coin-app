@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
         paddingBottom: 14,
         paddingHorizontal: 18,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255,255,255,0.07)',
+        borderBottomColor: 'rgba(16, 185, 129, 0.2)', // Themed border (Green)
     },
     headerBg: {
         display: 'none',
@@ -85,10 +85,10 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         flex: 1,
-        fontSize: 18,
-        fontWeight: '800',
-        color: '#FFF',
-        letterSpacing: -0.4,
+        fontSize: 20,
+        fontWeight: '900',
+        color: '#10B981', // Themed primary color (Green)
+        letterSpacing: -0.5,
     },
     coinBadge: {
         flexDirection: 'row',

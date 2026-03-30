@@ -8,12 +8,14 @@ import { Wallet as WalletIcon, CheckCircle, Lock, TrendingUp, ChevronLeft, Arrow
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { AdBanner } from '../components/AdBanner';
+import { useOpenGames } from '../hooks/useOpenGames';
 
 const GOAL = 10000;
 
 export default function Wallet() {
     const router = useRouter();
     const { balance, transactions } = useCoins();
+    const openGames = useOpenGames();
     const progress = Math.min((balance / GOAL) * 100, 100);
     const canRedeem = balance >= GOAL;
 
@@ -37,7 +39,7 @@ export default function Wallet() {
 
             {/* Header */}
             <View style={styles.header}>
-                <Pressable onPress={() => router.back()} style={styles.backButton}>
+                <Pressable onPress={() => { openGames(); router.back(); }} style={styles.backButton}>
                     <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
                 </Pressable>
                 <Text style={styles.headerTitle}>My Wallet</Text>
@@ -45,13 +47,12 @@ export default function Wallet() {
                     <Text style={styles.headerBadgeText}>🪙 {balance.toLocaleString()}</Text>
                 </View>
             </View>
-            <AdBanner />
-
             <ScrollView
                 contentContainerStyle={styles.scroll}
                 showsVerticalScrollIndicator={false}
                 bounces
             >
+                <AdBanner />
                 {/* Balance Card */}
                 <LinearGradient
                     colors={['#064E3B', '#065F46', '#059669']}

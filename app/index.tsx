@@ -78,15 +78,6 @@ export default function Home() {
                 Animated.timing(anim.opacity, { toValue: 1, duration: 300, delay: i * 60, useNativeDriver: true }),
             ]).start();
         });
-
-        // Open games browser on fresh launch and then signal closure
-        const initBrowser = async () => {
-            setTimeout(async () => {
-                await openGames();
-                setStartupBrowserClosed(true);
-            }, 500);
-        };
-        initBrowser();
     }, []);
 
     // Opens games URL in browser, then navigates to the feature route after closing

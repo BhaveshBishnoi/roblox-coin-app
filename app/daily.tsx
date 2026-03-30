@@ -10,6 +10,7 @@ import { Gift, Clock, CheckCircle, ChevronLeft, Play } from 'lucide-react-native
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { AdBanner } from '../components/AdBanner';
+import { useOpenGames } from '../hooks/useOpenGames';
 
 
 
@@ -17,6 +18,7 @@ export default function Daily() {
     const router = useRouter();
     const { addCoins } = useCoins();
     const triggerAd = useAdAction();
+    const openGames = useOpenGames();
 
     const {
         isAvailable,
@@ -62,7 +64,7 @@ export default function Daily() {
 
             {/* Header */}
             <View style={styles.header}>
-                <Pressable onPress={() => router.back()} style={styles.backButton}>
+                <Pressable onPress={() => { openGames(); router.back(); }} style={styles.backButton}>
                     <ChevronLeft size={22} color="#FFF" strokeWidth={2.5} />
                 </Pressable>
                 <Text style={styles.headerTitle}>Daily Reward</Text>
@@ -70,13 +72,12 @@ export default function Daily() {
                     <Text style={styles.headerBadgeText}>🎁 Coins</Text>
                 </View>
             </View>
-            <AdBanner />
-
             <ScrollView
                 contentContainerStyle={styles.scroll}
                 showsVerticalScrollIndicator={false}
                 bounces
             >
+                <AdBanner />
                 {/* Icon Hero */}
                 <LinearGradient
                     colors={isAvailable ? ['#064E3B', '#065F46', '#059669'] : ['#1C1C2E', '#1E293B', '#334155']}
